@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
-  /* ... STYLE LAR (OLDINGI KODDA QOLDI) ... */
+  /* STYLE LAR (OLDINGI KOD) */
   :root{
     --salad:#2F6FE4;
     --salad-dark:#1E54B7;
@@ -342,6 +342,18 @@ const ICONS = {
 function fmt(n) { return Math.round(n || 0).toLocaleString('ru-RU'); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 
+// ============ COMPUTE SALE FIGURES ============
+function computeSaleFigures(d) {
+  const product = state.products.find(p => p._id === d.productId);
+  const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
+  const tolangan = Number(d.tolangan || 0);
+  const qarz = Math.max(0, jami - tolangan);
+  const ortiqcha = Math.max(0, tolangan - jami);
+  const existingDebt = d.customerId ? getCustomerDebtLocal(d.customerId) : 0;
+  const debtAfter = Math.max(0, existingDebt - ortiqcha);
+  return { product, jami, tolangan, qarz, ortiqcha, existingDebt, debtAfter };
+}
+
 // ============ RENDER ============
 function render() {
   const app = document.getElementById('app');
@@ -587,7 +599,7 @@ function viewMahsulot() {
   const rows = state.products.map(p => {
     const soldQty = state.sales.filter(s => s.productId === p._id).reduce((a, s) => a + s.soni, 0);
     return `<tr>
-      <td><span class="artikul-badge">${p.artikul}</span></td>
+      <td><span class="artikul-badge">${p.artikul || 'ART-???'}</span></td>
       <td>${p.name}</td>
       <td>${fmt(p.narx)} so'm</td>
       <td>${soldQty} dona</td>
@@ -611,7 +623,7 @@ function viewMahsulot() {
   </div>`;
 }
 
-<!-- SOTUV QISMI -->
+// ============ SOTUV ============
 function viewSotuv() {
   const d = state.saleDraft;
   const f = computeSaleFigures(d);
@@ -620,8 +632,8 @@ function viewSotuv() {
   let searchResultsHtml = '';
   if (state.showSearchResults && state.searchResults.length > 0) {
     searchResultsHtml = state.searchResults.map(p => `
-      <div class="search-result" data-product-id="${p._id}" data-product-name="${p.name}" data-product-narx="${p.narx}" data-product-artikul="${p.artikul}">
-        <span class="artikul">${p.artikul || 'No ART'}</span> - ${p.name} <span style="color:var(--ink-soft);">${fmt(p.narx)} so'm</span>
+      <div class="search-result" data-product-id="${p._id}" data-product-name="${p.name}" data-product-narx="${p.narx}" data-product-artikul="${p.artikul || 'ART-???'}">
+        <span class="artikul">${p.artikul || 'ART-???'}</span> - ${p.name} <span style="color:var(--ink-soft);">${fmt(p.narx)} so'm</span>
       </div>
     `).join('');
   }
@@ -631,7 +643,7 @@ function viewSotuv() {
     const p = state.products.find(x => x._id === d.productId);
     if (p) {
       selectedProductHtml = `<div style="margin-top:8px;padding:10px 14px;background:var(--salad-light);border-radius:10px;">
-        <strong>Tanlangan:</strong> <span class="artikul-badge">${p.artikul || 'No ART'}</span> ${p.name} — ${fmt(p.narx)} so'm
+        <strong>Tanlangan:</strong> <span class="artikul-badge">${p.artikul || 'ART-???'}</span> ${p.name} — ${fmt(p.narx)} so'm
       </div>`;
     }
   }
@@ -803,40 +815,31 @@ function viewTarix() {
   let resultsHtml = '';
   
   if (f.customerId) {
-    // Sana formatini to'g'rilash
     let filterSana = f.sana;
     if (filterSana) {
-      // 04.06.2026 -> 2026-06-04 formatiga o'tkazish
       const parts = filterSana.split('.');
       if (parts.length === 3) {
         filterSana = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
       }
     }
     
-    // Sotuvlarni filtrlash
     let matches = state.sales.filter(s => s.customerId === f.customerId);
-    
-    // Sana bo'yicha filtr (agar sana kiritilgan bo'lsa)
     if (filterSana) {
       matches = matches.filter(s => s.sana === filterSana);
     }
     
-    // Tarix bo'yicha tartiblash (eng yangisi birinchi)
     matches.sort((a, b) => b.createdAt - a.createdAt);
     
     const totalJami = matches.reduce((a, s) => a + s.jami, 0);
     const totalTolangan = matches.reduce((a, s) => a + s.tolangan, 0);
     const totalQarz = matches.reduce((a, s) => a + s.qarz, 0);
     
-    // Qarz to'lovlarini olish
     const payments = state.payments.filter(p => p.customerId === f.customerId);
     const totalPayments = payments.reduce((a, p) => a + p.amount, 0);
     
     if (matches.length > 0 || payments.length > 0) {
-      // Sotuvlar jadvali
       let rows = matches.map(s => {
         const p = state.products.find(x => x._id === s.productId);
-        // Sana formatini o'zgartirish (2026-06-04 -> 04.06.2026)
         const dateParts = s.sana.split('-');
         const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : s.sana;
         
@@ -850,7 +853,6 @@ function viewTarix() {
         </tr>`;
       }).join('');
       
-      // Qarz to'lovlari jadvali
       let paymentRows = payments.map(p => {
         const dateParts = p.sana.split('-');
         const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : p.sana;
@@ -930,6 +932,7 @@ function viewTarix() {
     ${resultsHtml}
   </div>`;
 }
+
 // ============ FOYDALANUVCHILAR ============
 function viewFoydalanuvchilar() {
   const rows = state.users.map(u => `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Administrator' : 'Xodim'}</td><td>${u.login === 'baxrom' ? '' : `<button class="small-btn danger" data-del-user="${u.login}">O'chirish</button>`}</td></tr>`).join('');
@@ -1021,136 +1024,151 @@ function attachViewEvents() {
   });
 
   // ============ SALES EVENTS ============
-const saleForm = document.getElementById('saleForm');
-if (saleForm) {
-  const searchInput = document.getElementById('saleProductSearch');
-  const productHidden = document.getElementById('saleProduct');
+  const saleForm = document.getElementById('saleForm');
+  if (saleForm) {
+    const searchInput = document.getElementById('saleProductSearch');
+    const productHidden = document.getElementById('saleProduct');
 
-  if (searchInput) {
-    let searchTimeout;
-    searchInput.addEventListener('input', async function() {
-      const query = this.value.trim();
-      state.searchQuery = query;
-      
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(async () => {
-        if (query.length > 0) {
-          try {
-            const results = await searchProducts(query);
-            state.searchResults = results;
-            state.showSearchResults = results.length > 0;
+    if (searchInput) {
+      let searchTimeout;
+      searchInput.addEventListener('input', async function() {
+        const query = this.value.trim();
+        state.searchQuery = query;
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+          if (query.length > 0) {
+            try {
+              const results = await searchProducts(query);
+              state.searchResults = results;
+              state.showSearchResults = results.length > 0;
+              render();
+            } catch (error) {
+              console.error('Qidiruv xatosi:', error);
+            }
+          } else {
+            state.searchResults = [];
+            state.showSearchResults = false;
             render();
-          } catch (error) {
-            console.error('Qidiruv xatosi:', error);
           }
-        } else {
+        }, 300);
+      });
+
+      document.addEventListener('click', function(e) {
+        const result = e.target.closest('.search-result');
+        if (result) {
+          const productId = result.dataset.productId;
+          const productName = result.dataset.productName;
+          const productNarx = result.dataset.productNarx;
+          const productArtikul = result.dataset.productArtikul;
+          
+          productHidden.value = productId;
+          searchInput.value = `${productArtikul || 'ART-???'} - ${productName}`;
           state.searchResults = [];
           state.showSearchResults = false;
+          state.searchQuery = '';
+          state.saleDraft.productId = productId;
+          
           render();
+          
+          setTimeout(() => {
+            const event = new Event('input');
+            document.getElementById('saleSoni')?.dispatchEvent(event);
+          }, 100);
         }
-      }, 300);
+      });
+    }
+
+    const updateSaleComputed = () => {
+      state.saleDraft = {
+        sana: document.getElementById('saleSana').value,
+        customerId: document.getElementById('saleCustomer').value,
+        productId: document.getElementById('saleProduct').value,
+        soni: document.getElementById('saleSoni').value,
+        tolangan: document.getElementById('saleTolangan').value,
+      };
+      const f = computeSaleFigures(state.saleDraft);
+      document.getElementById('saleJamiVal').textContent = fmt(f.jami) + " so'm";
+      document.getElementById('salePerUnitVal').textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
+      const qarzEl = document.getElementById('saleQarzVal');
+      qarzEl.value = fmt(f.qarz) + " so'm";
+      qarzEl.style.background = f.qarz > 0 ? 'var(--amber-light)' : 'var(--salad-light)';
+      qarzEl.style.color = f.qarz > 0 ? 'var(--amber)' : 'var(--salad-dark)';
+    };
+
+    ['saleSana', 'saleCustomer', 'saleSoni', 'saleTolangan'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const evt = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
+      el.addEventListener(evt, updateSaleComputed);
     });
 
-    document.addEventListener('click', function(e) {
-      const result = e.target.closest('.search-result');
-      if (result) {
-        const productId = result.dataset.productId;
-        const productName = result.dataset.productName;
-        const productNarx = result.dataset.productNarx;
-        const productArtikul = result.dataset.productArtikul;
+    saleForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const d = state.saleDraft;
+      
+      console.log('📤 Sotuv yuborilmoqda:', d);
+      
+      if (!d.customerId || !d.productId || !d.soni || Number(d.soni) <= 0) {
+        alert("Iltimos mijoz, mahsulot va sonini to'g'ri kiriting.");
+        return;
+      }
+      
+      try {
+        const saleData = {
+          sana: d.sana || todayStr(),
+          customerId: d.customerId,
+          productId: d.productId,
+          soni: Number(d.soni),
+          tolangan: Number(d.tolangan || 0)
+        };
         
-        productHidden.value = productId;
-        searchInput.value = `${productArtikul || 'No ART'} - ${productName}`;
+        console.log('📤 API ga yuborilmoqda:', saleData);
+        
+        const result = await addSale(saleData);
+        console.log('✅ Sotuv saqlandi:', result);
+        
+        state.saleDraft = { sana: todayStr(), productId: '', customerId: '', soni: '', tolangan: '' };
+        state.searchQuery = '';
         state.searchResults = [];
         state.showSearchResults = false;
-        state.searchQuery = '';
-        state.saleDraft.productId = productId;
+        if (searchInput) searchInput.value = '';
+        if (productHidden) productHidden.value = '';
         
+        await loadData();
         render();
         
-        setTimeout(() => {
-          const event = new Event('input');
-          document.getElementById('saleSoni')?.dispatchEvent(event);
-        }, 100);
+        alert(`✅ Sotuv muvaffaqiyatli saqlandi!\nJami: ${fmt(result.jami)} so'm\nQarz: ${fmt(result.qarz)} so'm`);
+        
+      } catch (error) {
+        console.error('❌ Sotuv xatosi:', error);
+        alert('Xatolik: ' + error.message);
       }
     });
   }
-
-  const updateSaleComputed = () => {
-    state.saleDraft = {
-      sana: document.getElementById('saleSana').value,
-      customerId: document.getElementById('saleCustomer').value,
-      productId: document.getElementById('saleProduct').value,
-      soni: document.getElementById('saleSoni').value,
-      tolangan: document.getElementById('saleTolangan').value,
-    };
-    const f = computeSaleFigures(state.saleDraft);
-    document.getElementById('saleJamiVal').textContent = fmt(f.jami) + " so'm";
-    document.getElementById('salePerUnitVal').textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
-    const qarzEl = document.getElementById('saleQarzVal');
-    qarzEl.value = fmt(f.qarz) + " so'm";
-    qarzEl.style.background = f.qarz > 0 ? 'var(--amber-light)' : 'var(--salad-light)';
-    qarzEl.style.color = f.qarz > 0 ? 'var(--amber)' : 'var(--salad-dark)';
-  };
-
-  ['saleSana', 'saleCustomer', 'saleSoni', 'saleTolangan'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const evt = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
-    el.addEventListener(evt, updateSaleComputed);
-  });
-
-  saleForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const d = state.saleDraft;
-    
-    console.log('📤 Sotuv yuborilmoqda:', d);
-    
-    if (!d.customerId || !d.productId || !d.soni || Number(d.soni) <= 0) {
-      alert("Iltimos mijoz, mahsulot va sonini to'g'ri kiriting.");
-      return;
-    }
-    
-    try {
-      const saleData = {
-        sana: d.sana || todayStr(),
-        customerId: d.customerId,
-        productId: d.productId,
-        soni: Number(d.soni),
-        tolangan: Number(d.tolangan || 0)
-      };
-      
-      console.log('📤 API ga yuborilmoqda:', saleData);
-      
-      const result = await addSale(saleData);
-      console.log('✅ Sotuv saqlandi:', result);
-      
-      state.saleDraft = { sana: todayStr(), productId: '', customerId: '', soni: '', tolangan: '' };
-      state.searchQuery = '';
-      state.searchResults = [];
-      state.showSearchResults = false;
-      if (searchInput) searchInput.value = '';
-      if (productHidden) productHidden.value = '';
-      
-      await loadData();
-      render();
-      
-      alert(`✅ Sotuv muvaffaqiyatli saqlandi!\nJami: ${fmt(result.jami)} so'm\nQarz: ${fmt(result.qarz)} so'm`);
-      
-    } catch (error) {
-      console.error('❌ Sotuv xatosi:', error);
-      alert('Xatolik: ' + error.message);
-    }
-  });
-}
 
   // History
   const histSana = document.getElementById('histSana');
   const histCustomer = document.getElementById('histCustomer');
   const histBtn = document.getElementById('histShowBtn');
+  const histClearBtn = document.getElementById('histClearBtn');
+
   if (histBtn) {
     histBtn.addEventListener('click', () => {
-      state.historyFilter = { sana: histSana.value, customerId: histCustomer.value };
+      let sana = histSana.value;
+      state.historyFilter = { 
+        sana: sana, 
+        customerId: histCustomer.value 
+      };
+      render();
+    });
+  }
+
+  if (histClearBtn) {
+    histClearBtn.addEventListener('click', () => {
+      histSana.value = '';
+      histCustomer.value = '';
+      state.historyFilter = { sana: '', customerId: '' };
       render();
     });
   }
@@ -1196,7 +1214,6 @@ if (saleForm) {
     if (savedToken) {
       token = savedToken;
       try {
-        // Token ni tekshirish
         const user = await getCurrentUser();
         if (user) {
           state.currentUser = user;
@@ -1222,54 +1239,6 @@ if (saleForm) {
     render();
   }
 })();
-  // Mahsulot qo'shish funksiyasi
-async function addProduct(name, narx) {
-  try {
-    const response = await fetch('/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, narx })
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Xatolik yuz berdi');
-    }
-    
-    const data = await response.json();
-    console.log('✅ Mahsulot qo\'shildi:', data);
-    return data;
-  } catch (error) {
-    console.error('❌ Xatolik:', error);
-    throw error;
-  }
-}
-
-// Form submit
-document.getElementById('productForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const name = document.getElementById('prodName').value.trim();
-  const narx = Number(document.getElementById('prodNarx').value);
-  
-  if (!name || !narx) {
-    alert('Iltimos, nom va narxni kiriting');
-    return;
-  }
-  
-  try {
-    const result = await addProduct(name, narx);
-    alert(`✅ Mahsulot qo'shildi!\nArtikul: ${result.artikul}\nNomi: ${result.name}\nNarxi: ${result.narx} so'm`);
-    document.getElementById('prodName').value = '';
-    document.getElementById('prodNarx').value = '';
-    await loadData();
-    render();
-  } catch (error) {
-    alert(error.message);
-  }
-});
 </script>
 </body>
 </html>
