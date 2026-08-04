@@ -21,7 +21,6 @@
     --danger-light:#FDEDEA;
     --amber:#E9A23B;
     --amber-light:#FCF1DF;
-    --blue:#2F6FE4;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--white);color:var(--ink);font-family:'Inter',sans-serif;}
@@ -110,7 +109,6 @@
   .loading-spinner::after{content:'';display:inline-block;width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--salad);border-radius:50%;animation:spin 0.8s linear infinite;margin-left:10px;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* Artikul uchun */
   .artikul-badge{
     background:var(--salad-light);
     color:var(--salad-dark);
@@ -184,7 +182,7 @@ async function apiRequest(endpoint, options = {}) {
     return response.json();
   } catch (error) {
     if (error.message.includes('Failed to fetch')) {
-      throw new Error('Serverga ulanish mumkin emas. Iltimos, backend ishlayotganligini tekshiring.');
+      throw new Error('Serverga ulanish mumkin emas');
     }
     throw error;
   }
@@ -198,22 +196,15 @@ async function loginUser(login, password) {
   });
   token = data.token;
   localStorage.setItem('token', token);
-  const expires = new Date();
-  expires.setDate(expires.getDate() + 7);
-  localStorage.setItem('token_expires', expires.toISOString());
   return data.user;
 }
 
-function isTokenValid() {
-  const expires = localStorage.getItem('token_expires');
-  if (!expires) return false;
-  return new Date(expires) > new Date();
+async function getCurrentUser() {
+  return apiRequest('/auth/me');
 }
 
 // Users
-async function getUsers() {
-  return apiRequest('/users');
-}
+async function getUsers() { return apiRequest('/users'); }
 async function registerUser(login, password, role = 'user') {
   return apiRequest('/users/register', {
     method: 'POST',
@@ -221,15 +212,11 @@ async function registerUser(login, password, role = 'user') {
   });
 }
 async function deleteUser(login) {
-  return apiRequest(`/users/${login}`, {
-    method: 'DELETE'
-  });
+  return apiRequest(`/users/${login}`, { method: 'DELETE' });
 }
 
 // Customers
-async function getCustomers() {
-  return apiRequest('/customers');
-}
+async function getCustomers() { return apiRequest('/customers'); }
 async function addCustomer(name, phone) {
   return apiRequest('/customers', {
     method: 'POST',
@@ -237,15 +224,11 @@ async function addCustomer(name, phone) {
   });
 }
 async function deleteCustomer(id) {
-  return apiRequest(`/customers/${id}`, {
-    method: 'DELETE'
-  });
+  return apiRequest(`/customers/${id}`, { method: 'DELETE' });
 }
 
 // Products
-async function getProducts() {
-  return apiRequest('/products');
-}
+async function getProducts() { return apiRequest('/products'); }
 async function searchProducts(query) {
   if (!query || query.length < 1) return getProducts();
   return apiRequest(`/products/search/${encodeURIComponent(query)}`);
@@ -257,23 +240,16 @@ async function addProduct(name, narx) {
   });
 }
 async function deleteProduct(id) {
-  return apiRequest(`/products/${id}`, {
-    method: 'DELETE'
-  });
+  return apiRequest(`/products/${id}`, { method: 'DELETE' });
 }
 
 // Sales
-async function getSales() {
-  return apiRequest('/sales');
-}
+async function getSales() { return apiRequest('/sales'); }
 async function addSale(saleData) {
   return apiRequest('/sales', {
     method: 'POST',
     body: JSON.stringify(saleData)
   });
-}
-async function getCustomerDebt(customerId) {
-  return apiRequest(`/sales/debt/${customerId}`);
 }
 
 // Payments
@@ -460,7 +436,6 @@ function attachShellEvents() {
     state.currentUser = null;
     token = null;
     localStorage.removeItem('token');
-    localStorage.removeItem('token_expires');
     state.loaded = false;
     render();
   });
@@ -624,7 +599,6 @@ function viewSotuv() {
     `).join('');
   }
 
-  // Tanlangan mahsulotni ko'rsatish
   let selectedProductHtml = '';
   if (d.productId) {
     const p = state.products.find(x => x._id === d.productId);
@@ -649,6 +623,7 @@ function viewSotuv() {
             <input type="text" id="saleProductSearch" placeholder="ART123456 yoki nom..." value="${state.searchQuery}" autocomplete="off">
             <div class="search-results-dropdown ${state.showSearchResults && state.searchResults.length > 0 ? 'show' : ''}">
               ${searchResultsHtml}
+              ${state.showSearchResults && state.searchResults.length === 0 ? '<div class="search-result" style="color:var(--ink-soft);cursor:default;">Hech narsa topilmadi</div>' : ''}
             </div>
           </div>
           <input type="hidden" id="saleProduct" value="${d.productId}">
@@ -1048,30 +1023,25 @@ function attachViewEvents() {
 // ============ INIT ============
 (async function init() {
   const savedToken = localStorage.getItem('token');
-  if (savedToken && isTokenValid()) {
+  
+  if (savedToken) {
     token = savedToken;
     try {
+      // Token ni tekshirish
+      const user = await getCurrentUser();
+      state.currentUser = user;
       await loadData();
-      try {
-        const user = await apiRequest('/auth/me');
-        state.currentUser = user;
-      } catch (e) {
-        token = null;
-        localStorage.removeItem('token');
-        localStorage.removeItem('token_expires');
-      }
       state.loaded = true;
       render();
       return;
     } catch (error) {
+      console.log('Token eskirgan yoki yaroqsiz:', error.message);
       token = null;
       localStorage.removeItem('token');
-      localStorage.removeItem('token_expires');
+      state.currentUser = null;
     }
-  } else {
-    localStorage.removeItem('token');
-    localStorage.removeItem('token_expires');
   }
+  
   state.loaded = true;
   render();
 })();
