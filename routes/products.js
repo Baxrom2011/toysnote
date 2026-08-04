@@ -40,20 +40,30 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
     }
 
+    // Yangi Product yaratish (artikul avtomatik yaratiladi)
     const product = new Product({ 
       name: name.trim(), 
       narx: Number(narx)
     });
     
+    console.log('Yangi mahsulot yaratilmoqda:', { name, narx });
+    
     await product.save();
+    
+    console.log('Mahsulot saqlandi:', product);
     
     res.status(201).json(product);
   } catch (error) {
-    console.error('Create product error:', error);
+    console.error('Create product error - FULL:', error);
+    console.error('Error details:', error.errors);
+    
     if (error.code === 11000) {
       res.status(400).json({ error: 'Bu artikul allaqachon mavjud' });
     } else {
-      res.status(500).json({ error: 'Server xatosi: ' + error.message });
+      res.status(500).json({ 
+        error: 'Server xatosi: ' + error.message,
+        details: error.errors || {}
+      });
     }
   }
 });
