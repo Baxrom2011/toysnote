@@ -1091,6 +1091,54 @@ function attachViewEvents() {
     render();
   }
 })();
+  // Mahsulot qo'shish funksiyasi
+async function addProduct(name, narx) {
+  try {
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, narx })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Xatolik yuz berdi');
+    }
+    
+    const data = await response.json();
+    console.log('✅ Mahsulot qo\'shildi:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Xatolik:', error);
+    throw error;
+  }
+}
+
+// Form submit
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('prodName').value.trim();
+  const narx = Number(document.getElementById('prodNarx').value);
+  
+  if (!name || !narx) {
+    alert('Iltimos, nom va narxni kiriting');
+    return;
+  }
+  
+  try {
+    const result = await addProduct(name, narx);
+    alert(`✅ Mahsulot qo'shildi!\nArtikul: ${result.artikul}\nNomi: ${result.name}\nNarxi: ${result.narx} so'm`);
+    document.getElementById('prodName').value = '';
+    document.getElementById('prodNarx').value = '';
+    await loadData();
+    render();
+  } catch (error) {
+    alert(error.message);
+  }
+});
 </script>
 </body>
 </html>
