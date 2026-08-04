@@ -9,7 +9,8 @@ router.get('/', auth, async (req, res) => {
     const products = await Product.find().sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: 'Server xatosi' });
+    console.error('Products error:', error);
+    res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 });
 
@@ -25,7 +26,8 @@ router.get('/search/:query', auth, async (req, res) => {
     });
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error: 'Server xatosi' });
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 });
 
@@ -34,16 +36,20 @@ router.post('/', auth, async (req, res) => {
   try {
     const { name, narx } = req.body;
     
-    // Artikul avtomatik yaratiladi (model pre-save da)
+    if (!name || !narx) {
+      return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
+    }
+    
     const product = new Product({ name, narx });
     await product.save();
     
     res.status(201).json(product);
   } catch (error) {
+    console.error('Create product error:', error);
     if (error.code === 11000) {
       res.status(400).json({ error: 'Bu artikul allaqachon mavjud' });
     } else {
-      res.status(500).json({ error: 'Server xatosi' });
+      res.status(500).json({ error: 'Server xatosi: ' + error.message });
     }
   }
 });
@@ -54,7 +60,8 @@ router.delete('/:id', auth, async (req, res) => {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ message: 'Mahsulot o\'chirildi' });
   } catch (error) {
-    res.status(500).json({ error: 'Server xatosi' });
+    console.error('Delete product error:', error);
+    res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 });
 
