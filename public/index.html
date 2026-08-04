@@ -232,6 +232,12 @@ async function apiRequest(endpoint, options = {}) {
       headers
     });
 
+    // Agar javob HTML bo'lsa, xatolik
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+      throw new Error('Server HTML javob qaytardi. Backend ishlayotganligini tekshiring.');
+    }
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.error || `So'rov xatosi: ${response.status}`);
