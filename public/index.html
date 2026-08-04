@@ -118,7 +118,8 @@
 
 <script>
 // ============ API KONFIGURATSIYA ============
-const API_URL = 'http://localhost:5000/api';
+// Endi bir xil serverda, shuning uchun /api yetarli
+const API_URL = '/api';
 let token = localStorage.getItem('token');
 
 // ============ API FUNKSIYALAR ============
@@ -140,7 +141,7 @@ async function apiRequest(endpoint, options = {}) {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.error || `So\'rov xatosi: ${response.status}`);
+      throw new Error(error.error || `So'rov xatosi: ${response.status}`);
     }
 
     return response.json();
@@ -910,7 +911,6 @@ function attachViewEvents() {
     token = savedToken;
     try {
       await loadData();
-      // Joriy foydalanuvchini olish uchun /auth/me endpoint
       try {
         const user = await apiRequest('/auth/me');
         state.currentUser = user;

@@ -1,7 +1,7 @@
 {
-  "name": "toys-note-backend",
+  "name": "toys-note",
   "version": "1.0.0",
-  "description": "Toys Note do'kon boshqaruvi backend",
+  "description": "Toys Note do'kon boshqaruvi (backend + frontend)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -13,10 +13,12 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "express-validator": "^7.0.1"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
