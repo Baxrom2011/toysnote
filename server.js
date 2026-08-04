@@ -17,16 +17,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ============ ROUTES ============
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');        // ⬅️ FAQAT BIR MARTA
+const userRoutes = require('./routes/users');
 const customerRoutes = require('./routes/customers');
 const productRoutes = require('./routes/products');
 const saleRoutes = require('./routes/sales');
 const paymentRoutes = require('./routes/payments');
 const statisticRoutes = require('./routes/statistics');
 
-// ============ API ROUTES ============
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);                  // ⬅️ BIR MARTA ISHLATILGAN
+app.use('/api/users', userRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/sales', saleRoutes);
@@ -38,7 +37,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Frontend route (SPA uchun)
+// Frontend route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
