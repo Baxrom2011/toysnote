@@ -51,15 +51,6 @@ mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('✅ MongoDB ga ulanish muvaffaqiyatli');
     
-    // Counter yaratish
-    const Counter = require('./models/Counter');
-    const counter = await Counter.findOne({ name: 'product_artikul' });
-    if (!counter) {
-      const newCounter = new Counter({ name: 'product_artikul', value: 0 });
-      await newCounter.save();
-      console.log('✅ Counter yaratildi');
-    }
-    
     // Admin foydalanuvchi yaratish
     const User = require('./models/User');
     const admin = await User.findOne({ login: 'baxrom' });
