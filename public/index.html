@@ -783,37 +783,135 @@ function viewTarix() {
   const f = state.historyFilter;
   const customerOptions = state.customers.map(c => `<option value="${c._id}" ${f.customerId === c._id ? 'selected' : ''}>${c.name}</option>`).join('');
   let resultsHtml = '';
+  
   if (f.customerId) {
-    const matches = state.sales.filter(s => s.customerId === f.customerId && (!f.sana || s.sana === f.sana));
+    // Sana formatini to'g'rilash
+    let filterSana = f.sana;
+    if (filterSana) {
+      // 04.06.2026 -> 2026-06-04 formatiga o'tkazish
+      const parts = filterSana.split('.');
+      if (parts.length === 3) {
+        filterSana = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    
+    // Sotuvlarni filtrlash
+    let matches = state.sales.filter(s => s.customerId === f.customerId);
+    
+    // Sana bo'yicha filtr (agar sana kiritilgan bo'lsa)
+    if (filterSana) {
+      matches = matches.filter(s => s.sana === filterSana);
+    }
+    
+    // Tarix bo'yicha tartiblash (eng yangisi birinchi)
+    matches.sort((a, b) => b.createdAt - a.createdAt);
+    
     const totalJami = matches.reduce((a, s) => a + s.jami, 0);
     const totalTolangan = matches.reduce((a, s) => a + s.tolangan, 0);
     const totalQarz = matches.reduce((a, s) => a + s.qarz, 0);
-    const rows = matches.map(s => {
-      const p = state.products.find(x => x._id === s.productId);
-      return `<tr><td>${s.sana}</td><td>${p ? p.name : '—'}</td><td>${s.soni} dona</td><td>${fmt(s.jami)} so'm</td><td>${fmt(s.tolangan)} so'm</td><td>${s.qarz > 0 ? `<span class="pill pill-debt">${fmt(s.qarz)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td></tr>`;
-    }).join('');
-    resultsHtml = matches.length ? `
-      <table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="sale-total-box" style="margin-top:18px">
-        <div><div class="t-lbl">Jami xarid</div><div class="t-val">${fmt(totalJami)} so'm</div></div>
-        <div><div class="t-lbl">To'langan</div><div class="t-val">${fmt(totalTolangan)} so'm</div></div>
-        <div><div class="t-lbl">Qarz</div><div class="t-val">${fmt(totalQarz)} so'm</div></div>
-      </div>` : `<div class="empty">Bu sana / mijoz bo'yicha ma'lumot topilmadi.</div>`;
+    
+    // Qarz to'lovlarini olish
+    const payments = state.payments.filter(p => p.customerId === f.customerId);
+    const totalPayments = payments.reduce((a, p) => a + p.amount, 0);
+    
+    if (matches.length > 0 || payments.length > 0) {
+      // Sotuvlar jadvali
+      let rows = matches.map(s => {
+        const p = state.products.find(x => x._id === s.productId);
+        // Sana formatini o'zgartirish (2026-06-04 -> 04.06.2026)
+        const dateParts = s.sana.split('-');
+        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : s.sana;
+        
+        return `<tr>
+          <td>${formattedDate}</td>
+          <td>${p ? p.name : '—'}</td>
+          <td>${s.soni} dona</td>
+          <td>${fmt(s.jami)} so'm</td>
+          <td>${fmt(s.tolangan)} so'm</td>
+          <td>${s.qarz > 0 ? `<span class="pill pill-debt">${fmt(s.qarz)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td>
+        </tr>`;
+      }).join('');
+      
+      // Qarz to'lovlari jadvali
+      let paymentRows = payments.map(p => {
+        const dateParts = p.sana.split('-');
+        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : p.sana;
+        return `<tr>
+          <td>${formattedDate}</td>
+          <td colspan="3">💳 Qarz to'lovi</td>
+          <td colspan="2"><span class="pill pill-ok">${fmt(p.amount)} so'm</span></td>
+        </tr>`;
+      }).join('');
+      
+      resultsHtml = `
+        <table>
+          <thead>
+            <tr>
+              <th>Sana</th>
+              <th>Mahsulot</th>
+              <th>Soni</th>
+              <th>Jami</th>
+              <th>To'langan</th>
+              <th>Qarz</th>
+            </tr>
+          </thead>
+          <tbody>${rows}${paymentRows}</tbody>
+        </table>
+        <div class="sale-total-box" style="margin-top:18px">
+          <div>
+            <div class="t-lbl">Jami xarid</div>
+            <div class="t-val">${fmt(totalJami)} so'm</div>
+          </div>
+          <div>
+            <div class="t-lbl">To'langan</div>
+            <div class="t-val">${fmt(totalTolangan)} so'm</div>
+          </div>
+          <div>
+            <div class="t-lbl">Qarz</div>
+            <div class="t-val">${fmt(totalQarz)} so'm</div>
+          </div>
+          ${totalPayments > 0 ? `<div>
+            <div class="t-lbl">Qarz to'lovi</div>
+            <div class="t-val">${fmt(totalPayments)} so'm</div>
+          </div>` : ''}
+        </div>
+      `;
+    } else {
+      resultsHtml = `<div class="empty">Bu mijoz bo'yicha hech qanday ma'lumot topilmadi.</div>`;
+    }
   } else {
     resultsHtml = `<div class="empty">Natijalarni ko'rish uchun mijozni tanlang.</div>`;
   }
+  
   return `
-  <div class="topbar"><div><h2>Tarix</h2><p>Sana va mijoz bo'yicha xaridlar tarixi</p></div></div>
-  <div class="card">
-    <div class="row-flex">
-      <div class="field"><label>Sana</label><input type="date" id="histSana" value="${f.sana || ''}"></div>
-      <div class="field"><label>Mijoz</label><select id="histCustomer"><option value="">— tanlang —</option>${customerOptions}</select></div>
-      <button class="btn btn-primary" id="histShowBtn" style="width:auto;padding:12px 24px;">Ko'rsatish</button>
+  <div class="topbar">
+    <div>
+      <h2>Tarix</h2>
+      <p>Sana va mijoz bo'yicha xaridlar tarixi</p>
     </div>
   </div>
-  <div class="card"><h3>Natija</h3>${resultsHtml}</div>`;
+  <div class="card">
+    <div class="row-flex">
+      <div class="field">
+        <label>Sana</label>
+        <input type="date" id="histSana" value="${f.sana || ''}">
+      </div>
+      <div class="field">
+        <label>Mijoz</label>
+        <select id="histCustomer">
+          <option value="">— tanlang —</option>
+          ${customerOptions}
+        </select>
+      </div>
+      <button class="btn btn-primary" id="histShowBtn" style="width:auto;padding:12px 24px;">Ko'rsatish</button>
+      <button class="btn btn-secondary" id="histClearBtn" style="width:auto;padding:12px 24px;">Tozalash</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Natija</h3>
+    ${resultsHtml}
+  </div>`;
 }
-
 // ============ FOYDALANUVCHILAR ============
 function viewFoydalanuvchilar() {
   const rows = state.users.map(u => `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Administrator' : 'Xodim'}</td><td>${u.login === 'baxrom' ? '' : `<button class="small-btn danger" data-del-user="${u.login}">O'chirish</button>`}</td></tr>`).join('');
