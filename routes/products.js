@@ -48,7 +48,7 @@ router.post('/', auth, async (req, res) => {
       narx: Number(narx)
     });
     
-    console.log('🆕 Mahsulot yaratilmoqda');
+    console.log('🆕 Mahsulot yaratilmoqda...');
     
     await product.save();
     
@@ -78,6 +78,39 @@ router.delete('/:id', auth, async (req, res) => {
     res.json({ message: 'Mahsulot o\'chirildi' });
   } catch (error) {
     console.error('Delete product error:', error);
+    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+  }
+});
+
+// Barcha mahsulotlarni yangilash (eski undefined larni tuzatish)
+router.post('/fix-artikul', auth, async (req, res) => {
+  try {
+    const products = await Product.find({});
+    let updated = 0;
+    
+    for (const product of products) {
+      if (!product.artikul || product.artikul === 'undefined') {
+        const lastProduct = await Product.findOne({})
+          .sort({ artikul: -1 });
+        
+        let nextNumber = 1;
+        if (lastProduct && lastProduct.artikul && lastProduct.artikul !== 'undefined') {
+          const match = lastProduct.artikul.match(/ART-(\d+)/);
+          if (match) {
+            nextNumber = parseInt(match[1]) + 1;
+          }
+        }
+        
+        product.artikul = `ART-${String(nextNumber).padStart(3, '0')}`;
+        await product.save();
+        updated++;
+        console.log(`✅ ${product.name} ga artikul berildi: ${product.artikul}`);
+      }
+    }
+    
+    res.json({ message: `${updated} ta mahsulot yangilandi` });
+  } catch (error) {
+    console.error('Fix artikul error:', error);
     res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 });
