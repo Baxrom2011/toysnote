@@ -4,10 +4,7 @@ const ProductSchema = new mongoose.Schema({
   artikul: {
     type: String,
     unique: true,
-    trim: true,
-    default: function() {
-      return `ART-${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`;
-    }
+    trim: true
   },
   name: {
     type: String,
@@ -30,24 +27,22 @@ ProductSchema.pre('save', async function(next) {
   try {
     // Agar artikul mavjud bo'lmasa yaratish
     if (!this.artikul || this.artikul === 'undefined') {
-      // Oxirgi mahsulotni topish
+      
+      // Barcha mahsulotlarni artikul bo'yicha tartiblab, oxirgisini olish
       const lastProduct = await mongoose.model('Product')
-        .findOne({})
+        .findOne({ artikul: { $exists: true, $ne: null, $ne: 'undefined' } })
         .sort({ artikul: -1 });
       
       let nextNumber = 1;
       
-      if (lastProduct && lastProduct.artikul && lastProduct.artikul !== 'undefined') {
+      if (lastProduct && lastProduct.artikul) {
         const match = lastProduct.artikul.match(/ART-(\d+)/);
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
         }
-      } else {
-        // Hech qanday mahsulot yo'q yoki artikul undefined
-        const count = await mongoose.model('Product').countDocuments();
-        nextNumber = count + 1;
       }
       
+      // 3 xonali raqam formatida (001, 002, 003...)
       this.artikul = `ART-${String(nextNumber).padStart(3, '0')}`;
       console.log(`✅ Artikul yaratildi: ${this.artikul}`);
     }
