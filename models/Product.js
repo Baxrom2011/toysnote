@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Counter = require('./Counter');
 
 const ProductSchema = new mongoose.Schema({
   artikul: {
@@ -26,28 +25,41 @@ const ProductSchema = new mongoose.Schema({
 
 // ART-001 dan boshlab ketma-ket nomer berish
 ProductSchema.pre('save', async function(next) {
-  if (!this.artikul) {
-    try {
-      // Counter dan keyingi raqamni olish
-      const counter = await Counter.findOneAndUpdate(
-        { name: 'product_artikul' },
-        { $inc: { value: 1 } },
-        { upsert: true, new: true }
-      );
-      
-      // 3 xonali raqam formatida (001, 002, 003...)
-      this.artikul = `ART-${String(counter.value).padStart(3, '0')}`;
-      
-      console.log(`✅ Yangi artikul yaratildi: ${this.artikul}`);
-      
-    } catch (error) {
-      console.error('Artikul yaratish xatosi:', error);
-      // Xatolik bo'lsa vaqt bo'yicha unique raqam
-      const timestamp = Date.now().toString().slice(-6);
-      this.artikul = `ART-${timestamp}`;
-    }
+  // Agar artikul allaqachon mavjud bo'lsa, o'tkazib yuborish
+  if (this.artikul) {
+    return next();
   }
-  next();
+  
+  try {
+    // Barcha mahsulotlarni artikul bo'yicha tartiblab, oxirgisini olish
+    const lastProduct = await mongoose.model('Product')
+      .findOne({})
+      .sort({ artikul: -1 })
+      .select('artikul');
+    
+    let nextNumber = 1;
+    
+    if (lastProduct && lastProduct.artikul) {
+      // ART-001 dan raqamni olish
+      const match = lastProduct.artikul.match(/ART-(\d+)/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+    
+    // 3 xonali raqam formatida (001, 002, 003...)
+    this.artikul = `ART-${String(nextNumber).padStart(3, '0')}`;
+    
+    console.log(`✅ Yangi artikul yaratildi: ${this.artikul}`);
+    next();
+    
+  } catch (error) {
+    console.error('Artikul yaratish xatosi:', error);
+    // Xatolik bo'lsa vaqt bo'yicha unique raqam
+    const timestamp = Date.now().toString().slice(-6);
+    this.artikul = `ART-${timestamp}`;
+    next();
+  }
 });
 
 module.exports = mongoose.model('Product', ProductSchema);
