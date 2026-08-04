@@ -9,8 +9,8 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: 'Avtorizatsiya talab qilinadi' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'mysecretkey123');
+    const user = await User.findById(decoded.id).select('-password');
     
     if (!user) {
       return res.status(401).json({ error: 'Foydalanuvchi topilmadi' });
@@ -19,6 +19,7 @@ const auth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error('Auth error:', error);
     res.status(401).json({ error: 'Avtorizatsiya xatosi' });
   }
 };
