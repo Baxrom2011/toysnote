@@ -69,6 +69,9 @@ mongoose.connect(MONGODB_URI)
     console.error('❌ MongoDB ulanish xatosi:', err);
   });
 
+const userRoutes = require('./routes/users');
+app.use('/api/users', userRoutes);
+
 // ============ SERVER ============
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
