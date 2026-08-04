@@ -5,12 +5,7 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    trim: true,
-    default: function() {
-      // Agar artikul bo'lmasa, avtomatik yaratish
-      const random = Math.floor(100000 + Math.random() * 900000);
-      return `ART${random}`;
-    }
+    trim: true
   },
   name: {
     type: String,
@@ -28,32 +23,49 @@ const ProductSchema = new mongoose.Schema({
   }
 });
 
-// Artikul avtomatik yaratish (agar bo'sh bo'lsa)
-ProductSchema.pre('save', function(next) {
-  if (!this.artikul || this.artikul === '') {
-    const random = Math.floor(100000 + Math.random() * 900000);
-    this.artikul = `ART${random}`;
-  }
-  next();
-});
-
-// Artikul uniqligini tekshirish va qayta urinish
+// ART-001 dan boshlab ketma-ket nomer berish
 ProductSchema.pre('save', async function(next) {
   if (!this.artikul) {
-    let unique = false;
-    let attempts = 0;
-    while (!unique && attempts < 10) {
-      const random = Math.floor(100000 + Math.random() * 900000);
-      const testArtikul = `ART${random}`;
-      const existing = await mongoose.model('Product').findOne({ artikul: testArtikul });
-      if (!existing) {
-        this.artikul = testArtikul;
-        unique = true;
+    try {
+      // Oxirgi mahsulotni topish
+      const lastProduct = await mongoose.model('Product')
+        .findOne({ artikul: /^ART-/ })
+        .sort({ artikul: -1 });
+      
+      let nextNumber = 1;
+      
+      if (lastProduct && lastProduct.artikul) {
+        // ART-001 dan raqamni olish
+        const match = lastProduct.artikul.match(/ART-(\d+)/);
+        if (match) {
+          nextNumber = parseInt(match[1]) + 1;
+        }
       }
-      attempts++;
-    }
-    if (!unique) {
-      this.artikul = `ART${Date.now().toString().slice(-6)}`;
+      
+      // 3 xonali raqam formatida (001, 002, 003...)
+      this.artikul = `ART-${String(nextNumber).padStart(3, '0')}`;
+      
+      // Agar shu raqam mavjud bo'lsa, keyingisiga o'tish
+      const existing = await mongoose.model('Product').findOne({ artikul: this.artikul });
+      if (existing) {
+        // Rekursiv ravishda keyingi raqamni topish
+        let counter = nextNumber + 1;
+        let found = false;
+        while (!found && counter < 10000) {
+          const testArtikul = `ART-${String(counter).padStart(3, '0')}`;
+          const testExisting = await mongoose.model('Product').findOne({ artikul: testArtikul });
+          if (!testExisting) {
+            this.artikul = testArtikul;
+            found = true;
+          }
+          counter++;
+        }
+      }
+      
+    } catch (error) {
+      console.error('Artikul yaratish xatosi:', error);
+      // Xatolik bo'lsa vaqt bo'yicha unique raqam
+      this.artikul = `ART-${Date.now().toString().slice(-6)}`;
     }
   }
   next();
