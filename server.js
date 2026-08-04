@@ -11,8 +11,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Static fayllar (frontend)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ============ ROUTES ============
@@ -24,6 +22,7 @@ const saleRoutes = require('./routes/sales');
 const paymentRoutes = require('./routes/payments');
 const statisticRoutes = require('./routes/statistics');
 
+// API ROUTES - MUHIM: BULAR STATIC DAN OLDIN KELISHI KERAK!
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/customers', customerRoutes);
@@ -37,18 +36,22 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Frontend route
+// ============ FRONTEND ROUTE - FAQAT YO'Q YO'NALISHLAR UCHUN ============
+// BU API ROUTELARDAN KEYIN KELISHI KERAK!
 app.get('*', (req, res) => {
+  // Agar so'rov /api dan boshlasa, 404 qaytarish
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint topilmadi' });
+  }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// MongoDB ulanish
+// MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/toys_note';
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log('✅ MongoDB ga ulanish muvaffaqiyatli');
-    
     const User = require('./models/User');
     User.findOne({ login: 'baxrom' }).then(user => {
       if (!user) {
