@@ -69,6 +69,11 @@ mongoose.connect(MONGODB_URI)
   .catch(err => {
     console.error('❌ MongoDB ulanish xatosi:', err);
   });
+// ============ ERROR HANDLING ============
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Server xatosi: ' + err.message });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
