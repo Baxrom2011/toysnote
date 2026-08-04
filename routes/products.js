@@ -40,7 +40,6 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
     }
 
-    // Artikul avtomatik yaratiladi
     const product = new Product({ 
       name: name.trim(), 
       narx: Number(narx)
@@ -52,7 +51,7 @@ router.post('/', auth, async (req, res) => {
   } catch (error) {
     console.error('Create product error:', error);
     if (error.code === 11000) {
-      res.status(400).json({ error: 'Bu artikul allaqachon mavjud, qayta urinib ko\'ring' });
+      res.status(400).json({ error: 'Bu artikul allaqachon mavjud' });
     } else {
       res.status(500).json({ error: 'Server xatosi: ' + error.message });
     }
