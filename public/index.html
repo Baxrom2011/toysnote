@@ -157,6 +157,58 @@
 const API_URL = '/api';
 let token = localStorage.getItem('token');
 
+// ============ STATE ============
+function loadStateFromStorage() {
+  try {
+    const saved = localStorage.getItem('app_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        view: parsed.view || 'mijozlar',
+        saleDraft: parsed.saleDraft || { sana: '', productId: '', customerId: '', soni: '', tolangan: '' },
+        historyFilter: parsed.historyFilter || { sana: '', customerId: '' }
+      };
+    }
+  } catch (e) {}
+  return { view: 'mijozlar', saleDraft: { sana: '', productId: '', customerId: '', soni: '', tolangan: '' }, historyFilter: { sana: '', customerId: '' } };
+}
+
+function saveStateToStorage() {
+  try {
+    localStorage.setItem('app_state', JSON.stringify({
+      view: state.view,
+      saleDraft: state.saleDraft,
+      historyFilter: state.historyFilter
+    }));
+  } catch (e) {}
+}
+
+let state = {
+  loaded: false,
+  loading: false,
+  users: [],
+  customers: [],
+  products: [],
+  sales: [],
+  payments: [],
+  currentUser: null,
+  view: 'mijozlar',
+  saleDraft: { sana: '', productId: '', customerId: '', soni: '', tolangan: '' },
+  historyFilter: { sana: '', customerId: '' },
+  loginErr: '',
+  payModal: null,
+  error: null,
+  searchResults: [],
+  showSearchResults: false,
+  searchQuery: ''
+};
+
+// Saved state ni yuklash
+const savedState = loadStateFromStorage();
+state.view = savedState.view;
+state.saleDraft = savedState.saleDraft;
+state.historyFilter = savedState.historyFilter;
+
 // ============ API FUNKSIYALAR ============
 async function apiRequest(endpoint, options = {}) {
   const headers = {
@@ -285,27 +337,6 @@ const ICONS = {
   alert: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
 };
 
-// ============ STATE ============
-let state = {
-  loaded: false,
-  loading: false,
-  users: [],
-  customers: [],
-  products: [],
-  sales: [],
-  payments: [],
-  currentUser: null,
-  view: 'mijozlar',
-  saleDraft: { sana: '', productId: '', customerId: '', soni: '', tolangan: '' },
-  historyFilter: { sana: '', customerId: '' },
-  loginErr: '',
-  payModal: null,
-  error: null,
-  searchResults: [],
-  showSearchResults: false,
-  searchQuery: ''
-};
-
 function fmt(n) { return Math.round(n || 0).toLocaleString('ru-RU'); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 
@@ -339,6 +370,9 @@ function render() {
   if (state.view === 'statistika') {
     setTimeout(drawStatCharts, 200);
   }
+  
+  // State ni saqlash
+  saveStateToStorage();
 }
 
 // ============ LOGIN ============
@@ -429,6 +463,7 @@ function attachShellEvents() {
   document.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', () => {
       state.view = el.getAttribute('data-nav');
+      saveStateToStorage();
       render();
     });
   });
@@ -436,6 +471,7 @@ function attachShellEvents() {
     state.currentUser = null;
     token = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('app_state');
     state.loaded = false;
     render();
   });
@@ -897,7 +933,6 @@ function attachViewEvents() {
         }, 300);
       });
 
-      // Qidiruv natijalarini tanlash
       document.addEventListener('click', function(e) {
         const result = e.target.closest('.search-result');
         if (result) {
