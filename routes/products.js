@@ -42,13 +42,13 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
     }
 
-    // Yangi Product yaratish
+    // Yangi Product yaratish (artikul avtomatik yaratiladi)
     const product = new Product({ 
       name: name.trim(), 
       narx: Number(narx)
     });
     
-    console.log('🆕 Mahsulot yaratilmoqda:', product);
+    console.log('🆕 Mahsulot yaratilmoqda');
     
     await product.save();
     
@@ -57,16 +57,12 @@ router.post('/', auth, async (req, res) => {
     res.status(201).json(product);
   } catch (error) {
     console.error('❌ XATOLIK:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
     
     if (error.code === 11000) {
       res.status(400).json({ error: 'Bu artikul allaqachon mavjud' });
     } else {
       res.status(500).json({ 
-        error: 'Server xatosi: ' + error.message,
-        details: error.errors || {}
+        error: 'Server xatosi: ' + error.message
       });
     }
   }
