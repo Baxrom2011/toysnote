@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
+  /* ... STYLE LAR (OLDINGI KODDA QOLDI) ... */
   :root{
     --salad:#2F6FE4;
     --salad-dark:#1E54B7;
@@ -154,14 +155,8 @@
 
 <script>
 // ============ API KONFIGURATSIYA ============
-// Agar backend va frontend bir xil serverda bo'lsa:
 const API_URL = '/api';
-
-// YOKI agar Render da bo'lsa:
-// const API_URL = 'https://toys-note-backend.onrender.com/api';
-
-// YOKI localda backend boshqa portda bo'lsa:
-// const API_URL = 'http://localhost:5000/api';
+let token = localStorage.getItem('token');
 
 // ============ STATE ============
 function loadStateFromStorage() {
@@ -232,12 +227,6 @@ async function apiRequest(endpoint, options = {}) {
       headers
     });
 
-    // Agar javob HTML bo'lsa, xatolik
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('text/html')) {
-      throw new Error('Server HTML javob qaytardi. Backend ishlayotganligini tekshiring.');
-    }
-
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
       throw new Error(error.error || `So'rov xatosi: ${response.status}`);
@@ -264,6 +253,7 @@ async function loginUser(login, password) {
 }
 
 async function getCurrentUser() {
+  if (!token) return null;
   return apiRequest('/auth/me');
 }
 
@@ -613,7 +603,7 @@ function viewMahsulot() {
       <div class="field"><label>Narxi (so'm)</label><input id="prodNarx" type="number" min="0" required placeholder="50000"></div>
       <button class="btn btn-primary" type="submit">Qo'shish</button>
     </form>
-    <p style="font-size:12px;color:var(--ink-soft);margin-top:10px;">⚠️ Artikul avtomatik yaratiladi: ART + 6 xonali raqam</p>
+    <p style="font-size:12px;color:var(--ink-soft);margin-top:10px;">⚠️ Artikul avtomatik yaratiladi: ART-001, ART-002 ...</p>
   </div>
   <div class="card">
     <h3>Mahsulotlar ro'yxati (${state.products.length})</h3>
@@ -668,7 +658,7 @@ function viewSotuv() {
         <div class="field">
           <label>Mahsulot (artikul yoki nom)</label>
           <div class="search-wrapper">
-            <input type="text" id="saleProductSearch" placeholder="ART123456 yoki nom..." value="${state.searchQuery}" autocomplete="off">
+            <input type="text" id="saleProductSearch" placeholder="ART-001 yoki nom..." value="${state.searchQuery}" autocomplete="off">
             <div class="search-results-dropdown ${state.showSearchResults && state.searchResults.length > 0 ? 'show' : ''}">
               ${searchResultsHtml}
               ${state.showSearchResults && state.searchResults.length === 0 ? '<div class="search-result" style="color:var(--ink-soft);cursor:default;">Hech narsa topilmadi</div>' : ''}
@@ -1077,21 +1067,19 @@ function attachViewEvents() {
       try {
         // Token ni tekshirish
         const user = await getCurrentUser();
-        state.currentUser = user;
-        await loadData();
-        state.loaded = true;
-        render();
-        return;
+        if (user) {
+          state.currentUser = user;
+          await loadData();
+          state.loaded = true;
+          render();
+          return;
+        }
       } catch (error) {
         console.log('Token eskirgan:', error.message);
-        // Token yaroqsiz bo'lsa, tozalash
         localStorage.removeItem('token');
         localStorage.removeItem('app_state');
         token = null;
         state.currentUser = null;
-        state.loaded = true;
-        render();
-        return;
       }
     }
     
