@@ -38,10 +38,13 @@ ProductSchema.pre('save', async function(next) {
       // 3 xonali raqam formatida (001, 002, 003...)
       this.artikul = `ART-${String(counter.value).padStart(3, '0')}`;
       
+      console.log(`✅ Yangi artikul yaratildi: ${this.artikul}`);
+      
     } catch (error) {
       console.error('Artikul yaratish xatosi:', error);
       // Xatolik bo'lsa vaqt bo'yicha unique raqam
-      this.artikul = `ART-${Date.now().toString().slice(-6)}`;
+      const timestamp = Date.now().toString().slice(-6);
+      this.artikul = `ART-${timestamp}`;
     }
   }
   next();
