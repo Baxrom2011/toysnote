@@ -74,7 +74,19 @@ app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Server xatosi: ' + err.message });
 });
+// server.js ga qo'shing, MongoDB ulanishidan keyin
+const Counter = require('./models/Counter');
 
+// Counter yaratish (agar mavjud bo'lmasa)
+Counter.findOneAndUpdate(
+  { name: 'product_artikul' },
+  { $setOnInsert: { value: 0 } },
+  { upsert: true }
+).then(() => {
+  console.log('✅ Counter tayyor');
+}).catch(err => {
+  console.error('Counter yaratish xatosi:', err);
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server ${PORT} portda ishlamoqda`);
