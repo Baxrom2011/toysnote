@@ -36,26 +36,30 @@ router.post('/', auth, async (req, res) => {
   try {
     const { name, narx } = req.body;
     
+    console.log('📦 Mahsulot ma\'lumotlari:', { name, narx });
+    
     if (!name || !narx) {
       return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
     }
 
-    // Yangi Product yaratish (artikul avtomatik yaratiladi)
+    // Yangi Product yaratish
     const product = new Product({ 
       name: name.trim(), 
       narx: Number(narx)
     });
     
-    console.log('Yangi mahsulot yaratilmoqda:', { name, narx });
+    console.log('🆕 Mahsulot yaratilmoqda:', product);
     
     await product.save();
     
-    console.log('Mahsulot saqlandi:', product);
+    console.log('✅ Mahsulot saqlandi:', product);
     
     res.status(201).json(product);
   } catch (error) {
-    console.error('Create product error - FULL:', error);
-    console.error('Error details:', error.errors);
+    console.error('❌ XATOLIK:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     
     if (error.code === 11000) {
       res.status(400).json({ error: 'Bu artikul allaqachon mavjud' });
