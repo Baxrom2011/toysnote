@@ -1057,28 +1057,39 @@ function attachViewEvents() {
 
 // ============ INIT ============
 (async function init() {
-  const savedToken = localStorage.getItem('token');
-  
-  if (savedToken) {
-    token = savedToken;
-    try {
-      // Token ni tekshirish
-      const user = await getCurrentUser();
-      state.currentUser = user;
-      await loadData();
-      state.loaded = true;
-      render();
-      return;
-    } catch (error) {
-      console.log('Token eskirgan yoki yaroqsiz:', error.message);
-      token = null;
-      localStorage.removeItem('token');
-      state.currentUser = null;
+  try {
+    const savedToken = localStorage.getItem('token');
+    
+    if (savedToken) {
+      token = savedToken;
+      try {
+        // Token ni tekshirish
+        const user = await getCurrentUser();
+        state.currentUser = user;
+        await loadData();
+        state.loaded = true;
+        render();
+        return;
+      } catch (error) {
+        console.log('Token eskirgan:', error.message);
+        // Token yaroqsiz bo'lsa, tozalash
+        localStorage.removeItem('token');
+        localStorage.removeItem('app_state');
+        token = null;
+        state.currentUser = null;
+        state.loaded = true;
+        render();
+        return;
+      }
     }
+    
+    state.loaded = true;
+    render();
+  } catch (error) {
+    console.error('Init xatosi:', error);
+    state.loaded = true;
+    render();
   }
-  
-  state.loaded = true;
-  render();
 })();
 </script>
 </body>
