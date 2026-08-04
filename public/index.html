@@ -154,8 +154,14 @@
 
 <script>
 // ============ API KONFIGURATSIYA ============
+// Agar backend va frontend bir xil serverda bo'lsa:
 const API_URL = '/api';
-let token = localStorage.getItem('token');
+
+// YOKI agar Render da bo'lsa:
+// const API_URL = 'https://toys-note-backend.onrender.com/api';
+
+// YOKI localda backend boshqa portda bo'lsa:
+// const API_URL = 'http://localhost:5000/api';
 
 // ============ STATE ============
 function loadStateFromStorage() {
