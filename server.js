@@ -22,7 +22,6 @@ const saleRoutes = require('./routes/sales');
 const paymentRoutes = require('./routes/payments');
 const statisticRoutes = require('./routes/statistics');
 
-// API ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/customers', customerRoutes);
