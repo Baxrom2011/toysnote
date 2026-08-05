@@ -50,7 +50,6 @@ mongoose.connect(MONGODB_URI)
   .then(async () => {
     console.log('✅ MongoDB ga ulanish muvaffaqiyatli');
     
-    // Admin foydalanuvchi yaratish
     const User = require('./models/User');
     const admin = await User.findOne({ login: 'baxrom' });
     if (!admin) {
@@ -66,6 +65,12 @@ mongoose.connect(MONGODB_URI)
   .catch(err => {
     console.error('❌ MongoDB ulanish xatosi:', err);
   });
+
+// ============ ERROR HANDLER ============
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: err.message });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
