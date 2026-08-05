@@ -1,7 +1,7 @@
 {
   "name": "toys-note",
   "version": "1.0.0",
-  "description": "Toys Note do'kon boshqaruvi (backend + frontend)",
+  "description": "Toys Note do'kon boshqaruvi",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
