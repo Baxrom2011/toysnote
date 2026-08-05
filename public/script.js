@@ -103,7 +103,6 @@ let state = {
   searchResults: [],
   showSearchResults: false,
   searchQuery: '',
-  showLogoutCube: false,
   lastProductSale: null,
   settings: {
     avatar: localStorage.getItem('user_avatar') || '',
@@ -242,36 +241,69 @@ async function addPayment(customerId, sana, amount) {
 function fmt(n) { return Math.round(n || 0).toLocaleString('ru-RU'); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 
-// ============ MIJOZ QARZI ============
+// ============ MIJOZ QARZI (TO'G'RI HISOBLASH) ============
 function getCustomerDebtLocal(customerId) {
-  const sales = state.sales.filter(s => s.customerId === customerId);
-  const totalDebt = sales.reduce((sum, s) => sum + (s.qarz || 0), 0);
-  const payments = state.payments.filter(p => p.customerId === customerId);
-  const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
-  return Math.max(0, totalDebt - totalPaid);
+  // Mijozning barcha sotuvlari
+  const sales = state.sales.filter(function(s) { return s.customerId === customerId; });
+  
+  // Sotuvlar bo'yicha umumiy qarz
+  const totalDebt = sales.reduce(function(sum, s) { 
+    return sum + (s.qarz || 0); 
+  }, 0);
+  
+  // Qarz to'lovlari
+  const payments = state.payments.filter(function(p) { return p.customerId === customerId; });
+  const totalPaid = payments.reduce(function(sum, p) { 
+    return sum + p.amount; 
+  }, 0);
+  
+  // Qolgan qarz
+  const debt = Math.max(0, totalDebt - totalPaid);
+  return debt;
 }
 
-// ============ COMPUTE SALE ============
+// ============ COMPUTE SALE (TO'G'RI HISOBLASH) ============
 function computeSaleFigures(d) {
-  const product = state.products.find(p => p._id === d.productId);
+  const product = state.products.find(function(p) { return p._id === d.productId; });
+  
+  // Jami summa
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
+  
+  // Mijoz bergan pul
   const tolangan = Number(d.tolangan || 0);
+  
+  // Bu sotuv bo'yicha qarz
   const qarz = Math.max(0, jami - tolangan);
+  
+  // Ortiqcha to'lov
   const ortiqcha = Math.max(0, tolangan - jami);
+  
+  // Mijozning oldingi qarzi
   const existingDebt = d.customerId ? getCustomerDebtLocal(d.customerId) : 0;
+  
+  // Ortiqcha to'lov oldingi qarzni kamaytiradi
   const debtAfter = Math.max(0, existingDebt - ortiqcha);
-  return { product, jami, tolangan, qarz, ortiqcha, existingDebt, debtAfter };
+  
+  return { 
+    product: product,
+    jami: jami,
+    tolangan: tolangan,
+    qarz: qarz,
+    ortiqcha: ortiqcha,
+    existingDebt: existingDebt,
+    debtAfter: debtAfter
+  };
 }
 
 // ============ RENDER ============
 function render() {
   const app = document.getElementById('app');
   if (state.loading) {
-    app.innerHTML = `<div class="loading-spinner">Yuklanmoqda...</div>`;
+    app.innerHTML = '<div class="loading-spinner">Yuklanmoqda...</div>';
     return;
   }
   if (!state.loaded) {
-    app.innerHTML = `<div class="loading-spinner">Ma'lumotlar yuklanmoqda...</div>`;
+    app.innerHTML = '<div class="loading-spinner">Ma\'lumotlar yuklanmoqda...</div>';
     return;
   }
   if (!state.currentUser) {
@@ -279,16 +311,12 @@ function render() {
     attachLoginEvents();
     return;
   }
-  if (state.showLogoutCube) {
-    app.innerHTML = renderLogoutCube();
-    return;
-  }
   if (state.error) {
-    app.innerHTML = `<div style="padding:40px;text-align:center;color:#ff4444;">
-      <h3>Xatolik yuz berdi</h3>
-      <p>${state.error}</p>
-      <button onclick="location.reload()" class="btn-neon" style="width:auto;margin-top:20px;">Qayta yuklash</button>
-    </div>`;
+    app.innerHTML = '<div style="padding:40px;text-align:center;color:#ff4444;">' +
+      '<h3>Xatolik yuz berdi</h3>' +
+      '<p>' + state.error + '</p>' +
+      '<button onclick="location.reload()" class="btn-neon" style="width:auto;margin-top:20px;">Qayta yuklash</button>' +
+    '</div>';
     return;
   }
   app.innerHTML = renderShell() + (state.payModal ? renderPayModal() : '');
@@ -302,13 +330,15 @@ function render() {
 
 // ============ LOGIN ============
 function renderLogin() {
+  const hello = LANGUAGES[currentLang].hello || 'Salom';
+  
   return `
   <div class="login-wrap">
     <div class="login-card glass">
-      <div style="font-size:48px;margin-bottom:16px;">🚀</div>
+      <div class="logo">🚀</div>
       <h1>Toys Note</h1>
-      <p>Do'kon boshqaruv tizimiga kirish</p>
-      ${state.loginErr ? `<div class="login-error">${state.loginErr}</div>` : ''}
+      <p class="subtitle">${hello}! Do'kon boshqaruv tizimiga xush kelibsiz</p>
+      ${state.loginErr ? '<div class="login-error">' + state.loginErr + '</div>' : ''}
       <form id="loginForm">
         <div class="field">
           <label>Login</label>
@@ -318,15 +348,15 @@ function renderLogin() {
           <label>Parol</label>
           <input id="parolInput" type="password" autocomplete="current-password" required value="14042011">
         </div>
-        <button class="btn-neon" type="submit" style="width:100%;">Kirish</button>
+        <button class="btn-neon" type="submit" style="width:100%;">${t('login')}</button>
       </form>
-      <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.4);">Admin: baxrom / 14042011</p>
+      <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.3);">Admin: baxrom / 14042011</p>
     </div>
   </div>`;
 }
 
 function attachLoginEvents() {
-  document.getElementById('loginForm').addEventListener('submit', async e => {
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const login = document.getElementById('loginInput').value.trim();
     const parol = document.getElementById('parolInput').value;
@@ -348,35 +378,16 @@ function attachLoginEvents() {
   });
 }
 
-// ============ LOGOUT CUBE ============
-function renderLogoutCube() {
-  const userName = state.currentUser?.login || 'User';
-  const goodbye = LANGUAGES[currentLang].goodbye || 'Goodbye';
-  
-  return `
-  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;">
-    <div class="cube-wrapper">
-      <div class="cube">
-        <div class="cube-face cube-face-front">${goodbye}</div>
-        <div class="cube-face cube-face-back">${userName}</div>
-        <div class="cube-face cube-face-right">👋</div>
-        <div class="cube-face cube-face-left">✨</div>
-        <div class="cube-face cube-face-top">⭐</div>
-        <div class="cube-face cube-face-bottom">🌟</div>
-      </div>
-    </div>
-    <p style="margin-top:30px;color:rgba(255,255,255,0.6);font-size:18px;">
-      ${goodbye}, ${userName}! 👋
-    </p>
-  </div>`;
-}
-
 // ============ SHELL ============
 function renderShell() {
   const isAdmin = state.currentUser?.role === 'admin';
   const userName = state.currentUser?.login || '';
   const userRole = isAdmin ? t('admin') : t('user');
-  const avatar = state.settings.avatar || `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Ccircle cx="20" cy="20" r="20" fill="%232F6FE4"/%3E%3Ctext x="20" y="26" text-anchor="middle" fill="white" font-size="18" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  const avatar = state.settings.avatar || '';
+  const hello = LANGUAGES[currentLang].hello || 'Salom';
+  
+  // Avatar default
+  const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Ccircle cx="20" cy="20" r="20" fill="%232F6FE4"/%3E%3Ctext x="20" y="26" text-anchor="middle" fill="white" font-size="18" font-weight="bold"%3E' + userName.charAt(0).toUpperCase() + '%3C/text%3E%3C/svg%3E';
   
   const navItems = [
     { id: 'mijozlar', label: t('customers'), icon: '👥' },
@@ -390,24 +401,27 @@ function renderShell() {
     navItems.push({ id: 'sozlamalar', label: t('settings'), icon: '⚙️' });
   }
   
-  const navHtml = navItems.map(n => {
-    return `<div class="nav-item ${state.view === n.id ? 'active' : ''}" data-nav="${n.id}">
-      <span>${n.icon}</span>
-      <span>${n.label}</span>
-    </div>`;
+  const navHtml = navItems.map(function(n) {
+    return '<div class="nav-item ' + (state.view === n.id ? 'active' : '') + '" data-nav="' + n.id + '">' +
+      '<span class="icon">' + n.icon + '</span>' +
+      '<span>' + n.label + '</span>' +
+    '</div>';
   }).join('');
   
-  const langOptions = ['uz', 'ru', 'en'].map(l => {
-    return `<option value="${l}" ${currentLang === l ? 'selected' : ''}>${l.toUpperCase()}</option>`;
+  const langOptions = ['uz', 'ru', 'en'].map(function(l) {
+    return '<option value="' + l + '" ' + (currentLang === l ? 'selected' : '') + '>' + l.toUpperCase() + '</option>';
   }).join('');
   
   return `
   <div class="shell">
     <div class="sidebar">
-      <div class="brand">🚀 Toys Note</div>
+      <div class="brand">
+        <span class="logo-icon">🚀</span>
+        <span>Toys Note</span>
+      </div>
       
-      <div style="display:flex;gap:8px;margin-bottom:12px;padding:0 10px;">
-        <select id="langSelect" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 10px;color:#fff;font-size:13px;flex:1;">
+      <div style="display:flex;gap:8px;margin-bottom:16px;padding:0 12px;">
+        <select id="langSelect" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;color:#fff;font-size:13px;flex:1;font-family:'Inter',sans-serif;">
           ${langOptions}
         </select>
       </div>
@@ -418,10 +432,10 @@ function renderShell() {
       
       <div class="user-chip">
         <div class="user-avatar">
-          <img src="${avatar}" alt="Avatar">
+          <img src="${avatar || defaultAvatar}" alt="Avatar">
         </div>
         <div class="user-info">
-          <div class="name">${userName}</div>
+          <div class="name">${hello}, ${userName}</div>
           <div class="role">${userRole}</div>
         </div>
       </div>
@@ -445,7 +459,7 @@ function renderView() {
 }
 
 function attachShellEvents() {
-  document.querySelectorAll('[data-nav]').forEach(el => {
+  document.querySelectorAll('[data-nav]').forEach(function(el) {
     el.addEventListener('click', function() {
       state.view = this.getAttribute('data-nav');
       saveStateToStorage();
@@ -453,31 +467,26 @@ function attachShellEvents() {
     });
   });
   
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async function() {
-      state.showLogoutCube = true;
-      render();
-      setTimeout(function() {
-        state.currentUser = null;
-        token = null;
-        localStorage.removeItem('token');
-        localStorage.removeItem('app_state');
-        state.loaded = false;
-        state.showLogoutCube = false;
-        render();
-      }, 3000);
-    });
-  }
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    const goodbye = LANGUAGES[currentLang].goodbye || 'Hayr';
+    const userName = state.currentUser?.login || 'User';
+    
+    // Oddiy chiqish - salom bilan
+    alert(goodbye + ', ' + userName + '! 👋');
+    
+    state.currentUser = null;
+    token = null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('app_state');
+    state.loaded = false;
+    render();
+  });
   
-  const langSelect = document.getElementById('langSelect');
-  if (langSelect) {
-    langSelect.addEventListener('change', function() {
-      currentLang = this.value;
-      localStorage.setItem('lang', currentLang);
-      render();
-    });
-  }
+  document.getElementById('langSelect').addEventListener('change', function() {
+    currentLang = this.value;
+    localStorage.setItem('lang', currentLang);
+    render();
+  });
   
   attachViewEvents();
 }
@@ -488,15 +497,15 @@ function attachShellEvents() {
 function viewMijozlar() {
   const rows = state.customers.map(function(c) {
     const debt = getCustomerDebtLocal(c._id);
-    return `<tr>
-      <td>${c.name}</td>
-      <td>${c.phone || '—'}</td>
-      <td>${debt > 0 ? `<span class="pill pill-debt">${fmt(debt)} so'm</span>` : `<span class="pill pill-ok">Qarzi yo'q</span>`}</td>
-      <td>
-        ${debt > 0 ? `<button class="small-btn pay" data-pay-customer="${c._id}">💰 Qarz to'lash</button>` : ''}
-        <button class="small-btn danger" data-del-customer="${c._id}">🗑️ O'chirish</button>
-      </td>
-    </tr>`;
+    return '<tr>' +
+      '<td>' + c.name + '</td>' +
+      '<td>' + (c.phone || '—') + '</td>' +
+      '<td>' + (debt > 0 ? '<span class="pill pill-debt">' + fmt(debt) + ' so\'m qarz</span>' : '<span class="pill pill-ok">Qarzi yo\'q</span>') + '</td>' +
+      '<td>' +
+        (debt > 0 ? '<button class="small-btn pay" data-pay-customer="' + c._id + '">💰 Qarz to\'lash</button>' : '') +
+        '<button class="small-btn danger" data-del-customer="' + c._id + '">🗑️ O\'chirish</button>' +
+      '</td>' +
+    '</tr>';
   }).join('');
   
   return `
@@ -535,7 +544,7 @@ function renderPayModal() {
   <div class="modal-overlay" id="payOverlay">
     <div class="modal-card glass">
       <h3>💰 Qarz to'lash — ${c.name}</h3>
-      <p style="color:rgba(255,255,255,0.6);font-size:13.5px;margin-top:-8px;">Joriy qarz: <b style="color:var(--neon-orange)">${fmt(debt)} so'm</b></p>
+      <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-top:-8px;">Joriy qarz: <b style="color:#fb923c;">${fmt(debt)} so'm</b></p>
       <form id="payForm">
         <div class="field">
           <label>Sana</label>
@@ -555,58 +564,48 @@ function renderPayModal() {
 }
 
 function attachPayModalEvents() {
-  const cancelBtn = document.getElementById('payCancelBtn');
-  const overlay = document.getElementById('payOverlay');
-  const payForm = document.getElementById('payForm');
+  document.getElementById('payCancelBtn').addEventListener('click', function() {
+    state.payModal = null;
+    render();
+  });
   
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() {
+  document.getElementById('payOverlay').addEventListener('click', function(e) {
+    if (e.target.id === 'payOverlay') {
       state.payModal = null;
       render();
-    });
-  }
+    }
+  });
   
-  if (overlay) {
-    overlay.addEventListener('click', function(e) {
-      if (e.target.id === 'payOverlay') {
-        state.payModal = null;
-        render();
-      }
-    });
-  }
-  
-  if (payForm) {
-    payForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const sana = document.getElementById('paySana').value || todayStr();
-      const amount = Number(document.getElementById('payAmount').value);
-      if (!amount || amount <= 0) return;
-      try {
-        await addPayment(state.payModal.customerId, sana, amount);
-        state.payModal = null;
-        await loadData();
-        render();
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-  }
+  document.getElementById('payForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const sana = document.getElementById('paySana').value || todayStr();
+    const amount = Number(document.getElementById('payAmount').value);
+    if (!amount || amount <= 0) return;
+    try {
+      await addPayment(state.payModal.customerId, sana, amount);
+      state.payModal = null;
+      await loadData();
+      render();
+    } catch (error) {
+      alert(error.message);
+    }
+  });
 }
 
 // ---- MAHSULOT ----
 function viewMahsulot() {
   const rows = state.products.map(function(p) {
     const soldQty = state.sales.filter(function(s) { return s.productId === p._id; }).reduce(function(a, s) { return a + s.soni; }, 0);
-    return `<tr>
-      <td><span class="artikul-badge">${p.artikul || 'ART-???'}</span></td>
-      <td>${p.name}</td>
-      <td>${fmt(p.narx)} so'm</td>
-      <td>${soldQty} dona</td>
-      <td>
-        <button class="small-btn danger" data-del-product="${p._id}">🗑️ O'chirish</button>
-        <button class="small-btn pay" data-last-product="${p._id}">📦 Oxirgi</button>
-      </td>
-    </tr>`;
+    return '<tr>' +
+      '<td><span class="artikul-badge">' + (p.artikul || 'ART-???') + '</span></td>' +
+      '<td>' + p.name + '</td>' +
+      '<td>' + fmt(p.narx) + ' so\'m</td>' +
+      '<td>' + soldQty + ' dona</td>' +
+      '<td>' +
+        '<button class="small-btn danger" data-del-product="' + p._id + '">🗑️ O\'chirish</button>' +
+        '<button class="small-btn pay" data-last-product="' + p._id + '">📦 Oxirgi</button>' +
+      '</td>' +
+    '</tr>';
   }).join('');
   
   return `
@@ -629,7 +628,7 @@ function viewMahsulot() {
       </div>
       <button class="btn-neon" type="submit">Qo'shish</button>
     </form>
-    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:10px;">⚠️ Artikul avtomatik yaratiladi: ART-001, ART-002 ...</p>
+    <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:10px;">⚠️ Artikul avtomatik yaratiladi: ART-001, ART-002 ...</p>
   </div>
   <div class="card">
     <h3>Mahsulotlar ro'yxati (${state.products.length})</h3>
@@ -642,15 +641,15 @@ function viewSotuv() {
   const d = state.saleDraft;
   const f = computeSaleFigures(d);
   const customerOptions = state.customers.map(function(c) {
-    return `<option value="${c._id}" ${d.customerId === c._id ? 'selected' : ''}>${c.name}</option>`;
+    return '<option value="' + c._id + '" ' + (d.customerId === c._id ? 'selected' : '') + '>' + c.name + '</option>';
   }).join('');
   
   let searchResultsHtml = '';
   if (state.showSearchResults && state.searchResults.length > 0) {
     searchResultsHtml = state.searchResults.map(function(p) {
-      return `<div class="search-result" data-product-id="${p._id}" data-product-name="${p.name}" data-product-narx="${p.narx}" data-product-artikul="${p.artikul || 'ART-???'}">
-        <span class="artikul">${p.artikul || 'ART-???'}</span> - ${p.name} <span style="color:rgba(255,255,255,0.4);">${fmt(p.narx)} so'm</span>
-      </div>`;
+      return '<div class="search-result" data-product-id="' + p._id + '" data-product-name="' + p.name + '" data-product-narx="' + p.narx + '" data-product-artikul="' + (p.artikul || 'ART-???') + '">' +
+        '<span class="artikul">' + (p.artikul || 'ART-???') + '</span> - ' + p.name + ' <span style="color:rgba(255,255,255,0.3);">' + fmt(p.narx) + ' so\'m</span>' +
+      '</div>';
     }).join('');
   }
 
@@ -658,9 +657,9 @@ function viewSotuv() {
   if (d.productId) {
     const p = state.products.find(function(x) { return x._id === d.productId; });
     if (p) {
-      selectedProductHtml = `<div style="margin-top:8px;padding:10px 14px;background:rgba(0,212,255,0.1);border-radius:10px;border:1px solid rgba(0,212,255,0.2);">
-        <strong>Tanlangan:</strong> <span class="artikul-badge">${p.artikul || 'ART-???'}</span> ${p.name} — ${fmt(p.narx)} so'm
-      </div>`;
+      selectedProductHtml = '<div style="margin-top:8px;padding:12px 16px;background:rgba(0,212,255,0.05);border-radius:12px;border:1px solid rgba(0,212,255,0.08);">' +
+        '<strong>Tanlangan:</strong> <span class="artikul-badge">' + (p.artikul || 'ART-???') + '</span> ' + p.name + ' — ' + fmt(p.narx) + ' so\'m' +
+      '</div>';
     }
   }
 
@@ -692,7 +691,7 @@ function viewSotuv() {
             <input type="text" id="saleProductSearch" placeholder="ART-001 yoki nom..." value="${state.searchQuery}" autocomplete="off">
             <div class="search-results-dropdown ${state.showSearchResults && state.searchResults.length > 0 ? 'show' : ''}">
               ${searchResultsHtml}
-              ${state.showSearchResults && state.searchResults.length === 0 ? '<div class="search-result" style="color:rgba(255,255,255,0.4);cursor:default;">Hech narsa topilmadi</div>' : ''}
+              ${state.showSearchResults && state.searchResults.length === 0 ? '<div class="search-result" style="color:rgba(255,255,255,0.3);cursor:default;">Hech narsa topilmadi</div>' : ''}
             </div>
           </div>
           <input type="hidden" id="saleProduct" value="${d.productId}">
@@ -720,12 +719,12 @@ function viewSotuv() {
         </div>
         <div class="field">
           <label>Ushbu sotuv bo'yicha qarz</label>
-          <input id="saleQarzVal" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz > 0 ? 'rgba(255,107,0,0.15)' : 'rgba(0,255,136,0.15)'};color:${f.qarz > 0 ? 'var(--neon-orange)' : 'var(--neon-green)'};font-weight:700;border:1px solid ${f.qarz > 0 ? 'rgba(255,107,0,0.3)' : 'rgba(0,255,136,0.3)'};">
+          <input id="saleQarzVal" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz > 0 ? 'rgba(251,146,60,0.1)' : 'rgba(34,211,238,0.1)'};color:${f.qarz > 0 ? '#fb923c' : '#22d3ee'};font-weight:700;border:1px solid ${f.qarz > 0 ? 'rgba(251,146,60,0.2)' : 'rgba(34,211,238,0.2)'};">
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn-neon" type="submit">${t('save')}</button>
-        <button type="button" class="btn-neon" id="lastProductBtn" style="background:linear-gradient(135deg, var(--neon-pink), var(--neon-purple));">📦 ${t('lastProduct')}</button>
+        <button type="button" class="btn-neon" id="lastProductBtn" style="background:linear-gradient(135deg, #ff6bcd, #a855f7);">📦 ${t('lastProduct')}</button>
       </div>
     </form>
   </div>`;
@@ -733,12 +732,15 @@ function viewSotuv() {
 
 // ---- STATISTIKA ----
 function viewStatistika() {
+  // To'g'ri hisoblash
   const totalSales = state.sales.reduce(function(a, s) { return a + s.jami; }, 0);
   const totalPaid = state.sales.reduce(function(a, s) { return a + s.tolangan; }, 0);
+  
   let totalDebt = 0;
   state.customers.forEach(function(c) {
     totalDebt += getCustomerDebtLocal(c._id);
   });
+  
   return `
   <div class="topbar">
     <div>
@@ -748,17 +750,17 @@ function viewStatistika() {
   </div>
   <div class="grid-3" style="margin-bottom:20px;">
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(0,212,255,0.1);color:var(--neon-blue);">💰</div>
+      <div class="icn" style="background:rgba(0,212,255,0.06);color:#00d4ff;">💰</div>
       <div class="lbl">Umumiy savdo</div>
       <div class="val">${fmt(totalSales)} so'm</div>
     </div>
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(0,255,136,0.1);color:var(--neon-green);">✅</div>
+      <div class="icn" style="background:rgba(34,211,238,0.06);color:#22d3ee;">✅</div>
       <div class="lbl">Qabul qilingan pul</div>
       <div class="val">${fmt(totalPaid)} so'm</div>
     </div>
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(255,107,0,0.1);color:var(--neon-orange);">⚠️</div>
+      <div class="icn" style="background:rgba(251,146,60,0.06);color:#fb923c;">⚠️</div>
       <div class="lbl">Umumiy qarz</div>
       <div class="val">${fmt(totalDebt)} so'm</div>
     </div>
@@ -798,7 +800,7 @@ function destroyCharts() {
 function drawStatCharts() {
   if (state.view !== 'statistika' || typeof Chart === 'undefined') return;
   destroyCharts();
-  var palette = ['#00d4ff', '#ff00e6', '#9b00ff', '#00ff88', '#ff6b00', '#ffdd00'];
+  var palette = ['#00d4ff', '#ff6bcd', '#a855f7', '#22d3ee', '#fb923c', '#fbbf24'];
 
   // Daily
   var byDay = {};
@@ -816,7 +818,7 @@ function drawStatCharts() {
           label: "Savdo (so'm)",
           data: days.map(function(d) { return byDay[d]; }),
           borderColor: '#00d4ff',
-          backgroundColor: 'rgba(0,212,255,0.1)',
+          backgroundColor: 'rgba(0,212,255,0.05)',
           fill: true,
           tension: 0.3
         }]
@@ -932,7 +934,7 @@ function drawStatCharts() {
 function viewTarix() {
   var f = state.historyFilter;
   var customerOptions = state.customers.map(function(c) {
-    return `<option value="${c._id}" ${f.customerId === c._id ? 'selected' : ''}>${c.name}</option>`;
+    return '<option value="' + c._id + '" ' + (f.customerId === c._id ? 'selected' : '') + '>' + c.name + '</option>';
   }).join('');
   var resultsHtml = '';
   
@@ -973,24 +975,24 @@ function viewTarix() {
         var dateParts = s.sana.split('-');
         var formattedDate = dateParts.length === 3 ? dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0] : s.sana;
         
-        return `<tr>
-          <td>${formattedDate}</td>
-          <td>${p ? p.name : '—'}</td>
-          <td>${s.soni} dona</td>
-          <td>${fmt(s.jami)} so'm</td>
-          <td>${fmt(s.tolangan)} so'm</td>
-          <td>${s.qarz > 0 ? '<span class="pill pill-debt">' + fmt(s.qarz) + ' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
-        </tr>`;
+        return '<tr>' +
+          '<td>' + formattedDate + '</td>' +
+          '<td>' + (p ? p.name : '—') + '</td>' +
+          '<td>' + s.soni + ' dona</td>' +
+          '<td>' + fmt(s.jami) + ' so\'m</td>' +
+          '<td>' + fmt(s.tolangan) + ' so\'m</td>' +
+          '<td>' + (s.qarz > 0 ? '<span class="pill pill-debt">' + fmt(s.qarz) + ' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>') + '</td>' +
+        '</tr>';
       }).join('');
       
       var paymentRows = payments.map(function(p) {
         var dateParts = p.sana.split('-');
         var formattedDate = dateParts.length === 3 ? dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0] : p.sana;
-        return `<tr>
-          <td>${formattedDate}</td>
-          <td colspan="3">💳 Qarz to'lovi</td>
-          <td colspan="2"><span class="pill pill-ok">${fmt(p.amount)} so'm</span></td>
-        </tr>`;
+        return '<tr>' +
+          '<td>' + formattedDate + '</td>' +
+          '<td colspan="3">💳 Qarz to\'lovi</td>' +
+          '<td colspan="2"><span class="pill pill-ok">' + fmt(p.amount) + ' so\'m</span></td>' +
+        '</tr>';
       }).join('');
       
       resultsHtml = `
@@ -1064,6 +1066,8 @@ function viewTarix() {
 function viewSozlamalar() {
   var isAdmin = state.currentUser?.role === 'admin';
   var userName = state.currentUser?.login || '';
+  var avatar = state.settings.avatar || '';
+  var defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%232F6FE4"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E' + userName.charAt(0).toUpperCase() + '%3C/text%3E%3C/svg%3E';
   
   return `
   <div class="topbar">
@@ -1077,7 +1081,7 @@ function viewSozlamalar() {
     <h3>👤 Profil rasmi</h3>
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       <div class="user-avatar" style="width:80px;height:80px;">
-        <img src="${state.settings.avatar || ''}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2240%22 fill=%22%232F6FE4%22/%3E%3Ctext x=%2240%22 y=%2252%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2236%22 font-weight=%22bold%22%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E'">
+        <img src="${avatar || defaultAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
       </div>
       <div>
         <form id="avatarForm" style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -1087,7 +1091,7 @@ function viewSozlamalar() {
           </div>
           <button class="btn-neon" type="submit">Yangilash</button>
         </form>
-        <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:8px;">💡 Rasm URL ni kiriting yoki default qoldiring</p>
+        <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:8px;">💡 Rasm URL ni kiriting yoki default qoldiring</p>
       </div>
     </div>
   </div>
@@ -1095,13 +1099,13 @@ function viewSozlamalar() {
   <div class="card">
     <h3>🌐 Til</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="${currentLang === 'uz' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('uz')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'uz' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'uz' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+      <button class="${currentLang === 'uz' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('uz')" style="padding:10px 20px;border-radius:12px;border:${currentLang === 'uz' ? 'none' : '1px solid rgba(255,255,255,0.06)'};background:${currentLang === 'uz' ? 'linear-gradient(135deg, #00d4ff, #a855f7)' : 'rgba(255,255,255,0.03)'};color:#fff;cursor:pointer;">
         🇺🇿 O'zbek
       </button>
-      <button class="${currentLang === 'ru' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('ru')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'ru' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'ru' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+      <button class="${currentLang === 'ru' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('ru')" style="padding:10px 20px;border-radius:12px;border:${currentLang === 'ru' ? 'none' : '1px solid rgba(255,255,255,0.06)'};background:${currentLang === 'ru' ? 'linear-gradient(135deg, #00d4ff, #a855f7)' : 'rgba(255,255,255,0.03)'};color:#fff;cursor:pointer;">
         🇷🇺 Русский
       </button>
-      <button class="${currentLang === 'en' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('en')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'en' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'en' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+      <button class="${currentLang === 'en' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('en')" style="padding:10px 20px;border-radius:12px;border:${currentLang === 'en' ? 'none' : '1px solid rgba(255,255,255,0.06)'};background:${currentLang === 'en' ? 'linear-gradient(135deg, #00d4ff, #a855f7)' : 'rgba(255,255,255,0.03)'};color:#fff;cursor:pointer;">
         🇬🇧 English
       </button>
     </div>
@@ -1112,11 +1116,11 @@ function viewSozlamalar() {
     <h3>🎨 Dizayn sozlamalari</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <div style="display:flex;gap:6px;align-items:center;">
-        <span style="color:rgba(255,255,255,0.6);">Neon rang:</span>
+        <span style="color:rgba(255,255,255,0.4);">Neon rang:</span>
         <input type="color" id="neonColor" value="#00d4ff" style="width:40px;height:40px;border:none;border-radius:8px;cursor:pointer;background:transparent;">
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
-        <span style="color:rgba(255,255,255,0.6);">Fon rangi:</span>
+        <span style="color:rgba(255,255,255,0.4);">Fon rangi:</span>
         <input type="color" id="bgColor" value="#0a0a1a" style="width:40px;height:40px;border:none;border-radius:8px;cursor:pointer;background:transparent;">
       </div>
     </div>
@@ -1126,7 +1130,7 @@ function viewSozlamalar() {
   
   <div class="card">
     <h3>📊 Ma'lumotlar</h3>
-    <p style="color:rgba(255,255,255,0.6);font-size:14px;">
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.8;">
       Mijozlar: ${state.customers.length} ta<br>
       Mahsulotlar: ${state.products.length} ta<br>
       Sotuvlar: ${state.sales.length} ta<br>
@@ -1319,9 +1323,9 @@ function attachViewEvents() {
       if (perUnitEl) perUnitEl.textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
       if (qarzEl) {
         qarzEl.value = fmt(f.qarz) + " so'm";
-        qarzEl.style.background = f.qarz > 0 ? 'rgba(255,107,0,0.15)' : 'rgba(0,255,136,0.15)';
-        qarzEl.style.color = f.qarz > 0 ? 'var(--neon-orange)' : 'var(--neon-green)';
-        qarzEl.style.border = '1px solid ' + (f.qarz > 0 ? 'rgba(255,107,0,0.3)' : 'rgba(0,255,136,0.3)');
+        qarzEl.style.background = f.qarz > 0 ? 'rgba(251,146,60,0.1)' : 'rgba(34,211,238,0.1)';
+        qarzEl.style.color = f.qarz > 0 ? '#fb923c' : '#22d3ee';
+        qarzEl.style.border = '1px solid ' + (f.qarz > 0 ? 'rgba(251,146,60,0.2)' : 'rgba(34,211,238,0.2)');
       }
     };
 
@@ -1362,7 +1366,15 @@ function attachViewEvents() {
         await loadData();
         render();
         
-        alert('✅ Sotuv muvaffaqiyatli saqlandi!\nJami: ' + fmt(result.jami) + ' so\'m\nQarz: ' + fmt(result.qarz) + ' so\'m');
+        var message = '✅ Sotuv muvaffaqiyatli saqlandi!\n';
+        message += 'Jami: ' + fmt(result.jami) + ' so\'m\n';
+        message += 'Qarz: ' + fmt(result.qarz) + ' so\'m';
+        if (result.qarz > 0) {
+          message += '\n⚠️ Mijozda qarz qoldi!';
+        } else {
+          message += '\n✅ Mijoz to\'liq to\'ladi!';
+        }
+        alert(message);
         
       } catch (error) {
         console.error('❌ Sotuv xatosi:', error);
