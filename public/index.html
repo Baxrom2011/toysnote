@@ -10,147 +10,161 @@
 <style>
 /* ============ ROOT ============ */
 :root {
-  --primary: #4F46E5;
-  --primary-light: #818CF8;
-  --secondary: #EC4899;
-  --accent: #14B8A6;
-  --bg: #0F0F1A;
-  --card-bg: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.06);
+  --primary: #4A90D9;
+  --primary-light: #6BB5FF;
+  --secondary: #2ECC71;
+  --accent: #F39C12;
+  --bg: #0A1628;
+  --card-bg: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.08);
   --text: #FFFFFF;
-  --text-secondary: rgba(255,255,255,0.6);
-  --text-muted: rgba(255,255,255,0.3);
+  --text-secondary: rgba(255,255,255,0.7);
+  --text-muted: rgba(255,255,255,0.4);
   --radius: 16px;
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --glass: rgba(255,255,255,0.03);
 }
 
-/* ============ QORONG'I REJIM ============ */
-body.dark {
-  --bg: #0F0F1A;
-  --card-bg: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.06);
-  --text: #FFFFFF;
-  --text-secondary: rgba(255,255,255,0.6);
-  --text-muted: rgba(255,255,255,0.3);
-  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+/* ============ GLASS / SHISHA EFFEKT ============ */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.glass:hover {
+  border-color: rgba(74, 144, 217, 0.2);
 }
 
-/* ============ YORUG' REJIM ============ */
+/* ============ FON ============ */
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0A1628 0%, #1A2A4A 50%, #0A1628 100%);
+  color: var(--text);
+  min-height: 100vh;
+  transition: all 0.4s ease;
+  background-attachment: fixed;
+}
+
+/* ============ LIGHT THEME ============ */
 body.light {
-  --bg: #F0F2F5;
-  --card-bg: rgba(255,255,255,0.8);
-  --border: rgba(0,0,0,0.08);
-  --text: #1A1A2E;
-  --text-secondary: rgba(0,0,0,0.6);
-  --text-muted: rgba(0,0,0,0.3);
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  background: linear-gradient(135deg, #E8F0FE 0%, #D4E4F7 50%, #E8F0FE 100%);
+  --text: #1A2A4A;
+  --text-secondary: rgba(26,42,74,0.7);
+  --text-muted: rgba(26,42,74,0.4);
+  --card-bg: rgba(255,255,255,0.7);
+  --border: rgba(26,42,74,0.08);
+  --glass: rgba(255,255,255,0.5);
+  --shadow: 0 8px 32px rgba(26,42,74,0.1);
 }
-body.light .card{background:rgba(255,255,255,0.9);}
-body.light input,body.light select{background:rgba(255,255,255,0.9);color:#1A1A2E;border-color:rgba(0,0,0,0.1);}
-body.light .header{background:rgba(255,255,255,0.9);}
-body.light .login-card{background:rgba(255,255,255,0.95);}
-body.light .login-card input{background:rgba(255,255,255,0.9);color:#1A1A2E;}
-body.light .nav button{color:rgba(0,0,0,0.5);}
-body.light .nav button:hover{color:#1A1A2E;}
-body.light .nav button.active{background:rgba(79,70,229,0.08);color:#4F46E5;}
-body.light .sale-box{background:rgba(0,0,0,0.02);border-color:rgba(0,0,0,0.06);}
-body.light .sale-box .val{color:#1A1A2E;}
-body.light .user-name{color:#1A1A2E;}
+body.light .card{background:rgba(255,255,255,0.7);}
+body.light input,body.light select{background:rgba(255,255,255,0.8);color:#1A2A4A;border-color:rgba(26,42,74,0.1);}
+body.light .header{background:rgba(255,255,255,0.7);}
+body.light .login-card{background:rgba(255,255,255,0.85);}
+body.light .login-card input{background:rgba(255,255,255,0.8);color:#1A2A4A;}
+body.light .nav button{color:rgba(26,42,74,0.5);}
+body.light .nav button:hover{color:#1A2A4A;}
+body.light .nav button.active{background:rgba(74,144,217,0.08);color:#4A90D9;}
+body.light .sale-box{background:rgba(0,0,0,0.02);border-color:rgba(26,42,74,0.06);}
+body.light .sale-box .val{color:#1A2A4A;}
+body.light .user-name{color:#1A2A4A;}
 body.light .search-dropdown{background:#fff;}
-body.light .search-item{color:rgba(0,0,0,0.6);}
-body.light .search-item:hover{background:rgba(79,70,229,0.05);}
 body.light .modal-card{background:#fff;}
-body.light .modal-card h3{color:#1A1A2E;}
-body.light .badge{background:rgba(79,70,229,0.08);}
-body.light .pill-ok{background:rgba(20,184,166,0.08);}
-body.light .pill-debt{background:rgba(236,72,153,0.08);}
+body.light .modal-card h3{color:#1A2A4A;}
+body.light .badge{background:rgba(74,144,217,0.08);}
+body.light .pill-ok{background:rgba(46,204,113,0.08);}
+body.light .pill-debt{background:rgba(231,76,60,0.08);}
+body.light .glass{background:rgba(255,255,255,0.5);}
 
-/* ============ KLASSIK REJIM ============ */
+/* ============ CLASSIC THEME ============ */
 body.classic {
-  --bg: #F5F0E8;
-  --card-bg: rgba(255,248,240,0.9);
-  --border: rgba(139,115,85,0.15);
+  background: linear-gradient(135deg, #F5F0E8 0%, #E8E0D5 50%, #F5F0E8 100%);
   --text: #3D2B1F;
-  --text-secondary: rgba(61,43,31,0.6);
-  --text-muted: rgba(61,43,31,0.3);
-  --shadow: 0 4px 24px rgba(139,115,85,0.1);
+  --text-secondary: rgba(61,43,31,0.7);
+  --text-muted: rgba(61,43,31,0.4);
   --primary: #8B7355;
   --primary-light: #A68B6E;
-  --secondary: #C0392B;
-  --accent: #2C3E50;
+  --secondary: #2C3E50;
+  --accent: #C0392B;
+  --card-bg: rgba(255,248,240,0.8);
+  --border: rgba(139,115,85,0.1);
+  --glass: rgba(255,248,240,0.6);
+  --shadow: 0 8px 32px rgba(139,115,85,0.1);
 }
-body.classic .card{background:rgba(255,248,240,0.95);}
-body.classic input,body.classic select{background:rgba(255,248,240,0.95);color:#3D2B1F;border-color:rgba(139,115,85,0.2);}
-body.classic .header{background:rgba(255,248,240,0.95);}
-body.classic .login-card{background:rgba(255,248,240,0.98);}
-body.classic .login-card input{background:rgba(255,248,240,0.95);color:#3D2B1F;}
+body.classic .card{background:rgba(255,248,240,0.85);}
+body.classic input,body.classic select{background:rgba(255,248,240,0.85);color:#3D2B1F;border-color:rgba(139,115,85,0.15);}
+body.classic .header{background:rgba(255,248,240,0.85);}
+body.classic .login-card{background:rgba(255,248,240,0.9);}
+body.classic .login-card input{background:rgba(255,248,240,0.85);color:#3D2B1F;}
 body.classic .nav button{color:rgba(61,43,31,0.5);}
 body.classic .nav button:hover{color:#3D2B1F;}
 body.classic .nav button.active{background:rgba(139,115,85,0.08);color:#8B7355;}
-body.classic .sale-box{background:rgba(0,0,0,0.02);border-color:rgba(139,115,85,0.1);}
+body.classic .sale-box{background:rgba(0,0,0,0.02);border-color:rgba(139,115,85,0.08);}
 body.classic .sale-box .val{color:#3D2B1F;}
 body.classic .user-name{color:#3D2B1F;}
 body.classic .search-dropdown{background:#F5F0E8;}
-body.classic .search-item{color:rgba(61,43,31,0.6);}
-body.classic .search-item:hover{background:rgba(139,115,85,0.05);}
 body.classic .modal-card{background:#F5F0E8;}
 body.classic .modal-card h3{color:#3D2B1F;}
 body.classic .badge{background:rgba(139,115,85,0.08);}
 body.classic .pill-ok{background:rgba(44,62,80,0.08);}
 body.classic .pill-debt{background:rgba(192,57,43,0.08);}
-body.classic .logo .gradient{background:linear-gradient(135deg,#8B7355,#C0392B,#2C3E50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+body.classic .glass{background:rgba(255,248,240,0.6);}
+body.classic .logo .gradient{background:linear-gradient(135deg,#8B7355,#2C3E50,#C0392B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.4s ease,color 0.4s ease;}
-.container{max-width:1200px;margin:0 auto;padding:20px;}
+body{font-family:'Inter',sans-serif;min-height:100vh;transition:all 0.4s ease;}
+.container{max-width:1200px;margin:0 auto;padding:16px;}
 
 /* ============ HEADER ============ */
-.header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;flex-wrap:wrap;gap:10px;backdrop-filter:blur(12px);transition:all 0.4s ease;}
-.logo{font-size:24px;font-weight:700;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:10px;color:var(--text);}
-.logo .icon{font-size:28px;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-radius:var(--radius);margin-bottom:16px;flex-wrap:wrap;gap:10px;transition:all 0.4s ease;background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);}
+.logo{font-size:22px;font-weight:700;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:8px;color:var(--text);}
+.logo .icon{font-size:26px;}
 .logo .gradient{background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.nav{display:flex;gap:6px;flex-wrap:wrap;}
-.nav button{padding:8px 16px;border:none;border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all 0.3s;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;}
+.nav{display:flex;gap:4px;flex-wrap:wrap;}
+.nav button{padding:6px 14px;border:none;border-radius:8px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all 0.3s;font-size:12px;font-weight:500;font-family:'Inter',sans-serif;}
 .nav button:hover{background:rgba(255,255,255,0.05);color:var(--text);}
-.nav button.active{background:rgba(79,70,229,0.12);color:var(--primary);border:1px solid rgba(79,70,229,0.15);}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;backdrop-filter:blur(8px);transition:all 0.4s ease;}
-.card h3{font-size:16px;font-weight:600;margin-bottom:14px;color:var(--text);}
-.card:hover{border-color:rgba(79,70,229,0.1);}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.nav button.active{background:rgba(74,144,217,0.12);color:var(--primary);border:1px solid rgba(74,144,217,0.15);}
+.card{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;transition:all 0.4s ease;}
+.card h3{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--text);}
+.card:hover{border-color:rgba(74,144,217,0.15);}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 @media(max-width:768px){.grid{grid-template-columns:1fr;}}
 input,select{width:100%;padding:10px 14px;border-radius:10px;border:2px solid var(--border);background:rgba(255,255,255,0.04);color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:all 0.3s;}
-input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,0.1);}
-label{display:block;color:var(--text-secondary);font-size:12px;font-weight:500;margin-bottom:5px;}
-.btn{padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:13px;font-family:'Inter',sans-serif;}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(74,144,217,0.1);}
+label{display:block;color:var(--text-secondary);font-size:12px;font-weight:500;margin-bottom:4px;}
+.btn{padding:8px 18px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:13px;font-family:'Inter',sans-serif;}
 .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,70,229,0.25);}
-.btn-danger{background:rgba(236,72,153,0.1);color:#EC4899;}
-.btn-danger:hover{background:rgba(236,72,153,0.2);}
-.btn-pay{background:rgba(20,184,166,0.1);color:#14B8A6;}
-.btn-pay:hover{background:rgba(20,184,166,0.2);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(74,144,217,0.3);}
+.btn-danger{background:rgba(231,76,60,0.1);color:#E74C3C;}
+.btn-danger:hover{background:rgba(231,76,60,0.2);}
+.btn-pay{background:rgba(46,204,113,0.1);color:#2ECC71;}
+.btn-pay:hover{background:rgba(46,204,113,0.2);}
 .btn-secondary{background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--border);}
 .btn-secondary:hover{background:rgba(255,255,255,0.08);color:var(--text);}
-.btn-edit{background:rgba(251,191,36,0.1);color:#FBBF24;}
-.btn-edit:hover{background:rgba(251,191,36,0.2);}
+.btn-edit{background:rgba(243,156,18,0.1);color:#F39C12;}
+.btn-edit:hover{background:rgba(243,156,18,0.2);}
 table{width:100%;border-collapse:collapse;}
-th{text-align:left;color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;padding:10px 12px;border-bottom:1px solid var(--border);}
-td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--text-secondary);font-size:13px;}
+th{text-align:left;color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;padding:8px 10px;border-bottom:1px solid var(--border);}
+td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--text-secondary);font-size:13px;}
 tr:hover td{background:rgba(255,255,255,0.01);}
-.pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;}
-.pill-ok{background:rgba(20,184,166,0.1);color:#14B8A6;}
-.pill-debt{background:rgba(236,72,153,0.1);color:#EC4899;}
-.badge{background:rgba(79,70,229,0.08);color:var(--primary);padding:2px 10px;border-radius:8px;font-size:11px;font-family:monospace;}
-.row{display:flex;gap:10px;flex-wrap:wrap;}
-.row .field{flex:1;min-width:140px;}
-.loading{text-align:center;padding:40px;color:var(--text-muted);}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.pill-ok{background:rgba(46,204,113,0.1);color:#2ECC71;}
+.pill-debt{background:rgba(231,76,60,0.1);color:#E74C3C;}
+.badge{background:rgba(74,144,217,0.08);color:var(--primary);padding:2px 8px;border-radius:6px;font-size:11px;font-family:monospace;}
+.row{display:flex;gap:8px;flex-wrap:wrap;}
+.row .field{flex:1;min-width:120px;}
+.loading{text-align:center;padding:40px;color:var(--text-muted);font-size:16px;}
+.loading::after{content:'...';animation:dots 1s steps(4) infinite;}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
 /* ============ LOGIN ============ */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg);transition:background 0.4s ease;}
-.login-card{width:400px;max-width:100%;padding:40px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);text-align:center;backdrop-filter:blur(16px);transition:all 0.4s ease;}
-.login-card .logo-big{font-size:48px;margin-bottom:12px;}
-.login-card h1{font-size:30px;background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;font-family:'Baloo 2',sans-serif;}
-.login-card .subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:20px;}
-.login-error{background:rgba(236,72,153,0.08);color:#EC4899;padding:10px;border-radius:10px;margin-bottom:14px;font-size:13px;}
+.login-card{width:400px;max-width:100%;padding:36px;border-radius:var(--radius);text-align:center;transition:all 0.4s ease;background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);}
+.login-card .logo-big{font-size:48px;margin-bottom:10px;}
+.login-card h1{font-size:28px;background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;font-family:'Baloo 2',sans-serif;}
+.login-card .subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:18px;}
+.login-error{background:rgba(231,76,60,0.08);color:#E74C3C;padding:10px;border-radius:10px;margin-bottom:14px;font-size:13px;}
 .login-card .field input{background:rgba(255,255,255,0.04);border:2px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);width:100%;font-size:14px;transition:all 0.3s;}
 .login-card .field input:focus{outline:none;border-color:var(--primary);}
 .login-card .field label{text-align:left;}
@@ -158,57 +172,62 @@ tr:hover td{background:rgba(255,255,255,0.01);}
 
 /* ============ ANIMATSIYA ============ */
 @keyframes bookOpen{
-  0%{transform:rotateY(-90deg) scale(0.6);opacity:0;}
+  0%{transform:rotateY(-90deg) scale(0.5);opacity:0;}
   100%{transform:rotateY(0) scale(1);opacity:1;}
 }
-.book-animation{animation:bookOpen 0.8s ease-out forwards;transform-origin:left center;display:inline-block;font-size:56px;}
-.welcome-text{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px;}
+@keyframes bookClose{
+  0%{transform:rotateY(0) scale(1);opacity:1;}
+  100%{transform:rotateY(90deg) scale(0.5);opacity:0;}
+}
+.book-open{animation:bookOpen 0.6s ease-out forwards;transform-origin:left center;display:inline-block;font-size:52px;}
+.book-close{animation:bookClose 0.5s ease-in forwards;transform-origin:left center;display:inline-block;font-size:52px;}
+.welcome-text{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:8px;}
 
-.sale-box{background:rgba(79,70,229,0.03);border:1px solid rgba(79,70,229,0.06);border-radius:12px;padding:14px 18px;margin:14px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.sale-box{background:rgba(74,144,217,0.03);border:1px solid rgba(74,144,217,0.06);border-radius:12px;padding:12px 16px;margin:12px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .sale-box .lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
-.sale-box .val{font-family:'Baloo 2',sans-serif;font-size:22px;color:var(--text);}
+.sale-box .val{font-family:'Baloo 2',sans-serif;font-size:20px;color:var(--text);}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:50;}
-.modal-card{background:#1a1a2e;border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:400px;max-width:92vw;transition:all 0.4s ease;}
-.modal-card h3{font-size:20px;margin-bottom:12px;color:var(--text);}
-.modal-actions{display:flex;gap:10px;margin-top:16px;}
+.modal-card{background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:400px;max-width:92vw;transition:all 0.4s ease;}
+.modal-card h3{font-size:18px;margin-bottom:10px;color:var(--text);}
+.modal-actions{display:flex;gap:10px;margin-top:14px;}
 .modal-actions .btn{flex:1;}
-.user-info{display:flex;align-items:center;gap:12px;}
-.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--primary);overflow:hidden;flex-shrink:0;}
+.user-info{display:flex;align-items:center;gap:10px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;border:2px solid var(--primary);overflow:hidden;flex-shrink:0;}
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
-.user-name{font-size:14px;font-weight:500;color:var(--text);}
-.user-role{font-size:11px;color:var(--text-muted);}
-.empty{color:var(--text-muted);padding:20px;text-align:center;font-size:14px;}
-.msg{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px;}
-.msg-ok{background:rgba(20,184,166,0.05);color:#14B8A6;border:1px solid rgba(20,184,166,0.08);}
-.msg-warn{background:rgba(236,72,153,0.05);color:#EC4899;border:1px solid rgba(236,72,153,0.08);}
+.user-name{font-size:13px;font-weight:500;color:var(--text);}
+.user-role{font-size:10px;color:var(--text-muted);}
+.empty{color:var(--text-muted);padding:16px;text-align:center;font-size:13px;}
+.msg{padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;}
+.msg-ok{background:rgba(46,204,113,0.05);color:#2ECC71;border:1px solid rgba(46,204,113,0.08);}
+.msg-warn{background:rgba(231,76,60,0.05);color:#E74C3C;border:1px solid rgba(231,76,60,0.08);}
 .search-wrapper{position:relative;}
-.search-dropdown{position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid var(--border);border-radius:10px;max-height:200px;overflow-y:auto;z-index:10;display:none;margin-top:4px;transition:all 0.4s ease;}
+.search-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--card-bg);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:10px;max-height:180px;overflow-y:auto;z-index:10;display:none;margin-top:4px;transition:all 0.4s ease;}
 .search-dropdown.show{display:block;}
-.search-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:13px;color:var(--text-secondary);}
-.search-item:hover{background:rgba(79,70,229,0.05);color:var(--text);}
+.search-item{padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:13px;color:var(--text-secondary);}
+.search-item:hover{background:rgba(74,144,217,0.05);color:var(--text);}
 .search-item .art{color:var(--primary);font-weight:600;}
-.chart-box{height:220px;position:relative;}
-.logout-btn{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-secondary);padding:8px 16px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;}
-.logout-btn:hover{background:rgba(236,72,153,0.05);border-color:rgba(236,72,153,0.15);color:#EC4899;}
-.actions{display:flex;gap:6px;flex-wrap:wrap;}
+.chart-box{height:200px;position:relative;}
+.logout-btn{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;}
+.logout-btn:hover{background:rgba(231,76,60,0.05);border-color:rgba(231,76,60,0.15);color:#E74C3C;}
+.actions{display:flex;gap:4px;flex-wrap:wrap;}
 
 /* ============ SETTINGS ============ */
-.setting-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px;transition:all 0.4s ease;}
-.setting-card:hover{border-color:rgba(79,70,229,0.08);}
-.setting-card .title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
-.setting-card .desc{font-size:12px;color:var(--text-muted);margin-bottom:12px;}
-.theme-options{display:flex;gap:10px;flex-wrap:wrap;}
-.theme-options button{padding:10px 20px;border:2px solid var(--border);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;font-weight:500;}
+.theme-options{display:flex;gap:8px;flex-wrap:wrap;}
+.theme-options button{padding:8px 16px;border:2px solid var(--border);border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;font-weight:500;}
 .theme-options button:hover{border-color:var(--primary);color:var(--text);}
-.theme-options button.active{border-color:var(--primary);background:rgba(79,70,229,0.08);color:var(--primary);}
-.icon-options{display:flex;gap:12px;flex-wrap:wrap;}
-.icon-options button{padding:12px 20px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;font-size:24px;transition:all 0.3s;}
+.theme-options button.active{border-color:var(--primary);background:rgba(74,144,217,0.08);color:var(--primary);}
+.icon-options{display:flex;gap:8px;flex-wrap:wrap;}
+.icon-options button{padding:8px 14px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;font-size:22px;transition:all 0.3s;}
 .icon-options button:hover{border-color:var(--primary);transform:scale(1.05);}
-.icon-options button.active{border-color:var(--primary);background:rgba(79,70,229,0.08);}
+.icon-options button.active{border-color:var(--primary);background:rgba(74,144,217,0.08);}
+.flag-select{display:flex;gap:6px;align-items:center;}
+.flag-select button{padding:4px 10px;border:2px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-size:16px;transition:all 0.3s;}
+.flag-select button:hover{border-color:var(--primary);}
+.flag-select button.active{border-color:var(--primary);background:rgba(74,144,217,0.08);}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading">Yuklanmoqda...</div></div>
+<div id="app"><div class="loading">Yuklanmoqda</div></div>
 
 <script>
 // ============ KONFIG ============
@@ -217,9 +236,9 @@ let token = localStorage.getItem('token');
 
 // ============ TILLAR ============
 const LANG = {
-  uz: { hello: 'Salom', goodbye: 'Hayr', login: 'Kirish', logout: 'Chiqish', customers: 'Mijozlar', products: 'Mahsulotlar', sales: 'Sotuv', stats: 'Statistika', history: 'Tarix', settings: 'Sozlamalar', admin: 'Admin', user: 'Xodim', add: 'Qo\'shish', delete: 'O\'chirish', edit: 'Tahrirlash', save: 'Saqlash', cancel: 'Bekor qilish', debt: 'Qarz', paid: 'To\'langan', total: 'Jami', last: 'Oxirgi mahsulot', theme: 'Dizayn', light: 'Yorug\'', dark: 'Qorong\'i', classic: 'Klassik', icon: 'Ilova ikonasi' },
-  ru: { hello: 'Привет', goodbye: 'До свидания', login: 'Войти', logout: 'Выйти', customers: 'Клиенты', products: 'Товары', sales: 'Продажи', stats: 'Статистика', history: 'История', settings: 'Настройки', admin: 'Админ', user: 'Сотрудник', add: 'Добавить', delete: 'Удалить', edit: 'Редактировать', save: 'Сохранить', cancel: 'Отмена', debt: 'Долг', paid: 'Оплачено', total: 'Итого', last: 'Последний товар', theme: 'Дизайн', light: 'Светлый', dark: 'Тёмный', classic: 'Классический', icon: 'Иконка' },
-  en: { hello: 'Hello', goodbye: 'Goodbye', login: 'Login', logout: 'Logout', customers: 'Customers', products: 'Products', sales: 'Sales', stats: 'Statistics', history: 'History', settings: 'Settings', admin: 'Admin', user: 'Staff', add: 'Add', delete: 'Delete', edit: 'Edit', save: 'Save', cancel: 'Cancel', debt: 'Debt', paid: 'Paid', total: 'Total', last: 'Last Product', theme: 'Theme', light: 'Light', dark: 'Dark', classic: 'Classic', icon: 'Icon' }
+  uz: { hello: 'Salom', goodbye: 'Hayr', login: 'Kirish', logout: 'Chiqish', customers: 'Mijozlar', products: 'Mahsulotlar', sales: 'Sotuv', stats: 'Statistika', history: 'Tarix', settings: 'Sozlamalar', admin: 'Admin', user: 'Xodim', add: 'Qo\'shish', delete: 'O\'chirish', edit: 'Tahrirlash', save: 'Saqlash', cancel: 'Bekor qilish', debt: 'Qarz', paid: 'To\'langan', total: 'Jami', last: 'Oxirgi mahsulot', theme: 'Dizayn', light: 'Yorug\'', dark: 'Qorong\'i', classic: 'Klassik', icon: 'Belgi', select_date: 'Sana tanlang', show: 'Ko\'rsatish' },
+  ru: { hello: 'Привет', goodbye: 'До свидания', login: 'Войти', logout: 'Выйти', customers: 'Клиенты', products: 'Товары', sales: 'Продажи', stats: 'Статистика', history: 'История', settings: 'Настройки', admin: 'Админ', user: 'Сотрудник', add: 'Добавить', delete: 'Удалить', edit: 'Редактировать', save: 'Сохранить', cancel: 'Отмена', debt: 'Долг', paid: 'Оплачено', total: 'Итого', last: 'Последний товар', theme: 'Дизайн', light: 'Светлый', dark: 'Тёмный', classic: 'Классический', icon: 'Иконка', select_date: 'Выберите дату', show: 'Показать' },
+  en: { hello: 'Hello', goodbye: 'Goodbye', login: 'Login', logout: 'Logout', customers: 'Customers', products: 'Products', sales: 'Sales', stats: 'Statistics', history: 'History', settings: 'Settings', admin: 'Admin', user: 'Staff', add: 'Add', delete: 'Delete', edit: 'Edit', save: 'Save', cancel: 'Cancel', debt: 'Debt', paid: 'Paid', total: 'Total', last: 'Last Product', theme: 'Theme', light: 'Light', dark: 'Dark', classic: 'Classic', icon: 'Icon', select_date: 'Select date', show: 'Show' }
 };
 let lang = localStorage.getItem('lang') || 'uz';
 function t(k){ return LANG[lang][k] || k; }
@@ -233,8 +252,7 @@ function applyTheme(theme) {
 }
 
 function applyIcon(icon) {
-  const iconElements = document.querySelectorAll('.app-icon');
-  iconElements.forEach(el => el.textContent = icon || currentIcon);
+  document.querySelectorAll('.app-icon').forEach(el => el.textContent = icon || currentIcon);
 }
 
 // ============ STATE ============
@@ -246,7 +264,9 @@ let state = {
   historyFilter: { sana: '', customerId: '' },
   searchResults: [], showSearch: false, searchQuery: '',
   settings: { avatar: localStorage.getItem('user_avatar') || '' },
-  showWelcome: false
+  showWelcome: false,
+  isLoggingOut: false,
+  statsFilter: { sana: '' }
 };
 
 // ============ API ============
@@ -293,6 +313,16 @@ function getCustomerDebt(customerId) {
   return Math.max(0, totalDebt - totalPaid);
 }
 
+// SANA BO'YICHA QARZ
+function getDebtByDate(customerId, sana) {
+  if (!customerId || !sana) return 0;
+  const sales = state.sales.filter(s => s.customerId === customerId && s.sana === sana);
+  const totalDebt = sales.reduce((a,s) => a + (s.qarz||0), 0);
+  const payments = state.payments.filter(p => p.customerId === customerId && p.sana === sana);
+  const totalPaid = payments.reduce((a,p) => a + p.amount, 0);
+  return Math.max(0, totalDebt - totalPaid);
+}
+
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
@@ -306,14 +336,19 @@ function computeSale(d) {
 // ============ RENDER ============
 function render() {
   const app = document.getElementById('app');
-  if (state.loading) { app.innerHTML = '<div class="loading">Yuklanmoqda...</div>'; return; }
-  if (!state.loaded) { app.innerHTML = '<div class="loading">Ma\'lumotlar yuklanmoqda...</div>'; return; }
+  if (state.loading) { app.innerHTML = '<div class="loading">Yuklanmoqda</div>'; return; }
+  if (!state.loaded) { app.innerHTML = '<div class="loading">Ma\'lumotlar yuklanmoqda</div>'; return; }
   if (!state.currentUser) { app.innerHTML = renderLogin(); attachLoginEvents(); return; }
-  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#EC4899;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
+  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#E74C3C;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
+  
+  if (state.isLoggingOut) {
+    app.innerHTML = renderLogoutAnimation();
+    return;
+  }
   
   if (state.showWelcome) {
     app.innerHTML = renderWelcome();
-    setTimeout(() => { state.showWelcome = false; render(); }, 2500);
+    setTimeout(() => { state.showWelcome = false; render(); }, 2000);
     return;
   }
   
@@ -321,7 +356,6 @@ function render() {
   attachShellEvents();
   if (state.view === 'statistika') setTimeout(drawCharts, 300);
   
-  // Theme va Iconni qo'llash
   applyTheme(currentTheme);
   applyIcon(currentIcon);
 }
@@ -332,35 +366,49 @@ function renderWelcome() {
   const hello = LANG[lang].hello;
   return `
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--bg);transition:background 0.4s ease;">
-    <div class="book-animation">${currentIcon}</div>
+    <div class="book-open">${currentIcon}</div>
     <div class="welcome-text">${hello}, ${userName}!</div>
-    <div style="color:var(--text-muted);font-size:14px;margin-top:8px;">Toys Note ga xush kelibsiz</div>
+    <div style="color:var(--text-muted);font-size:13px;margin-top:6px;">Toys Note ga xush kelibsiz</div>
+  </div>`;
+}
+
+// ============ LOGOUT ANIMATSIYA ============
+function renderLogoutAnimation() {
+  const userName = state.currentUser?.login || 'User';
+  const goodbye = LANG[lang].goodbye;
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--bg);transition:background 0.4s ease;">
+    <div class="book-close">${currentIcon}</div>
+    <div class="welcome-text" style="background:linear-gradient(135deg,#E74C3C,#F39C12);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${goodbye}, ${userName}!</div>
+    <div style="color:var(--text-muted);font-size:13px;margin-top:6px;">Yana ko'rishguncha 👋</div>
   </div>`;
 }
 
 // ============ LOGIN ============
 function renderLogin() {
   const hello = LANG[lang].hello;
+  const flags = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
   return `
   <div class="login-wrap">
-    <div class="login-card">
+    <div class="login-card glass">
       <div class="logo-big">${currentIcon}</div>
       <h1>Toys Note</h1>
       <p class="subtitle">${hello}! Do'kon boshqaruv tizimi</p>
       ${state.loginErr ? '<div class="login-error">'+state.loginErr+'</div>' : ''}
-      <div style="margin-bottom:12px;text-align:left;">
-        <select class="lang-select" id="loginLang">
-          <option value="uz" ${lang==='uz'?'selected':''}>🇺🇿 O\'zbek</option>
-          <option value="ru" ${lang==='ru'?'selected':''}>🇷🇺 Русский</option>
-          <option value="en" ${lang==='en'?'selected':''}>🇬🇧 English</option>
-        </select>
+      <div style="margin-bottom:12px;">
+        <div class="flag-select" style="justify-content:center;">
+          ${['uz','ru','en'].map(l => 
+            `<button class="${lang===l?'active':''}" onclick="document.getElementById('loginLang').value='${l}';this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');">${flags[l]}</button>`
+          ).join('')}
+        </div>
+        <input type="hidden" id="loginLang" value="${lang}">
       </div>
       <form id="loginForm">
         <div class="field"><label>Login</label><input id="loginInput" value="baxrom" required></div>
         <div class="field"><label>Parol</label><input id="parolInput" type="password" value="14042011" required></div>
         <button class="btn btn-primary" type="submit" style="width:100%;">${t('login')}</button>
       </form>
-      <p style="margin-top:12px;font-size:11px;color:var(--text-muted);">Admin: baxrom / 14042011</p>
+      <p style="margin-top:10px;font-size:11px;color:var(--text-muted);">Admin: baxrom / 14042011</p>
     </div>
   </div>`;
 }
@@ -370,7 +418,7 @@ function attachLoginEvents() {
     e.preventDefault();
     const login = document.getElementById('loginInput').value.trim();
     const password = document.getElementById('parolInput').value;
-    const langVal = document.getElementById('loginLang').value;
+    const langVal = document.getElementById('loginLang').value || 'uz';
     lang = langVal; localStorage.setItem('lang', lang);
     state.loading = true; state.loginErr = ''; render();
     try {
@@ -394,7 +442,7 @@ function renderShell() {
   const userName = state.currentUser?.login || '';
   const hello = LANG[lang].hello;
   const avatar = state.settings.avatar || '';
-  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234F46E5"/%3E%3Ctext x="18" y="24" text-anchor="middle" fill="white" font-size="16" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Ccircle cx="16" cy="16" r="16" fill="%234A90D9"/%3E%3Ctext x="16" y="22" text-anchor="middle" fill="white" font-size="14" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
   
   const navs = [
     { id: 'mijozlar', label: t('customers'), icon: '👥' },
@@ -409,17 +457,19 @@ function renderShell() {
     `<button class="${state.view === n.id ? 'active' : ''}" data-nav="${n.id}">${n.icon} ${n.label}</button>`
   ).join('');
   
+  const flags = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
+  
   return `
   <div class="container">
-    <div class="header">
+    <div class="header glass">
       <div class="logo"><span class="icon app-icon">${currentIcon}</span><span class="gradient">Toys Note</span></div>
       <div class="nav">${navHtml}</div>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <select class="lang-select" id="headerLang" style="width:auto;padding:6px 10px;">
-          <option value="uz" ${lang==='uz'?'selected':''}>🇺🇿</option>
-          <option value="ru" ${lang==='ru'?'selected':''}>🇷🇺</option>
-          <option value="en" ${lang==='en'?'selected':''}>🇬🇧</option>
-        </select>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div class="flag-select">
+          ${['uz','ru','en'].map(l => 
+            `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="font-size:14px;padding:2px 8px;">${flags[l]}</button>`
+          ).join('')}
+        </div>
         <div class="user-info">
           <div class="user-avatar"><img src="${avatar || defaultAvatar}" alt="Avatar"></div>
           <div><div class="user-name">${hello}, ${userName}</div><div class="user-role">${isAdmin ? t('admin') : t('user')}</div></div>
@@ -452,21 +502,18 @@ function attachShellEvents() {
   });
   
   document.getElementById('logoutBtn').addEventListener('click', function() {
-    const goodbye = LANG[lang].goodbye;
-    const name = state.currentUser?.login || 'User';
-    if (confirm(goodbye + ', ' + name + '!')) {
-      state.currentUser = null;
-      token = null;
-      localStorage.removeItem('token');
-      state.loaded = false;
+    if (confirm(t('goodbye') + ', ' + state.currentUser?.login + '!')) {
+      state.isLoggingOut = true;
       render();
+      setTimeout(() => {
+        state.currentUser = null;
+        token = null;
+        localStorage.removeItem('token');
+        state.loaded = false;
+        state.isLoggingOut = false;
+        render();
+      }, 1500);
     }
-  });
-  
-  document.getElementById('headerLang')?.addEventListener('change', function() {
-    lang = this.value;
-    localStorage.setItem('lang', lang);
-    render();
   });
   
   attachViewEvents();
@@ -491,7 +538,7 @@ function viewCustomers() {
   }).join('');
   
   return `
-  <div class="card">
+  <div class="card glass">
     <h3>➕ ${t('add')} mijoz</h3>
     <form id="customerForm" class="row">
       <div class="field"><label>Ism</label><input id="custName" required placeholder="Aziz Karimov"></div>
@@ -499,7 +546,7 @@ function viewCustomers() {
       <button class="btn btn-primary" type="submit">${t('add')}</button>
     </form>
   </div>
-  <div class="card">
+  <div class="card glass">
     <h3>${t('customers')} (${state.customers.length})</h3>
     ${state.customers.length ? '<table><thead><tr><th>Ism</th><th>Telefon</th><th>Holati</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>' : '<div class="empty">Hali mijoz yo\'q</div>'}
   </div>`;
@@ -523,16 +570,16 @@ function viewProducts() {
   }).join('');
   
   return `
-  <div class="card">
+  <div class="card glass">
     <h3>➕ ${t('add')} mahsulot</h3>
     <form id="productForm" class="row">
       <div class="field"><label>Nomi</label><input id="prodName" required placeholder="Ayiqcha"></div>
       <div class="field"><label>Narxi (so'm)</label><input id="prodNarx" type="number" required placeholder="50000"></div>
       <button class="btn btn-primary" type="submit">${t('add')}</button>
     </form>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">✅ Artikul avtomatik: ART-001, ART-002...</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">✅ Artikul avtomatik: ART-001, ART-002...</div>
   </div>
-  <div class="card">
+  <div class="card glass">
     <h3>${t('products')} (${state.products.length})</h3>
     ${state.products.length ? '<table><thead><tr><th>Artikul</th><th>Nomi</th><th>Narxi</th><th>Sotuv</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>' : '<div class="empty">Hali mahsulot yo\'q</div>'}
   </div>`;
@@ -559,14 +606,14 @@ function viewSales() {
   if (d.productId) {
     const p = state.products.find(x => x._id === d.productId);
     if (p) {
-      selectedHtml = `<div style="margin-top:6px;padding:8px 12px;background:rgba(79,70,229,0.04);border-radius:8px;font-size:13px;">
+      selectedHtml = `<div style="margin-top:6px;padding:8px 12px;background:rgba(74,144,217,0.04);border-radius:8px;font-size:13px;">
         ✅ <span class="badge">${p.artikul||'ART-???'}</span> ${p.name} — ${fmt(p.narx)} so'm
       </div>`;
     }
   }
   
   return `
-  <div class="card">
+  <div class="card glass">
     <h3>🛒 ${t('sales')}</h3>
     ${!state.products.length||!state.customers.length ? '<div class="msg msg-warn">Kamida 1 ta mijoz va 1 ta mahsulot qo\'shing!</div>' : ''}
     <form id="saleForm">
@@ -593,36 +640,81 @@ function viewSales() {
       </div>
       <div class="grid">
         <div class="field"><label>Mijoz bergan pul</label><input type="number" min="0" id="saleTolangan" value="${d.tolangan}" placeholder="0"></div>
-        <div class="field"><label>Qarz</label><input id="saleQarz" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz>0?'rgba(236,72,153,0.05)':'rgba(20,184,166,0.05)'};color:${f.qarz>0?'#EC4899':'#14B8A6'};border:1px solid ${f.qarz>0?'rgba(236,72,153,0.1)':'rgba(20,184,166,0.1)'};padding:10px 14px;border-radius:10px;width:100%;font-size:14px;"></div>
+        <div class="field"><label>Qarz</label><input id="saleQarz" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz>0?'rgba(231,76,60,0.05)':'rgba(46,204,113,0.05)'};color:${f.qarz>0?'#E74C3C':'#2ECC71'};border:1px solid ${f.qarz>0?'rgba(231,76,60,0.1)':'rgba(46,204,113,0.1)'};padding:10px 14px;border-radius:10px;width:100%;font-size:14px;"></div>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
         <button class="btn btn-primary" type="submit">💾 ${t('save')}</button>
-        <button type="button" class="btn btn-primary" id="lastBtn" style="background:linear-gradient(135deg,#EC4899,#4F46E5);">📦 ${t('last')}</button>
+        <button type="button" class="btn btn-primary" id="lastBtn" style="background:linear-gradient(135deg,#2ECC71,#4A90D9);">📦 ${t('last')}</button>
       </div>
     </form>
   </div>`;
 }
 
-// STATS
+// ============ STATISTIKA ============
 function viewStats() {
   const totalSales = state.sales.reduce((a,s) => a+s.jami, 0);
   const totalPaid = state.sales.reduce((a,s) => a+s.tolangan, 0);
   let totalDebt = 0;
   state.customers.forEach(c => totalDebt += getCustomerDebt(c._id));
   
+  // Sana bo'yicha qarz
+  const filterSana = state.statsFilter.sana;
+  let dateDebt = 0;
+  let dateSales = [];
+  if (filterSana) {
+    dateSales = state.sales.filter(s => s.sana === filterSana);
+    dateDebt = dateSales.reduce((a,s) => a + s.qarz, 0);
+    // To'langan qarzlar
+    const datePayments = state.payments.filter(p => p.sana === filterSana);
+    const datePaid = datePayments.reduce((a,p) => a + p.amount, 0);
+    dateDebt = Math.max(0, dateDebt - datePaid);
+  }
+  
   return `
-  <div class="grid" style="margin-bottom:16px;">
-    <div class="card"><h3>💰 ${t('total')}</h3><div style="font-size:28px;font-weight:700;">${fmt(totalSales)} so'm</div></div>
-    <div class="card"><h3>✅ ${t('paid')}</h3><div style="font-size:28px;font-weight:700;color:#14B8A6;">${fmt(totalPaid)} so'm</div></div>
-    <div class="card"><h3>⚠️ ${t('debt')}</h3><div style="font-size:28px;font-weight:700;color:#EC4899;">${fmt(totalDebt)} so'm</div></div>
+  <div class="card glass">
+    <h3>📊 ${t('stats')}</h3>
+    <div class="grid" style="margin-bottom:12px;">
+      <div class="card glass" style="margin:0;padding:14px;"><h3 style="font-size:13px;">💰 ${t('total')}</h3><div style="font-size:24px;font-weight:700;">${fmt(totalSales)} so'm</div></div>
+      <div class="card glass" style="margin:0;padding:14px;"><h3 style="font-size:13px;">✅ ${t('paid')}</h3><div style="font-size:24px;font-weight:700;color:#2ECC71;">${fmt(totalPaid)} so'm</div></div>
+      <div class="card glass" style="margin:0;padding:14px;"><h3 style="font-size:13px;">⚠️ ${t('debt')}</h3><div style="font-size:24px;font-weight:700;color:#E74C3C;">${fmt(totalDebt)} so'm</div></div>
+    </div>
+    
+    <div style="margin:12px 0;padding:14px;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);">
+      <h3 style="font-size:14px;">📅 Sana bo'yicha qarz</h3>
+      <div class="row">
+        <div class="field"><label>${t('select_date')}</label><input type="date" id="statsDate" value="${filterSana}"></div>
+        <button class="btn btn-primary" id="statsShowBtn" style="align-self:end;">${t('show')}</button>
+        <button class="btn btn-secondary" id="statsClearBtn" style="align-self:end;">Tozalash</button>
+      </div>
+      ${filterSana ? `
+        <div style="margin-top:10px;padding:12px;background:rgba(74,144,217,0.05);border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div>Sana: <strong>${filterSana}</strong></div>
+            <div>Sotuvlar: <strong>${dateSales.length} ta</strong></div>
+            <div>Qarz: <strong style="color:${dateDebt>0?'#E74C3C':'#2ECC71'};">${fmt(dateDebt)} so'm</strong></div>
+          </div>
+          ${dateSales.length > 0 ? `
+            <div style="margin-top:8px;max-height:150px;overflow-y:auto;">
+              <table>
+                <thead><tr><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>Qarz</th></tr></thead>
+                <tbody>${dateSales.map(s => {
+                  const p = state.products.find(x => x._id === s.productId);
+                  return `<tr><td>${p ? p.name : '—'}</td><td>${s.soni}</td><td>${fmt(s.jami)}</td><td>${s.qarz>0?'<span class="pill pill-debt">'+fmt(s.qarz)+'</span>':'<span class="pill pill-ok">0</span>'}</td></tr>`;
+                }).join('')}</tbody>
+              </table>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+    </div>
   </div>
   <div class="grid">
-    <div class="card"><h3>📊 Kunlik savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
-    <div class="card"><h3>📊 Mahsulot sotuvi</h3><div class="chart-box"><canvas id="chartProducts"></canvas></div></div>
+    <div class="card glass"><h3>📊 Kunlik savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
+    <div class="card glass"><h3>📊 Mahsulot sotuvi</h3><div class="chart-box"><canvas id="chartProducts"></canvas></div></div>
   </div>`;
 }
 
-// HISTORY
+// ============ HISTORY ============
 function viewHistory() {
   const f = state.historyFilter;
   const customerOptions = state.customers.map(c => 
@@ -638,12 +730,23 @@ function viewHistory() {
     totalQ = matches.reduce((a,s) => a+s.qarz, 0);
     rows = matches.map(s => {
       const p = state.products.find(x => x._id === s.productId);
-      return `<tr><td>${s.sana}</td><td>${p ? p.name : '—'}</td><td>${s.soni} dona</td><td>${fmt(s.jami)} so'm</td><td>${fmt(s.tolangan)} so'm</td><td>${s.qarz>0?'<span class="pill pill-debt">'+fmt(s.qarz)+' so\'m</span>':'<span class="pill pill-ok">To\'liq</span>'}</td></tr>`;
+      return `<tr>
+        <td>${s.sana}</td>
+        <td>${p ? p.name : '—'}</td>
+        <td>${s.soni} dona</td>
+        <td>${fmt(s.jami)} so'm</td>
+        <td>${fmt(s.tolangan)} so'm</td>
+        <td>${s.qarz>0?'<span class="pill pill-debt">'+fmt(s.qarz)+' so\'m</span>':'<span class="pill pill-ok">To\'liq</span>'}</td>
+        <td class="actions">
+          <button class="btn btn-edit" data-edit-sale="${s._id}">✏️</button>
+          <button class="btn btn-danger" data-del-sale="${s._id}">🗑️</button>
+        </td>
+      </tr>`;
     }).join('');
   }
   
   return `
-  <div class="card">
+  <div class="card glass">
     <div class="row">
       <div class="field"><label>Sana</label><input type="date" id="histSana" value="${f.sana||''}"></div>
       <div class="field"><label>Mijoz</label><select id="histCustomer"><option value="">— tanlang —</option>${customerOptions}</select></div>
@@ -651,9 +754,9 @@ function viewHistory() {
       <button class="btn btn-secondary" id="histClear">Tozalash</button>
     </div>
   </div>
-  <div class="card">
+  <div class="card glass">
     <h3>📜 ${t('history')}</h3>
-    ${f.customerId ? (rows ? '<table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To\'langan</th><th>Qarz</th></tr></thead><tbody>'+rows+'</tbody></table><div style="margin-top:12px;padding:12px 16px;background:rgba(79,70,229,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;"><div>Jami: <strong>'+fmt(totalJ)+' so\'m</strong></div><div>To\'langan: <strong>'+fmt(totalP)+' so\'m</strong></div><div>Qarz: <strong style="color:#EC4899;">'+fmt(totalQ)+' so\'m</strong></div></div>' : '<div class="empty">Ma\'lumot topilmadi</div>') : '<div class="empty">Mijoz tanlang</div>'}
+    ${f.customerId ? (rows ? `<table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To\'langan</th><th>Qarz</th><th></th></tr></thead><tbody>${rows}</tbody></table><div style="margin-top:10px;padding:10px 14px;background:rgba(74,144,217,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;"><div>Jami: <strong>${fmt(totalJ)} so'm</strong></div><div>To\'langan: <strong>${fmt(totalP)} so'm</strong></div><div>Qarz: <strong style="color:#E74C3C;">${fmt(totalQ)} so'm</strong></div></div>` : '<div class="empty">Ma\'lumot topilmadi</div>') : '<div class="empty">Mijoz tanlang</div>'}
   </div>`;
 }
 
@@ -662,43 +765,39 @@ function viewSettings() {
   const isAdmin = state.currentUser?.role === 'admin';
   const userName = state.currentUser?.login || '';
   const avatar = state.settings.avatar || '';
-  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%234F46E5"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%234A90D9"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
   
   const userRows = state.users.map(u => 
     `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Admin' : 'Xodim'}</td><td>${u.login !== 'baxrom' ? '<button class="btn btn-danger" data-del-user="'+u.login+'">🗑️</button>' : '⭐'}</td></tr>`
   ).join('');
   
-  const themeNames = {
-    dark: t('dark'),
-    light: t('light'),
-    classic: t('classic')
-  };
+  const flags = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
   
   return `
-  <div class="card">
+  <div class="card glass">
     <h3>👤 Profil rasmi</h3>
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div class="user-avatar" style="width:64px;height:64px;border-color:var(--primary);"><img src="${avatar || defaultAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-      <form id="avatarForm" style="display:flex;gap:10px;flex-wrap:wrap;flex:1;">
-        <div class="field" style="margin-bottom:0;flex:1;min-width:200px;"><label>Rasm URL</label><input id="avatarUrl" placeholder="https://example.com/avatar.jpg"></div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div class="user-avatar" style="width:60px;height:60px;border-color:var(--primary);"><img src="${avatar || defaultAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <form id="avatarForm" style="display:flex;gap:8px;flex-wrap:wrap;flex:1;">
+        <div class="field" style="margin-bottom:0;flex:1;min-width:180px;"><label>Rasm URL</label><input id="avatarUrl" placeholder="https://example.com/avatar.jpg"></div>
         <button class="btn btn-primary" type="submit" style="align-self:end;">Yangilash</button>
       </form>
     </div>
   </div>
   
-  <div class="card">
+  <div class="card glass">
     <h3>🌐 Til</h3>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="${lang==='uz'?'btn btn-primary':'btn btn-secondary'}" onclick="changeLang('uz')">🇺🇿 O\'zbek</button>
-      <button class="${lang==='ru'?'btn btn-primary':'btn btn-secondary'}" onclick="changeLang('ru')">🇷🇺 Русский</button>
-      <button class="${lang==='en'?'btn btn-primary':'btn btn-secondary'}" onclick="changeLang('en')">🇬🇧 English</button>
+    <div class="flag-select" style="gap:8px;">
+      ${['uz','ru','en'].map(l => 
+        `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="padding:6px 14px;font-size:16px;">${flags[l]} ${l.toUpperCase()}</button>`
+      ).join('')}
     </div>
   </div>
   
   ${isAdmin ? `
-  <div class="card">
+  <div class="card glass">
     <h3>👥 Foydalanuvchilar</h3>
-    <form id="userForm" class="row" style="margin-bottom:12px;">
+    <form id="userForm" class="row" style="margin-bottom:10px;">
       <div class="field"><label>Login</label><input id="newLogin" required placeholder="login"></div>
       <div class="field"><label>Parol</label><input id="newParol" type="password" required placeholder="parol"></div>
       <button class="btn btn-primary" type="submit" style="align-self:end;">➕ ${t('add')}</button>
@@ -706,33 +805,30 @@ function viewSettings() {
     ${state.users.length ? '<table><thead><tr><th>Login</th><th>Rol</th><th></th></tr></thead><tbody>'+userRows+'</tbody></table>' : '<div class="empty">Hali foydalanuvchi yo\'q</div>'}
   </div>
   
-  <div class="card">
+  <div class="card glass">
     <h3>🎨 ${t('theme')}</h3>
-    <div style="display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
       <div>
-        <div style="font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;">${t('theme')}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;">${t('theme')}</div>
         <div class="theme-options">
-          <button class="${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">🌙 ${themeNames.dark}</button>
-          <button class="${currentTheme === 'light' ? 'active' : ''}" data-theme="light">☀️ ${themeNames.light}</button>
-          <button class="${currentTheme === 'classic' ? 'active' : ''}" data-theme="classic">📜 ${themeNames.classic}</button>
+          <button class="${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">🌙 ${t('dark')}</button>
+          <button class="${currentTheme === 'light' ? 'active' : ''}" data-theme="light">☀️ ${t('light')}</button>
+          <button class="${currentTheme === 'classic' ? 'active' : ''}" data-theme="classic">📜 ${t('classic')}</button>
         </div>
       </div>
       <div>
-        <div style="font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;">${t('icon')}</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;">${t('icon')}</div>
         <div class="icon-options">
-          <button class="${currentIcon === '📖' ? 'active' : ''}" data-icon="📖">📖</button>
-          <button class="${currentIcon === '🚀' ? 'active' : ''}" data-icon="🚀">🚀</button>
-          <button class="${currentIcon === '⭐' ? 'active' : ''}" data-icon="⭐">⭐</button>
-          <button class="${currentIcon === '🎯' ? 'active' : ''}" data-icon="🎯">🎯</button>
-          <button class="${currentIcon === '💎' ? 'active' : ''}" data-icon="💎">💎</button>
-          <button class="${currentIcon === '🌈' ? 'active' : ''}" data-icon="🌈">🌈</button>
+          ${['📖','🚀','⭐','🎯','💎','🌈'].map(i => 
+            `<button class="${currentIcon === i ? 'active' : ''}" data-icon="${i}">${i}</button>`
+          ).join('')}
         </div>
       </div>
     </div>
   </div>
   ` : ''}
   
-  <div class="card">
+  <div class="card glass">
     <h3>📊 Ma'lumotlar</h3>
     <div style="color:var(--text-secondary);font-size:13px;line-height:1.8;">
       Mijozlar: ${state.customers.length}<br>
@@ -751,6 +847,7 @@ function drawCharts() {
   charts.forEach(c => { try { c.destroy(); } catch(e) {} });
   charts = [];
   
+  // Daily
   const byDay = {};
   state.sales.forEach(s => { byDay[s.sana] = (byDay[s.sana] || 0) + s.jami; });
   const days = Object.keys(byDay).sort();
@@ -758,11 +855,12 @@ function drawCharts() {
   if (dc && days.length) {
     charts.push(new Chart(dc, {
       type: 'line',
-      data: { labels: days, datasets: [{ label: 'Savdo', data: days.map(d=>byDay[d]), borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.05)', fill: true, tension: 0.3 }] },
+      data: { labels: days, datasets: [{ label: 'Savdo', data: days.map(d=>byDay[d]), borderColor: '#4A90D9', backgroundColor: 'rgba(74,144,217,0.05)', fill: true, tension: 0.3 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     }));
   }
   
+  // Products
   const byProd = {};
   state.sales.forEach(s => {
     const p = state.products.find(x => x._id === s.productId);
@@ -775,7 +873,7 @@ function drawCharts() {
     if (labels.length) {
       charts.push(new Chart(pc, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Dona', data: labels.map(l=>byProd[l]), backgroundColor: ['#4F46E5','#EC4899','#14B8A6','#FBBF24','#8B5CF6'] }] },
+        data: { labels, datasets: [{ label: 'Dona', data: labels.map(l=>byProd[l]), backgroundColor: ['#4A90D9','#2ECC71','#F39C12','#E74C3C','#9B59B6'] }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       }));
     }
@@ -896,9 +994,9 @@ function attachViewEvents() {
       document.getElementById('salePer').textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
       const q = document.getElementById('saleQarz');
       q.value = fmt(f.qarz) + " so'm";
-      q.style.background = f.qarz > 0 ? 'rgba(236,72,153,0.05)' : 'rgba(20,184,166,0.05)';
-      q.style.color = f.qarz > 0 ? '#EC4899' : '#14B8A6';
-      q.style.borderColor = f.qarz > 0 ? 'rgba(236,72,153,0.1)' : 'rgba(20,184,166,0.1)';
+      q.style.background = f.qarz > 0 ? 'rgba(231,76,60,0.05)' : 'rgba(46,204,113,0.05)';
+      q.style.color = f.qarz > 0 ? '#E74C3C' : '#2ECC71';
+      q.style.borderColor = f.qarz > 0 ? 'rgba(231,76,60,0.1)' : 'rgba(46,204,113,0.1)';
     };
     
     ['saleSana','saleCustomer','saleSoni','saleTolangan'].forEach(id => {
@@ -947,6 +1045,29 @@ function attachViewEvents() {
     render();
   });
   
+  // History - Edit & Delete
+  document.querySelectorAll('[data-edit-sale]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const id = this.dataset.editSale;
+      const sale = state.sales.find(s => s._id === id);
+      if (sale) {
+        // Tahrirlash modalini ochish
+        alert('Tahrirlash funksiyasi: ' + id + '\nJami: ' + fmt(sale.jami) + ' so\'m');
+      }
+    });
+  });
+  
+  document.querySelectorAll('[data-del-sale]').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      if (!confirm('Sotuvni o\'chirish?')) return;
+      try {
+        await deleteSale(this.dataset.delSale);
+        await loadData();
+        render();
+      } catch(err) { alert(err.message); }
+    });
+  });
+  
   // Settings
   document.getElementById('avatarForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -973,33 +1094,37 @@ function attachViewEvents() {
     });
   });
   
-  // ✅ THEME BUTTONS
+  // Stats - Sana bo'yicha qarz
+  document.getElementById('statsShowBtn')?.addEventListener('click', function() {
+    state.statsFilter.sana = document.getElementById('statsDate').value;
+    render();
+  });
+  
+  document.getElementById('statsClearBtn')?.addEventListener('click', function() {
+    document.getElementById('statsDate').value = '';
+    state.statsFilter.sana = '';
+    render();
+  });
+  
+  // Theme
   document.querySelectorAll('[data-theme]').forEach(btn => {
     btn.addEventListener('click', function() {
-      const theme = this.dataset.theme;
-      currentTheme = theme;
-      localStorage.setItem('theme', theme);
-      applyTheme(theme);
-      
-      // Active holatini yangilash
+      currentTheme = this.dataset.theme;
+      localStorage.setItem('theme', currentTheme);
       document.querySelectorAll('[data-theme]').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
-      
+      applyTheme(currentTheme);
       render();
     });
   });
   
-  // ✅ ICON BUTTONS
   document.querySelectorAll('[data-icon]').forEach(btn => {
     btn.addEventListener('click', function() {
-      const icon = this.dataset.icon;
-      currentIcon = icon;
-      localStorage.setItem('icon', icon);
-      applyIcon(icon);
-      
+      currentIcon = this.dataset.icon;
+      localStorage.setItem('icon', currentIcon);
       document.querySelectorAll('[data-icon]').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
-      
+      applyIcon(currentIcon);
       render();
     });
   });
@@ -1015,9 +1140,9 @@ function renderPayModal() {
   overlay.className = 'modal-overlay';
   overlay.id = 'payOverlay';
   overlay.innerHTML = `
-    <div class="modal-card">
+    <div class="modal-card glass">
       <h3>💰 Qarz to'lash — ${c.name}</h3>
-      <p style="color:var(--text-secondary);font-size:14px;margin-top:-8px;">Joriy qarz: <b style="color:#EC4899;">${fmt(debt)} so'm</b></p>
+      <p style="color:var(--text-secondary);font-size:14px;margin-top:-6px;">Joriy qarz: <b style="color:#E74C3C;">${fmt(debt)} so'm</b></p>
       <form id="payForm">
         <div class="field"><label>Sana</label><input type="date" id="paySana" value="${today()}"></div>
         <div class="field"><label>To'lov summasi (so'm)</label><input type="number" min="1" max="${debt}" id="payAmount" required placeholder="0"></div>
@@ -1050,12 +1175,17 @@ function renderPayModal() {
       state.payModal = null;
       await loadData();
       render();
+      alert('✅ To\'lov saqlandi!\nSana: '+sana+'\nSumma: '+fmt(amount)+' so\'m');
     } catch(err) { alert(err.message); }
   });
 }
 
 // ============ CHANGE LANG ============
-function changeLang(l) { lang = l; localStorage.setItem('lang', l); render(); }
+function changeLang(l) { 
+  lang = l; 
+  localStorage.setItem('lang', lang); 
+  render(); 
+}
 window.changeLang = changeLang;
 
 // ============ LOAD DATA ============
