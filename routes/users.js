@@ -3,7 +3,6 @@ const User = require('../models/User');
 const { auth, admin } = require('../middleware/auth');
 const router = express.Router();
 
-// Barcha foydalanuvchilarni olish (faqat admin)
 router.get('/', auth, admin, async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -13,7 +12,6 @@ router.get('/', auth, admin, async (req, res) => {
   }
 });
 
-// Foydalanuvchi qo'shish (faqat admin)
 router.post('/register', auth, admin, async (req, res) => {
   try {
     const { login, password, role } = req.body;
@@ -35,7 +33,6 @@ router.post('/register', auth, admin, async (req, res) => {
   }
 });
 
-// Foydalanuvchini o'chirish (faqat admin)
 router.delete('/:login', auth, admin, async (req, res) => {
   try {
     const { login } = req.params;
