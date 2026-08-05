@@ -9,10 +9,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;}
+body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;overflow-x:hidden;}
 .container{max-width:1200px;margin:0 auto;padding:20px;}
+
+/* ============ LOGO ============ */
+.logo{font-size:26px;font-weight:800;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:8px;}
+.logo .icon{font-size:30px;}
+.logo .gradient{background:linear-gradient(135deg,#6C63FF,#FF6584,#00D2FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* ============ HEADER ============ */
 .header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid rgba(255,255,255,0.06);margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.logo{font-size:22px;font-weight:700;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .nav{display:flex;gap:8px;flex-wrap:wrap;}
 .nav button{padding:8px 16px;border:none;border-radius:8px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.3s;font-size:13px;font-family:'Inter',sans-serif;}
 .nav button:hover{background:rgba(255,255,255,0.08);color:#fff;}
@@ -46,14 +52,27 @@ tr:hover td{background:rgba(255,255,255,0.01);}
 .row{display:flex;gap:10px;flex-wrap:wrap;}
 .row .field{flex:1;min-width:140px;}
 .loading{text-align:center;padding:40px;color:rgba(255,255,255,0.3);}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+
+/* ============ LOGIN ============ */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 30% 20%, rgba(108,99,255,0.05) 0%, transparent 50%),radial-gradient(ellipse at 70% 80%, rgba(255,101,132,0.05) 0%, transparent 50%),#0a0a1a;}
 .login-card{width:400px;max-width:100%;padding:40px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;text-align:center;}
-.login-card h1{font-size:30px;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;font-family:'Baloo 2',sans-serif;}
-.login-card p{color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:20px;}
+.login-card .logo-big{font-size:56px;margin-bottom:12px;}
+.login-card h1{font-size:32px;background:linear-gradient(135deg,#6C63FF,#FF6584,#00D2FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;font-family:'Baloo 2',sans-serif;}
+.login-card .subtitle{color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:20px;}
 .login-error{background:rgba(255,101,132,0.08);color:#FF6584;padding:10px;border-radius:8px;margin-bottom:14px;font-size:13px;}
 .login-card .field input{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 16px;color:#fff;width:100%;font-size:14px;}
 .login-card .field input:focus{outline:none;border-color:#6C63FF;}
 .login-card .field label{text-align:left;}
+.lang-select{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;width:100%;}
+
+/* ============ ANIMATSIYA ============ */
+@keyframes bookOpen{
+  0%{transform:rotateY(-90deg) scale(0.8);opacity:0;}
+  100%{transform:rotateY(0) scale(1);opacity:1;}
+}
+.book-animation{animation:bookOpen 1s ease-out forwards;transform-origin:left center;display:inline-block;font-size:64px;}
+.welcome-text{font-size:24px;font-weight:700;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px;}
+
 .sale-box{background:rgba(108,99,255,0.03);border:1px solid rgba(108,99,255,0.06);border-radius:10px;padding:14px 18px;margin:14px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 .sale-box .lbl{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;}
 .sale-box .val{font-family:'Baloo 2',sans-serif;font-size:22px;color:#fff;}
@@ -62,7 +81,6 @@ tr:hover td{background:rgba(255,255,255,0.01);}
 .modal-card h3{font-size:20px;margin-bottom:12px;}
 .modal-actions{display:flex;gap:10px;margin-top:16px;}
 .modal-actions .btn{flex:1;}
-.lang-select{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;}
 .user-info{display:flex;align-items:center;gap:12px;}
 .user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid #6C63FF;overflow:hidden;flex-shrink:0;}
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
@@ -109,7 +127,8 @@ let state = {
   saleDraft: { sana: '', productId: '', customerId: '', soni: '', tolangan: '' },
   historyFilter: { sana: '', customerId: '' },
   searchResults: [], showSearch: false, searchQuery: '',
-  settings: { avatar: localStorage.getItem('user_avatar') || '' }
+  settings: { avatar: localStorage.getItem('user_avatar') || '' },
+  showWelcome: false
 };
 
 // ============ API ============
@@ -147,7 +166,6 @@ async function deleteUser(l){ return apiRequest('/users/'+l,{method:'DELETE'}); 
 function fmt(n){ return Math.round(n||0).toLocaleString('ru-RU'); }
 function today(){ return new Date().toISOString().slice(0,10); }
 
-// ✅ QARZ HISOBLASH - TO'G'RI (payments ham yuklanadi)
 function getCustomerDebt(customerId) {
   if (!customerId) return 0;
   const sales = state.sales.filter(s => s.customerId === customerId);
@@ -157,7 +175,6 @@ function getCustomerDebt(customerId) {
   return Math.max(0, totalDebt - totalPaid);
 }
 
-// ✅ SOTUV HISOBLASH
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
@@ -175,9 +192,29 @@ function render() {
   if (!state.loaded) { app.innerHTML = '<div class="loading">Ma\'lumotlar yuklanmoqda...</div>'; return; }
   if (!state.currentUser) { app.innerHTML = renderLogin(); attachLoginEvents(); return; }
   if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#FF6584;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
+  
+  // Agar welcome ko'rsatilishi kerak bo'lsa
+  if (state.showWelcome) {
+    app.innerHTML = renderWelcome();
+    setTimeout(() => { state.showWelcome = false; render(); }, 3000);
+    return;
+  }
+  
   app.innerHTML = renderShell();
   attachShellEvents();
   if (state.view === 'statistika') setTimeout(drawCharts, 300);
+}
+
+// ============ WELCOME ANIMATSIYA ============
+function renderWelcome() {
+  const userName = state.currentUser?.login || 'User';
+  const hello = LANG[lang].hello;
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at 30% 20%, rgba(108,99,255,0.05) 0%, transparent 50%),radial-gradient(ellipse at 70% 80%, rgba(255,101,132,0.05) 0%, transparent 50%),#0a0a1a;">
+    <div class="book-animation">📖</div>
+    <div class="welcome-text">${hello}, ${userName}!</div>
+    <div style="color:rgba(255,255,255,0.3);font-size:14px;margin-top:8px;">Toys Note ga xush kelibsiz</div>
+  </div>`;
 }
 
 // ============ LOGIN ============
@@ -186,11 +223,12 @@ function renderLogin() {
   return `
   <div class="login-wrap">
     <div class="login-card">
-      <h1>🚀 Toys Note</h1>
-      <p>${hello}! Do'kon boshqaruv tizimi</p>
+      <div class="logo-big">📖</div>
+      <h1>Toys Note</h1>
+      <p class="subtitle">${hello}! Do'kon boshqaruv tizimi</p>
       ${state.loginErr ? '<div class="login-error">'+state.loginErr+'</div>' : ''}
       <div style="margin-bottom:12px;text-align:left;">
-        <select class="lang-select" id="loginLang" style="width:100%;">
+        <select class="lang-select" id="loginLang">
           <option value="uz" ${lang==='uz'?'selected':''}>🇺🇿 O\'zbek</option>
           <option value="ru" ${lang==='ru'?'selected':''}>🇷🇺 Русский</option>
           <option value="en" ${lang==='en'?'selected':''}>🇬🇧 English</option>
@@ -219,6 +257,7 @@ function attachLoginEvents() {
       state.currentUser = user;
       await loadData();
       state.loaded = true; state.loading = false;
+      state.showWelcome = true;
       render();
     } catch(err) {
       state.loading = false;
@@ -252,10 +291,10 @@ function renderShell() {
   return `
   <div class="container">
     <div class="header">
-      <div class="logo">🚀 Toys Note</div>
+      <div class="logo"><span class="icon">📖</span><span class="gradient">Toys Note</span></div>
       <div class="nav">${navHtml}</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <select class="lang-select" id="headerLang">
+        <select class="lang-select" id="headerLang" style="width:auto;">
           <option value="uz" ${lang==='uz'?'selected':''}>🇺🇿</option>
           <option value="ru" ${lang==='ru'?'selected':''}>🇷🇺</option>
           <option value="en" ${lang==='en'?'selected':''}>🇬🇧</option>
@@ -314,7 +353,7 @@ function attachShellEvents() {
 
 // ============ VIEWS ============
 
-// ✅ CUSTOMERS - TUZATILGAN (o'chirish tugmasi ishlaydi)
+// CUSTOMERS
 function viewCustomers() {
   const rows = state.customers.map(c => {
     const debt = getCustomerDebt(c._id);
@@ -345,7 +384,7 @@ function viewCustomers() {
   </div>`;
 }
 
-// ✅ PRODUCTS - TUZATILGAN
+// PRODUCTS
 function viewProducts() {
   const rows = state.products.map(p => {
     const sold = state.sales.filter(s => s.productId === p._id).reduce((a,s) => a+s.soni, 0);
@@ -370,7 +409,7 @@ function viewProducts() {
       <div class="field"><label>Narxi (so'm)</label><input id="prodNarx" type="number" required placeholder="50000"></div>
       <button class="btn btn-primary" type="submit">${t('add')}</button>
     </form>
-    <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:10px;">⚠️ Artikul avtomatik: ART-001, ART-002...</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:10px;">✅ Artikul avtomatik: ART-001, ART-002...</div>
   </div>
   <div class="card">
     <h3>${t('products')} (${state.products.length})</h3>
@@ -378,7 +417,7 @@ function viewProducts() {
   </div>`;
 }
 
-// ✅ SALES - TUZATILGAN
+// SALES
 function viewSales() {
   const d = state.saleDraft;
   const f = computeSale(d);
@@ -443,7 +482,7 @@ function viewSales() {
   </div>`;
 }
 
-// ✅ STATS
+// STATS
 function viewStats() {
   const totalSales = state.sales.reduce((a,s) => a+s.jami, 0);
   const totalPaid = state.sales.reduce((a,s) => a+s.tolangan, 0);
@@ -462,7 +501,7 @@ function viewStats() {
   </div>`;
 }
 
-// ✅ HISTORY
+// HISTORY
 function viewHistory() {
   const f = state.historyFilter;
   const customerOptions = state.customers.map(c => 
@@ -497,7 +536,7 @@ function viewHistory() {
   </div>`;
 }
 
-// ✅ SETTINGS
+// SETTINGS
 function viewSettings() {
   const isAdmin = state.currentUser?.role === 'admin';
   const userName = state.currentUser?.login || '';
@@ -603,7 +642,7 @@ function drawCharts() {
 
 // ============ EVENTS ============
 function attachViewEvents() {
-  // ✅ Customers
+  // Customers
   document.getElementById('customerForm')?.addEventListener('submit', async e => {
     e.preventDefault();
     const name = document.getElementById('custName').value.trim();
@@ -626,7 +665,7 @@ function attachViewEvents() {
     });
   });
   
-  // ✅ Products
+  // Products
   document.getElementById('productForm')?.addEventListener('submit', async e => {
     e.preventDefault();
     const name = document.getElementById('prodName').value.trim();
@@ -654,7 +693,7 @@ function attachViewEvents() {
     });
   });
   
-  // ✅ Sales
+  // Sales
   const saleForm = document.getElementById('saleForm');
   if (saleForm) {
     const searchInput = document.getElementById('saleSearch');
@@ -750,7 +789,7 @@ function attachViewEvents() {
     });
   }
   
-  // ✅ History
+  // History
   document.getElementById('histShow')?.addEventListener('click', function() {
     state.historyFilter = {
       sana: document.getElementById('histSana').value,
@@ -766,14 +805,13 @@ function attachViewEvents() {
     render();
   });
   
-  // ✅ Settings - Avatar
+  // Settings
   document.getElementById('avatarForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     const url = document.getElementById('avatarUrl').value.trim();
     if (url) { state.settings.avatar = url; localStorage.setItem('user_avatar', url); render(); }
   });
   
-  // ✅ Settings - Users
   document.getElementById('userForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const login = document.getElementById('newLogin').value.trim();
@@ -793,7 +831,6 @@ function attachViewEvents() {
     });
   });
   
-  // ✅ Settings - Theme
   document.getElementById('applyTheme')?.addEventListener('click', function() {
     const c1 = document.getElementById('color1').value;
     const c2 = document.getElementById('color2').value;
@@ -872,7 +909,6 @@ window.changeLang = changeLang;
 async function loadData() {
   try {
     state.loading = true;
-    // ✅ PAYMENTS HAM YUKLANADI!
     const [customers, products, sales, payments, users] = await Promise.all([
       getCustomers().catch(()=>[]),
       getProducts().catch(()=>[]),
@@ -883,7 +919,7 @@ async function loadData() {
     state.customers = customers;
     state.products = products;
     state.sales = sales;
-    state.payments = payments;  // ✅ MUHIM!
+    state.payments = payments;
     state.users = users;
     state.loaded = true;
     state.loading = false;
