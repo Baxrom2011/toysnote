@@ -4,12 +4,8 @@ const ProductSchema = new mongoose.Schema({
   artikul: {
     type: String,
     unique: true,
-    trim: true,
-    // ⚠️ required: true O'CHIRILDI, default QO'SHILDI
-    default: function() {
-      const random = Math.floor(100000 + Math.random() * 900000);
-      return 'ART' + random;
-    }
+    trim: true
+    // ⚠️ default O'CHIRILDI, faqat pre('save') ishlaydi
   },
   name: {
     type: String,
@@ -27,7 +23,7 @@ const ProductSchema = new mongoose.Schema({
   }
 });
 
-// Artikul avtomatik yaratish
+// ✅ Artikul ketma-ket raqamlash (ART-000001, ART-000002...)
 ProductSchema.pre('save', async function(next) {
   try {
     if (!this.artikul) {
@@ -37,19 +33,19 @@ ProductSchema.pre('save', async function(next) {
       
       let nextNumber = 1;
       if (last && last.artikul) {
-        const match = last.artikul.match(/ART(\d+)/);
+        const match = last.artikul.match(/ART-?(\d+)/);
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
         }
       }
-      this.artikul = 'ART' + String(nextNumber).padStart(6, '0');
+      // 6 xonali raqam: 000001, 000002...
+      this.artikul = 'ART-' + String(nextNumber).padStart(6, '0');
       console.log('✅ Artikul yaratildi:', this.artikul);
     }
     next();
   } catch (error) {
     console.error('Artikul xatosi:', error);
-    const timestamp = Date.now().toString().slice(-6);
-    this.artikul = 'ART' + timestamp;
+    this.artikul = 'ART-' + Date.now().toString().slice(-6);
     next();
   }
 });
