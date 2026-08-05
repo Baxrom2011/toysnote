@@ -715,6 +715,7 @@ function viewStats() {
 }
 
 // ============ HISTORY ============
+// ============ TARIX ============
 function viewHistory() {
   const f = state.historyFilter;
   const customerOptions = state.customers.map(c => 
@@ -725,9 +726,16 @@ function viewHistory() {
   if (f.customerId) {
     let matches = state.sales.filter(s => s.customerId === f.customerId);
     if (f.sana) matches = matches.filter(s => s.sana === f.sana);
-    totalJ = matches.reduce((a,s) => a+s.jami, 0);
-    totalP = matches.reduce((a,s) => a+s.tolangan, 0);
-    totalQ = matches.reduce((a,s) => a+s.qarz, 0);
+    
+    // ✅ TO'G'RI HISOBLASH
+    totalJ = matches.reduce((a,s) => a + s.jami, 0);
+    totalP = matches.reduce((a,s) => a + s.tolangan, 0);
+    totalQ = matches.reduce((a,s) => a + s.qarz, 0);
+    
+    // Agar to'langan summa jami summa bilan bir xil bo'lsa, qarz 0
+    // Lekin qarz har bir sotuvda hisoblangan, shuning uchun totalQ = totalJ - totalP
+    // Agar totalP = totalJ bo'lsa, totalQ = 0 bo'ladi
+    
     rows = matches.map(s => {
       const p = state.products.find(x => x._id === s.productId);
       return `<tr>
@@ -736,11 +744,7 @@ function viewHistory() {
         <td>${s.soni} dona</td>
         <td>${fmt(s.jami)} so'm</td>
         <td>${fmt(s.tolangan)} so'm</td>
-        <td>${s.qarz>0?'<span class="pill pill-debt">'+fmt(s.qarz)+' so\'m</span>':'<span class="pill pill-ok">To\'liq</span>'}</td>
-        <td class="actions">
-          <button class="btn btn-edit" data-edit-sale="${s._id}">✏️</button>
-          <button class="btn btn-danger" data-del-sale="${s._id}">🗑️</button>
-        </td>
+        <td>${s.qarz > 0 ? '<span class="pill pill-debt">'+fmt(s.qarz)+' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
       </tr>`;
     }).join('');
   }
@@ -756,7 +760,18 @@ function viewHistory() {
   </div>
   <div class="card glass">
     <h3>📜 ${t('history')}</h3>
-    ${f.customerId ? (rows ? `<table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To\'langan</th><th>Qarz</th><th></th></tr></thead><tbody>${rows}</tbody></table><div style="margin-top:10px;padding:10px 14px;background:rgba(74,144,217,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;"><div>Jami: <strong>${fmt(totalJ)} so'm</strong></div><div>To\'langan: <strong>${fmt(totalP)} so'm</strong></div><div>Qarz: <strong style="color:#E74C3C;">${fmt(totalQ)} so'm</strong></div></div>` : '<div class="empty">Ma\'lumot topilmadi</div>') : '<div class="empty">Mijoz tanlang</div>'}
+    ${f.customerId ? (rows ? 
+      `<table>
+        <thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="margin-top:10px;padding:10px 14px;background:rgba(74,144,217,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;">
+        <div>📊 Jami: <strong>${fmt(totalJ)} so'm</strong></div>
+        <div>✅ To'langan: <strong style="color:#2ECC71;">${fmt(totalP)} so'm</strong></div>
+        <div>⚠️ Qarz: <strong style="color:${totalQ > 0 ? '#E74C3C' : '#2ECC71'};">${fmt(totalQ)} so'm</strong></div>
+      </div>` 
+      : '<div class="empty">Ma\'lumot topilmadi</div>') 
+    : '<div class="empty">Mijoz tanlang</div>'}
   </div>`;
 }
 
