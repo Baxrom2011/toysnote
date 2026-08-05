@@ -5,69 +5,107 @@ const Payment = require('../models/Payment');
 const { auth } = require('../middleware/auth');
 const router = express.Router();
 
+// Barcha sotuvlar
 router.get('/', auth, async (req, res) => {
   try {
     const sales = await Sale.find().sort({ createdAt: -1 });
     res.json(sales);
   } catch (error) {
     console.error('GET /sales error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
+// Yangi sotuv qo'shish
 router.post('/', auth, async (req, res) => {
   try {
     const { sana, customerId, productId, soni, tolangan } = req.body;
     
-    if (!sana || !customerId || !productId || !soni) {
-      return res.status(400).json({ error: 'Barcha maydonlar to\'ldirilishi shart' });
-    }
+    console.log('📦 Sotuv ma\'lumotlari:', { sana, customerId, productId, soni, tolangan });
+    
+    // Ma'lumotlarni tekshirish
+    if (!sana) return res.status(400).json({ error: 'Sana kerak' });
+    if (!customerId) return res.status(400).json({ error: 'Mijoz kerak' });
+    if (!productId) return res.status(400).json({ error: 'Mahsulot kerak' });
+    if (!soni || Number(soni) <= 0) return res.status(400).json({ error: 'Soni noto\'g\'ri' });
 
+    // Mahsulotni topish
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ error: 'Mahsulot topilmadi' });
     }
 
-    const jami = product.narx * Number(soni);
-    const tolanganAmt = Number(tolangan || 0);
-    const qarz = Math.max(0, jami - tolanganAmt);
-    const ortiqcha = Math.max(0, tolanganAmt - jami);
+    // Hisoblashlar
+    const soniNum = Number(soni);
+    const jami = product.narx * soniNum;
+    const tolanganNum = Number(tolangan || 0);
+    const qarz = Math.max(0, jami - tolanganNum);
+    const ortiqcha = Math.max(0, tolanganNum - jami);
 
+    console.log('💳 Hisoblar:', { jami, tolangan: tolanganNum, qarz, ortiqcha });
+
+    // Sotuvni saqlash
     const sale = new Sale({
       sana,
       customerId,
       productId,
-      soni: Number(soni),
+      soni: soniNum,
       narx: product.narx,
       jami,
-      tolangan: tolanganAmt,
+      tolangan: tolanganNum,
       qarz
     });
     
-    await sale.save();
+    const savedSale = await sale.save();
+    console.log('✅ Sotuv saqlandi:', savedSale);
 
+    // ✅ ORTIQCHA TO'LOV - QARZGA QO'SHILADI
     if (ortiqcha > 0) {
-      const payment = new Payment({
-        customerId,
-        sana,
-        amount: ortiqcha
-      });
-      await payment.save();
+      // Mijozning oldingi qarzini olish
+      const existingSales = await Sale.find({ customerId });
+      const existingPayments = await Payment.find({ customerId });
+      
+      const totalDebt = existingSales.reduce((a,s) => a + s.qarz, 0);
+      const totalPaid = existingPayments.reduce((a,p) => a + p.amount, 0);
+      const currentDebt = Math.max(0, totalDebt - totalPaid);
+      
+      // Ortiqcha to'lov qarzni kamaytiradi
+      let remaining = ortiqcha;
+      
+      // Eski qarz to'lovlari - ularni payment sifatida saqlash
+      if (currentDebt > 0) {
+        const toPay = Math.min(remaining, currentDebt);
+        const payment = new Payment({
+          customerId,
+          sana,
+          amount: toPay
+        });
+        await payment.save();
+        console.log('✅ Qarz to\'lovi saqlandi:', toPay);
+        remaining -= toPay;
+      }
+      
+      // Agar ortiqcha hali qolsa, uni mijozning balansiga qo'shish
+      if (remaining > 0) {
+        // Bonus yoki ortiqcha pul sifatida saqlash
+        console.log('💚 Ortiqcha pul qoldi:', remaining);
+      }
     }
 
-    res.status(201).json(sale);
+    res.status(201).json(savedSale);
   } catch (error) {
-    console.error('POST /sales error:', error);
+    console.error('❌ POST /sales error:', error);
     res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 });
 
+// Mijoz qarzini olish
 router.get('/debt/:customerId', auth, async (req, res) => {
   try {
     const customerId = req.params.customerId;
     
     const sales = await Sale.find({ customerId });
-    const totalDebt = sales.reduce((sum, s) => sum + s.qarz, 0);
+    const totalDebt = sales.reduce((sum, s) => sum + (s.qarz || 0), 0);
     
     const payments = await Payment.find({ customerId });
     const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
@@ -76,20 +114,7 @@ router.get('/debt/:customerId', auth, async (req, res) => {
     res.json({ debt });
   } catch (error) {
     console.error('GET /sales/debt error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
-  }
-});
-
-router.delete('/:id', auth, async (req, res) => {
-  try {
-    const deleted = await Sale.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'Sotuv topilmadi' });
-    }
-    res.json({ message: 'Sotuv o\'chirildi' });
-  } catch (error) {
-    console.error('DELETE /sales/:id error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
