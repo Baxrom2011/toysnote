@@ -9,7 +9,7 @@ router.get('/', auth, async (req, res) => {
     res.json(products);
   } catch (error) {
     console.error('GET /products error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
@@ -24,43 +24,50 @@ router.get('/search/:query', auth, async (req, res) => {
     });
     res.json(products);
   } catch (error) {
-    console.error('Search error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    console.error('GET /products/search error:', error);
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
 router.post('/', auth, async (req, res) => {
   try {
     const { name, narx } = req.body;
-    
-    if (!name || !narx) {
-      return res.status(400).json({ error: 'Nomi va narxi kiritilishi shart' });
-    }
-
-    const product = new Product({ 
-      name: name.trim(), 
-      narx: Number(narx)
-    });
-    
+    if (!name || !narx) return res.status(400).json({ error: 'Nomi va narxi kerak' });
+    const product = new Product({ name: name.trim(), narx: Number(narx) });
     await product.save();
-    
     res.status(201).json(product);
   } catch (error) {
     console.error('POST /products error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    res.status(500).json({ error: 'Server xatosi' });
+  }
+});
+
+// ✅ PUT - TAHRIRLASH
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const { name, narx } = req.body;
+    if (!name || !narx) return res.status(400).json({ error: 'Nomi va narxi kerak' });
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { name: name.trim(), narx: Number(narx) },
+      { new: true, runValidators: true }
+    );
+    if (!product) return res.status(404).json({ error: 'Mahsulot topilmadi' });
+    res.json(product);
+  } catch (error) {
+    console.error('PUT /products/:id error:', error);
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
 router.delete('/:id', auth, async (req, res) => {
   try {
     const deleted = await Product.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'Mahsulot topilmadi' });
-    }
+    if (!deleted) return res.status(404).json({ error: 'Mahsulot topilmadi' });
     res.json({ message: 'Mahsulot o\'chirildi' });
   } catch (error) {
     console.error('DELETE /products/:id error:', error);
-    res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
