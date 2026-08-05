@@ -5,101 +5,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Toys Note</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
+:root {
+  --primary: #4F46E5;
+  --primary-light: #818CF8;
+  --secondary: #EC4899;
+  --accent: #14B8A6;
+  --bg: #0F0F1A;
+  --card-bg: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.06);
+  --text: #FFFFFF;
+  --text-secondary: rgba(255,255,255,0.6);
+  --text-muted: rgba(255,255,255,0.3);
+  --radius: 16px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .container{max-width:1200px;margin:0 auto;padding:20px;}
 
-/* ============ LOGO ============ */
-.logo{font-size:26px;font-weight:800;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:8px;}
-.logo .icon{font-size:30px;}
-.logo .gradient{background:linear-gradient(135deg,#6C63FF,#FF6584,#00D2FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
 /* ============ HEADER ============ */
-.header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid rgba(255,255,255,0.06);margin-bottom:20px;flex-wrap:wrap;gap:10px;}
-.nav{display:flex;gap:8px;flex-wrap:wrap;}
-.nav button{padding:8px 16px;border:none;border-radius:8px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.3s;font-size:13px;font-family:'Inter',sans-serif;}
-.nav button:hover{background:rgba(255,255,255,0.08);color:#fff;}
-.nav button.active{background:rgba(108,99,255,0.1);color:#6C63FF;border:1px solid rgba(108,99,255,0.1);}
-.card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:20px;margin-bottom:16px;}
-.card h3{font-size:16px;margin-bottom:14px;color:#fff;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px;flex-wrap:wrap;gap:10px;backdrop-filter:blur(12px);}
+.logo{font-size:24px;font-weight:700;font-family:'Baloo 2',sans-serif;display:flex;align-items:center;gap:10px;color:#fff;}
+.logo .icon{font-size:28px;}
+.logo .gradient{background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav{display:flex;gap:6px;flex-wrap:wrap;}
+.nav button{padding:8px 16px;border:none;border-radius:10px;background:transparent;color:var(--text-secondary);cursor:pointer;transition:all 0.3s;font-size:13px;font-weight:500;font-family:'Inter',sans-serif;}
+.nav button:hover{background:rgba(255,255,255,0.05);color:#fff;}
+.nav button.active{background:rgba(79,70,229,0.12);color:var(--primary);border:1px solid rgba(79,70,229,0.15);}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;backdrop-filter:blur(8px);}
+.card h3{font-size:16px;font-weight:600;margin-bottom:14px;color:#fff;}
+.card:hover{border-color:rgba(79,70,229,0.1);}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media(max-width:768px){.grid{grid-template-columns:1fr;}}
-input,select{width:100%;padding:10px 14px;border-radius:10px;border:2px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#fff;font-size:14px;font-family:'Inter',sans-serif;}
-input:focus,select:focus{outline:none;border-color:#6C63FF;}
-label{display:block;color:rgba(255,255,255,0.4);font-size:12px;margin-bottom:4px;}
+input,select{width:100%;padding:10px 14px;border-radius:10px;border:2px solid var(--border);background:rgba(255,255,255,0.04);color:#fff;font-size:14px;font-family:'Inter',sans-serif;transition:all 0.3s;}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,0.1);}
+label{display:block;color:var(--text-secondary);font-size:12px;font-weight:500;margin-bottom:5px;}
 .btn{padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;transition:all 0.3s;font-size:13px;font-family:'Inter',sans-serif;}
-.btn-primary{background:linear-gradient(135deg,#6C63FF,#FF6584);color:#fff;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(108,99,255,0.2);}
-.btn-danger{background:rgba(255,101,132,0.1);color:#FF6584;}
-.btn-danger:hover{background:rgba(255,101,132,0.2);}
-.btn-pay{background:rgba(108,99,255,0.1);color:#6C63FF;}
-.btn-pay:hover{background:rgba(108,99,255,0.2);}
-.btn-secondary{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.06);}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(79,70,229,0.25);}
+.btn-danger{background:rgba(236,72,153,0.1);color:#EC4899;}
+.btn-danger:hover{background:rgba(236,72,153,0.2);}
+.btn-pay{background:rgba(20,184,166,0.1);color:#14B8A6;}
+.btn-pay:hover{background:rgba(20,184,166,0.2);}
+.btn-secondary{background:rgba(255,255,255,0.05);color:var(--text-secondary);border:1px solid var(--border);}
 .btn-secondary:hover{background:rgba(255,255,255,0.08);color:#fff;}
-.btn-edit{background:rgba(255,179,71,0.1);color:#FFB347;}
-.btn-edit:hover{background:rgba(255,179,71,0.2);}
+.btn-edit{background:rgba(251,191,36,0.1);color:#FBBF24;}
+.btn-edit:hover{background:rgba(251,191,36,0.2);}
 table{width:100%;border-collapse:collapse;}
-th{text-align:left;color:rgba(255,255,255,0.3);font-weight:600;font-size:11px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
-td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.02);color:rgba(255,255,255,0.7);font-size:13px;}
+th{text-align:left;color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;padding:10px 12px;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--text-secondary);font-size:13px;}
 tr:hover td{background:rgba(255,255,255,0.01);}
-.pill{display:inline-block;padding:3px 12px;border-radius:16px;font-size:11px;font-weight:600;}
-.pill-ok{background:rgba(0,210,255,0.08);color:#00D2FF;}
-.pill-debt{background:rgba(255,101,132,0.08);color:#FF6584;}
-.badge{background:rgba(108,99,255,0.08);color:#6C63FF;padding:2px 10px;border-radius:8px;font-size:11px;font-family:monospace;}
+.pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.pill-ok{background:rgba(20,184,166,0.1);color:#14B8A6;}
+.pill-debt{background:rgba(236,72,153,0.1);color:#EC4899;}
+.badge{background:rgba(79,70,229,0.08);color:var(--primary);padding:2px 10px;border-radius:8px;font-size:11px;font-family:monospace;}
 .row{display:flex;gap:10px;flex-wrap:wrap;}
 .row .field{flex:1;min-width:140px;}
-.loading{text-align:center;padding:40px;color:rgba(255,255,255,0.3);}
+.loading{text-align:center;padding:40px;color:var(--text-muted);}
 
 /* ============ LOGIN ============ */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 30% 20%, rgba(108,99,255,0.05) 0%, transparent 50%),radial-gradient(ellipse at 70% 80%, rgba(255,101,132,0.05) 0%, transparent 50%),#0a0a1a;}
-.login-card{width:400px;max-width:100%;padding:40px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;text-align:center;}
-.login-card .logo-big{font-size:56px;margin-bottom:12px;}
-.login-card h1{font-size:32px;background:linear-gradient(135deg,#6C63FF,#FF6584,#00D2FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;font-family:'Baloo 2',sans-serif;}
-.login-card .subtitle{color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:20px;}
-.login-error{background:rgba(255,101,132,0.08);color:#FF6584;padding:10px;border-radius:8px;margin-bottom:14px;font-size:13px;}
-.login-card .field input{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 16px;color:#fff;width:100%;font-size:14px;}
-.login-card .field input:focus{outline:none;border-color:#6C63FF;}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 30% 20%, rgba(79,70,229,0.04) 0%, transparent 50%),radial-gradient(ellipse at 70% 80%, rgba(236,72,153,0.04) 0%, transparent 50%),var(--bg);}
+.login-card{width:400px;max-width:100%;padding:40px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);text-align:center;backdrop-filter:blur(16px);}
+.login-card .logo-big{font-size:48px;margin-bottom:12px;}
+.login-card h1{font-size:30px;background:linear-gradient(135deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;font-family:'Baloo 2',sans-serif;}
+.login-card .subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:20px;}
+.login-error{background:rgba(236,72,153,0.08);color:#EC4899;padding:10px;border-radius:10px;margin-bottom:14px;font-size:13px;}
+.login-card .field input{background:rgba(255,255,255,0.04);border:2px solid var(--border);border-radius:10px;padding:12px 16px;color:#fff;width:100%;font-size:14px;}
+.login-card .field input:focus{outline:none;border-color:var(--primary);}
 .login-card .field label{text-align:left;}
-.lang-select{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:6px 10px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;width:100%;}
+.lang-select{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'Inter',sans-serif;width:100%;}
 
 /* ============ ANIMATSIYA ============ */
 @keyframes bookOpen{
-  0%{transform:rotateY(-90deg) scale(0.8);opacity:0;}
+  0%{transform:rotateY(-90deg) scale(0.6);opacity:0;}
   100%{transform:rotateY(0) scale(1);opacity:1;}
 }
-.book-animation{animation:bookOpen 1s ease-out forwards;transform-origin:left center;display:inline-block;font-size:64px;}
-.welcome-text{font-size:24px;font-weight:700;background:linear-gradient(135deg,#6C63FF,#FF6584);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px;}
+@keyframes bookClose{
+  0%{transform:rotateY(0) scale(1);opacity:1;}
+  100%{transform:rotateY(90deg) scale(0.6);opacity:0;}
+}
+.book-animation{animation:bookOpen 0.8s ease-out forwards;transform-origin:left center;display:inline-block;font-size:56px;}
+.book-animation.close{animation:bookClose 0.6s ease-in forwards;}
 
-.sale-box{background:rgba(108,99,255,0.03);border:1px solid rgba(108,99,255,0.06);border-radius:10px;padding:14px 18px;margin:14px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.sale-box .lbl{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;}
+.welcome-text{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:10px;}
+
+.sale-box{background:rgba(79,70,229,0.03);border:1px solid rgba(79,70,229,0.06);border-radius:12px;padding:14px 18px;margin:14px 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.sale-box .lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;}
 .sale-box .val{font-family:'Baloo 2',sans-serif;font-size:22px;color:#fff;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:50;}
-.modal-card{background:#1a1a2e;border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:28px;width:400px;max-width:92vw;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:50;}
+.modal-card{background:#1a1a2e;border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:400px;max-width:92vw;}
 .modal-card h3{font-size:20px;margin-bottom:12px;}
 .modal-actions{display:flex;gap:10px;margin-top:16px;}
 .modal-actions .btn{flex:1;}
 .user-info{display:flex;align-items:center;gap:12px;}
-.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid #6C63FF;overflow:hidden;flex-shrink:0;}
+.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--primary);overflow:hidden;flex-shrink:0;}
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
-.user-name{font-size:14px;color:#fff;}
-.user-role{font-size:11px;color:rgba(255,255,255,0.3);}
-.empty{color:rgba(255,255,255,0.3);padding:20px;text-align:center;font-size:14px;}
+.user-name{font-size:14px;font-weight:500;color:#fff;}
+.user-role{font-size:11px;color:var(--text-muted);}
+.empty{color:var(--text-muted);padding:20px;text-align:center;font-size:14px;}
 .msg{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px;}
-.msg-ok{background:rgba(0,210,255,0.04);color:#00D2FF;border:1px solid rgba(0,210,255,0.06);}
-.msg-warn{background:rgba(255,101,132,0.04);color:#FF6584;border:1px solid rgba(255,101,132,0.06);}
+.msg-ok{background:rgba(20,184,166,0.05);color:#14B8A6;border:1px solid rgba(20,184,166,0.08);}
+.msg-warn{background:rgba(236,72,153,0.05);color:#EC4899;border:1px solid rgba(236,72,153,0.08);}
 .search-wrapper{position:relative;}
-.search-dropdown{position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid rgba(255,255,255,0.05);border-radius:10px;max-height:200px;overflow-y:auto;z-index:10;display:none;margin-top:4px;}
+.search-dropdown{position:absolute;top:100%;left:0;right:0;background:#1a1a2e;border:1px solid var(--border);border-radius:10px;max-height:200px;overflow-y:auto;z-index:10;display:none;margin-top:4px;}
 .search-dropdown.show{display:block;}
-.search-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:all 0.15s;font-size:13px;color:rgba(255,255,255,0.6);}
-.search-item:hover{background:rgba(108,99,255,0.05);color:#fff;}
-.search-item .art{color:#6C63FF;font-weight:600;}
+.search-item{padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:13px;color:var(--text-secondary);}
+.search-item:hover{background:rgba(79,70,229,0.05);color:#fff;}
+.search-item .art{color:var(--primary);font-weight:600;}
 .chart-box{height:220px;position:relative;}
-.logout-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;}
-.logout-btn:hover{background:rgba(255,101,132,0.05);border-color:rgba(255,101,132,0.15);color:#FF6584;}
+.logout-btn{background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-secondary);padding:8px 16px;border-radius:10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;transition:all 0.3s;}
+.logout-btn:hover{background:rgba(236,72,153,0.05);border-color:rgba(236,72,153,0.15);color:#EC4899;}
 .actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* SETTINGS */
+.color-picker{width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0;}
+.color-picker::-webkit-color-swatch-wrapper{padding:0;}
+.color-picker::-webkit-color-swatch{border:2px solid var(--border);border-radius:8px;}
+.setting-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-row label{min-width:80px;margin:0;color:var(--text-secondary);font-size:13px;}
 </style>
 </head>
 <body>
@@ -128,7 +156,13 @@ let state = {
   historyFilter: { sana: '', customerId: '' },
   searchResults: [], showSearch: false, searchQuery: '',
   settings: { avatar: localStorage.getItem('user_avatar') || '' },
-  showWelcome: false
+  showWelcome: false,
+  theme: {
+    primary: localStorage.getItem('theme_primary') || '#4F46E5',
+    secondary: localStorage.getItem('theme_secondary') || '#EC4899',
+    accent: localStorage.getItem('theme_accent') || '#14B8A6',
+    bg: localStorage.getItem('theme_bg') || '#0F0F1A'
+  }
 };
 
 // ============ API ============
@@ -191,29 +225,35 @@ function render() {
   if (state.loading) { app.innerHTML = '<div class="loading">Yuklanmoqda...</div>'; return; }
   if (!state.loaded) { app.innerHTML = '<div class="loading">Ma\'lumotlar yuklanmoqda...</div>'; return; }
   if (!state.currentUser) { app.innerHTML = renderLogin(); attachLoginEvents(); return; }
-  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#FF6584;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
+  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#EC4899;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
   
-  // Agar welcome ko'rsatilishi kerak bo'lsa
   if (state.showWelcome) {
     app.innerHTML = renderWelcome();
-    setTimeout(() => { state.showWelcome = false; render(); }, 3000);
+    // 2.5 sekunddan keyin yopiladi
+    setTimeout(() => { 
+      state.showWelcome = false; 
+      render(); 
+    }, 2500);
     return;
   }
   
   app.innerHTML = renderShell();
   attachShellEvents();
   if (state.view === 'statistika') setTimeout(drawCharts, 300);
+  
+  // Temani qo'llash
+  applyTheme();
 }
 
-// ============ WELCOME ANIMATSIYA ============
+// ============ WELCOME ============
 function renderWelcome() {
   const userName = state.currentUser?.login || 'User';
   const hello = LANG[lang].hello;
   return `
-  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at 30% 20%, rgba(108,99,255,0.05) 0%, transparent 50%),radial-gradient(ellipse at 70% 80%, rgba(255,101,132,0.05) 0%, transparent 50%),#0a0a1a;">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;background:var(--bg);">
     <div class="book-animation">📖</div>
     <div class="welcome-text">${hello}, ${userName}!</div>
-    <div style="color:rgba(255,255,255,0.3);font-size:14px;margin-top:8px;">Toys Note ga xush kelibsiz</div>
+    <div style="color:var(--text-muted);font-size:14px;margin-top:8px;">Toys Note ga xush kelibsiz</div>
   </div>`;
 }
 
@@ -239,7 +279,7 @@ function renderLogin() {
         <div class="field"><label>Parol</label><input id="parolInput" type="password" value="14042011" required></div>
         <button class="btn btn-primary" type="submit" style="width:100%;">${t('login')}</button>
       </form>
-      <p style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.2);">Admin: baxrom / 14042011</p>
+      <p style="margin-top:12px;font-size:11px;color:var(--text-muted);">Admin: baxrom / 14042011</p>
     </div>
   </div>`;
 }
@@ -273,7 +313,7 @@ function renderShell() {
   const userName = state.currentUser?.login || '';
   const hello = LANG[lang].hello;
   const avatar = state.settings.avatar || '';
-  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%236C63FF"/%3E%3Ctext x="18" y="24" text-anchor="middle" fill="white" font-size="16" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234F46E5"/%3E%3Ctext x="18" y="24" text-anchor="middle" fill="white" font-size="16" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
   
   const navs = [
     { id: 'mijozlar', label: t('customers'), icon: '👥' },
@@ -294,7 +334,7 @@ function renderShell() {
       <div class="logo"><span class="icon">📖</span><span class="gradient">Toys Note</span></div>
       <div class="nav">${navHtml}</div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <select class="lang-select" id="headerLang" style="width:auto;">
+        <select class="lang-select" id="headerLang" style="width:auto;padding:6px 10px;">
           <option value="uz" ${lang==='uz'?'selected':''}>🇺🇿</option>
           <option value="ru" ${lang==='ru'?'selected':''}>🇷🇺</option>
           <option value="en" ${lang==='en'?'selected':''}>🇬🇧</option>
@@ -409,7 +449,7 @@ function viewProducts() {
       <div class="field"><label>Narxi (so'm)</label><input id="prodNarx" type="number" required placeholder="50000"></div>
       <button class="btn btn-primary" type="submit">${t('add')}</button>
     </form>
-    <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:10px;">✅ Artikul avtomatik: ART-001, ART-002...</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">✅ Artikul avtomatik: ART-001, ART-002...</div>
   </div>
   <div class="card">
     <h3>${t('products')} (${state.products.length})</h3>
@@ -429,7 +469,7 @@ function viewSales() {
   if (state.showSearch && state.searchResults.length > 0) {
     searchHtml = state.searchResults.map(p => 
       `<div class="search-item" data-pid="${p._id}" data-pname="${p.name}" data-part="${p.artikul||'ART-???'}">
-        <span class="art">${p.artikul||'ART-???'}</span> - ${p.name} <span style="color:rgba(255,255,255,0.2);">${fmt(p.narx)} so'm</span>
+        <span class="art">${p.artikul||'ART-???'}</span> - ${p.name} <span style="color:var(--text-muted);">${fmt(p.narx)} so'm</span>
       </div>`
     ).join('');
   }
@@ -438,7 +478,7 @@ function viewSales() {
   if (d.productId) {
     const p = state.products.find(x => x._id === d.productId);
     if (p) {
-      selectedHtml = `<div style="margin-top:6px;padding:8px 12px;background:rgba(108,99,255,0.04);border-radius:8px;font-size:13px;">
+      selectedHtml = `<div style="margin-top:6px;padding:8px 12px;background:rgba(79,70,229,0.04);border-radius:8px;font-size:13px;">
         ✅ <span class="badge">${p.artikul||'ART-???'}</span> ${p.name} — ${fmt(p.narx)} so'm
       </div>`;
     }
@@ -458,7 +498,7 @@ function viewSales() {
             <input type="text" id="saleSearch" placeholder="Artikul yoki nom..." value="${state.searchQuery}" autocomplete="off">
             <div class="search-dropdown ${state.showSearch && state.searchResults.length > 0 ? 'show' : ''}">
               ${searchHtml}
-              ${state.showSearch && state.searchResults.length === 0 ? '<div class="search-item" style="color:rgba(255,255,255,0.2);cursor:default;">Topilmadi</div>' : ''}
+              ${state.showSearch && state.searchResults.length === 0 ? '<div class="search-item" style="color:var(--text-muted);cursor:default;">Topilmadi</div>' : ''}
             </div>
           </div>
           <input type="hidden" id="saleProduct" value="${d.productId}">
@@ -472,11 +512,11 @@ function viewSales() {
       </div>
       <div class="grid">
         <div class="field"><label>Mijoz bergan pul</label><input type="number" min="0" id="saleTolangan" value="${d.tolangan}" placeholder="0"></div>
-        <div class="field"><label>Qarz</label><input id="saleQarz" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz>0?'rgba(255,101,132,0.05)':'rgba(0,210,255,0.05)'};color:${f.qarz>0?'#FF6584':'#00D2FF'};border:1px solid ${f.qarz>0?'rgba(255,101,132,0.1)':'rgba(0,210,255,0.1)'};padding:10px 14px;border-radius:10px;width:100%;font-size:14px;"></div>
+        <div class="field"><label>Qarz</label><input id="saleQarz" value="${fmt(f.qarz)} so'm" disabled style="background:${f.qarz>0?'rgba(236,72,153,0.05)':'rgba(20,184,166,0.05)'};color:${f.qarz>0?'#EC4899':'#14B8A6'};border:1px solid ${f.qarz>0?'rgba(236,72,153,0.1)':'rgba(20,184,166,0.1)'};padding:10px 14px;border-radius:10px;width:100%;font-size:14px;"></div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
         <button class="btn btn-primary" type="submit">💾 ${t('save')}</button>
-        <button type="button" class="btn btn-primary" id="lastBtn" style="background:linear-gradient(135deg,#FF6584,#6C63FF);">📦 ${t('last')}</button>
+        <button type="button" class="btn btn-primary" id="lastBtn" style="background:linear-gradient(135deg,#EC4899,#4F46E5);">📦 ${t('last')}</button>
       </div>
     </form>
   </div>`;
@@ -492,8 +532,8 @@ function viewStats() {
   return `
   <div class="grid" style="margin-bottom:16px;">
     <div class="card"><h3>💰 ${t('total')}</h3><div style="font-size:28px;font-weight:700;">${fmt(totalSales)} so'm</div></div>
-    <div class="card"><h3>✅ ${t('paid')}</h3><div style="font-size:28px;font-weight:700;color:#00D2FF;">${fmt(totalPaid)} so'm</div></div>
-    <div class="card"><h3>⚠️ ${t('debt')}</h3><div style="font-size:28px;font-weight:700;color:#FF6584;">${fmt(totalDebt)} so'm</div></div>
+    <div class="card"><h3>✅ ${t('paid')}</h3><div style="font-size:28px;font-weight:700;color:#14B8A6;">${fmt(totalPaid)} so'm</div></div>
+    <div class="card"><h3>⚠️ ${t('debt')}</h3><div style="font-size:28px;font-weight:700;color:#EC4899;">${fmt(totalDebt)} so'm</div></div>
   </div>
   <div class="grid">
     <div class="card"><h3>📊 Kunlik savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
@@ -532,16 +572,16 @@ function viewHistory() {
   </div>
   <div class="card">
     <h3>📜 ${t('history')}</h3>
-    ${f.customerId ? (rows ? '<table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To\'langan</th><th>Qarz</th></tr></thead><tbody>'+rows+'</tbody></table><div style="margin-top:12px;padding:12px 16px;background:rgba(108,99,255,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;"><div>Jami: <strong>'+fmt(totalJ)+' so\'m</strong></div><div>To\'langan: <strong>'+fmt(totalP)+' so\'m</strong></div><div>Qarz: <strong style="color:#FF6584;">'+fmt(totalQ)+' so\'m</strong></div></div>' : '<div class="empty">Ma\'lumot topilmadi</div>') : '<div class="empty">Mijoz tanlang</div>'}
+    ${f.customerId ? (rows ? '<table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To\'langan</th><th>Qarz</th></tr></thead><tbody>'+rows+'</tbody></table><div style="margin-top:12px;padding:12px 16px;background:rgba(79,70,229,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13px;"><div>Jami: <strong>'+fmt(totalJ)+' so\'m</strong></div><div>To\'langan: <strong>'+fmt(totalP)+' so\'m</strong></div><div>Qarz: <strong style="color:#EC4899;">'+fmt(totalQ)+' so\'m</strong></div></div>' : '<div class="empty">Ma\'lumot topilmadi</div>') : '<div class="empty">Mijoz tanlang</div>'}
   </div>`;
 }
 
-// SETTINGS
+// ============ SETTINGS ============
 function viewSettings() {
   const isAdmin = state.currentUser?.role === 'admin';
   const userName = state.currentUser?.login || '';
   const avatar = state.settings.avatar || '';
-  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%236C63FF"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%234F46E5"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
   
   const userRows = state.users.map(u => 
     `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Admin' : 'Xodim'}</td><td>${u.login !== 'baxrom' ? '<button class="btn btn-danger" data-del-user="'+u.login+'">🗑️</button>' : '⭐'}</td></tr>`
@@ -551,7 +591,7 @@ function viewSettings() {
   <div class="card">
     <h3>👤 Profil rasmi</h3>
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div class="user-avatar" style="width:64px;height:64px;"><img src="${avatar || defaultAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <div class="user-avatar" style="width:64px;height:64px;border-color:var(--primary);"><img src="${avatar || defaultAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
       <form id="avatarForm" style="display:flex;gap:10px;flex-wrap:wrap;flex:1;">
         <div class="field" style="margin-bottom:0;flex:1;min-width:200px;"><label>Rasm URL</label><input id="avatarUrl" placeholder="https://example.com/avatar.jpg"></div>
         <button class="btn btn-primary" type="submit" style="align-self:end;">Yangilash</button>
@@ -580,19 +620,31 @@ function viewSettings() {
   </div>
   
   <div class="card">
-    <h3>🎨 Dizayn</h3>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <div><span style="color:rgba(255,255,255,0.3);font-size:12px;">Asosiy:</span> <input type="color" id="color1" value="#6C63FF" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;"></div>
-      <div><span style="color:rgba(255,255,255,0.3);font-size:12px;">Ikkinchi:</span> <input type="color" id="color2" value="#FF6584" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;"></div>
-      <div><span style="color:rgba(255,255,255,0.3);font-size:12px;">Fon:</span> <input type="color" id="colorBg" value="#0a0a1a" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;"></div>
-      <button class="btn btn-primary" id="applyTheme">Qo'llash</button>
+    <h3>🎨 Dizayn sozlamalari</h3>
+    <div class="setting-row">
+      <label>Asosiy rang</label>
+      <input type="color" class="color-picker" id="colorPrimary" value="${state.theme.primary}">
     </div>
+    <div class="setting-row">
+      <label>Ikkinchi rang</label>
+      <input type="color" class="color-picker" id="colorSecondary" value="${state.theme.secondary}">
+    </div>
+    <div class="setting-row">
+      <label>Aksent rang</label>
+      <input type="color" class="color-picker" id="colorAccent" value="${state.theme.accent}">
+    </div>
+    <div class="setting-row">
+      <label>Fon rangi</label>
+      <input type="color" class="color-picker" id="colorBg" value="${state.theme.bg}">
+    </div>
+    <button class="btn btn-primary" id="applyThemeBtn" style="margin-top:12px;">🎨 Qo'llash</button>
+    <button class="btn btn-secondary" id="resetThemeBtn" style="margin-top:12px;margin-left:8px;">↺ Standart</button>
   </div>
   ` : ''}
   
   <div class="card">
     <h3>📊 Ma'lumotlar</h3>
-    <div style="color:rgba(255,255,255,0.4);font-size:13px;line-height:1.8;">
+    <div style="color:var(--text-secondary);font-size:13px;line-height:1.8;">
       Mijozlar: ${state.customers.length}<br>
       Mahsulotlar: ${state.products.length}<br>
       Sotuvlar: ${state.sales.length}<br>
@@ -600,6 +652,18 @@ function viewSettings() {
       Jami: ${fmt(state.sales.reduce((a,s)=>a+s.jami,0))} so'm
     </div>
   </div>`;
+}
+
+// ============ THEME FUNKSIYASI ============
+function applyTheme() {
+  const p = state.theme.primary;
+  const s = state.theme.secondary;
+  const a = state.theme.accent;
+  const b = state.theme.bg;
+  document.documentElement.style.setProperty('--primary', p);
+  document.documentElement.style.setProperty('--secondary', s);
+  document.documentElement.style.setProperty('--accent', a);
+  document.documentElement.style.setProperty('--bg', b);
 }
 
 // ============ CHARTS ============
@@ -616,7 +680,7 @@ function drawCharts() {
   if (dc && days.length) {
     charts.push(new Chart(dc, {
       type: 'line',
-      data: { labels: days, datasets: [{ label: 'Savdo', data: days.map(d=>byDay[d]), borderColor: '#6C63FF', backgroundColor: 'rgba(108,99,255,0.05)', fill: true, tension: 0.3 }] },
+      data: { labels: days, datasets: [{ label: 'Savdo', data: days.map(d=>byDay[d]), borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.05)', fill: true, tension: 0.3 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     }));
   }
@@ -633,7 +697,7 @@ function drawCharts() {
     if (labels.length) {
       charts.push(new Chart(pc, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Dona', data: labels.map(l=>byProd[l]), backgroundColor: ['#6C63FF','#FF6584','#00D2FF','#FFB347','#A855F7'] }] },
+        data: { labels, datasets: [{ label: 'Dona', data: labels.map(l=>byProd[l]), backgroundColor: ['#4F46E5','#EC4899','#14B8A6','#FBBF24','#8B5CF6'] }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       }));
     }
@@ -754,9 +818,9 @@ function attachViewEvents() {
       document.getElementById('salePer').textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
       const q = document.getElementById('saleQarz');
       q.value = fmt(f.qarz) + " so'm";
-      q.style.background = f.qarz > 0 ? 'rgba(255,101,132,0.05)' : 'rgba(0,210,255,0.05)';
-      q.style.color = f.qarz > 0 ? '#FF6584' : '#00D2FF';
-      q.style.borderColor = f.qarz > 0 ? 'rgba(255,101,132,0.1)' : 'rgba(0,210,255,0.1)';
+      q.style.background = f.qarz > 0 ? 'rgba(236,72,153,0.05)' : 'rgba(20,184,166,0.05)';
+      q.style.color = f.qarz > 0 ? '#EC4899' : '#14B8A6';
+      q.style.borderColor = f.qarz > 0 ? 'rgba(236,72,153,0.1)' : 'rgba(20,184,166,0.1)';
     };
     
     ['saleSana','saleCustomer','saleSoni','saleTolangan'].forEach(id => {
@@ -831,25 +895,67 @@ function attachViewEvents() {
     });
   });
   
-  document.getElementById('applyTheme')?.addEventListener('click', function() {
-    const c1 = document.getElementById('color1').value;
-    const c2 = document.getElementById('color2').value;
-    const cb = document.getElementById('colorBg').value;
-    document.documentElement.style.setProperty('--primary', c1);
-    document.documentElement.style.setProperty('--secondary', c2);
-    document.documentElement.style.setProperty('--dark-bg', cb);
-    localStorage.setItem('theme_primary', c1);
-    localStorage.setItem('theme_secondary', c2);
-    localStorage.setItem('theme_bg', cb);
+  // ✅ THEME - ISHLAYDI!
+  document.getElementById('applyThemeBtn')?.addEventListener('click', function() {
+    const p = document.getElementById('colorPrimary').value;
+    const s = document.getElementById('colorSecondary').value;
+    const a = document.getElementById('colorAccent').value;
+    const b = document.getElementById('colorBg').value;
+    
+    state.theme.primary = p;
+    state.theme.secondary = s;
+    state.theme.accent = a;
+    state.theme.bg = b;
+    
+    localStorage.setItem('theme_primary', p);
+    localStorage.setItem('theme_secondary', s);
+    localStorage.setItem('theme_accent', a);
+    localStorage.setItem('theme_bg', b);
+    
+    applyTheme();
+    render();
+  });
+  
+  document.getElementById('resetThemeBtn')?.addEventListener('click', function() {
+    const p = '#4F46E5';
+    const s = '#EC4899';
+    const a = '#14B8A6';
+    const b = '#0F0F1A';
+    
+    state.theme.primary = p;
+    state.theme.secondary = s;
+    state.theme.accent = a;
+    state.theme.bg = b;
+    
+    localStorage.setItem('theme_primary', p);
+    localStorage.setItem('theme_secondary', s);
+    localStorage.setItem('theme_accent', a);
+    localStorage.setItem('theme_bg', b);
+    
+    // Inputlarni yangilash
+    document.getElementById('colorPrimary').value = p;
+    document.getElementById('colorSecondary').value = s;
+    document.getElementById('colorAccent').value = a;
+    document.getElementById('colorBg').value = b;
+    
+    applyTheme();
+    render();
   });
   
   // Load theme
-  const t1 = localStorage.getItem('theme_primary');
-  const t2 = localStorage.getItem('theme_secondary');
-  const tb = localStorage.getItem('theme_bg');
-  if (t1) document.documentElement.style.setProperty('--primary', t1);
-  if (t2) document.documentElement.style.setProperty('--secondary', t2);
-  if (tb) document.documentElement.style.setProperty('--dark-bg', tb);
+  loadTheme();
+}
+
+function loadTheme() {
+  const p = localStorage.getItem('theme_primary');
+  const s = localStorage.getItem('theme_secondary');
+  const a = localStorage.getItem('theme_accent');
+  const b = localStorage.getItem('theme_bg');
+  if (p) { state.theme.primary = p; }
+  if (s) { state.theme.secondary = s; }
+  if (a) { state.theme.accent = a; }
+  if (b) { state.theme.bg = b; }
+  applyTheme();
 }
 
 // ============ PAY MODAL ============
@@ -864,7 +970,7 @@ function renderPayModal() {
   overlay.innerHTML = `
     <div class="modal-card">
       <h3>💰 Qarz to'lash — ${c.name}</h3>
-      <p style="color:rgba(255,255,255,0.4);font-size:14px;margin-top:-8px;">Joriy qarz: <b style="color:#FF6584;">${fmt(debt)} so'm</b></p>
+      <p style="color:var(--text-secondary);font-size:14px;margin-top:-8px;">Joriy qarz: <b style="color:#EC4899;">${fmt(debt)} so'm</b></p>
       <form id="payForm">
         <div class="field"><label>Sana</label><input type="date" id="paySana" value="${today()}"></div>
         <div class="field"><label>To'lov summasi (so'm)</label><input type="number" min="1" max="${debt}" id="payAmount" required placeholder="0"></div>
