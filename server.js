@@ -14,16 +14,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ============ ROUTES ============
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');        // ✅ QO'SHILDI!
 const customerRoutes = require('./routes/customers');
 const productRoutes = require('./routes/products');
 const saleRoutes = require('./routes/sales');
 const paymentRoutes = require('./routes/payments');
 const statisticRoutes = require('./routes/statistics');
 
-// ⚠️ userRoutes O'CHIRILDI (fayl yo'q edi)
-// const userRoutes = require('./routes/users');
-
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);                   // ✅ QO'SHILDI!
 app.use('/api/customers', customerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/sales', saleRoutes);
