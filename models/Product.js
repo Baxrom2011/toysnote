@@ -22,15 +22,12 @@ const ProductSchema = new mongoose.Schema({
   }
 });
 
-// Artikul avtomatik yaratish (save dan oldin)
+// Artikul avtomatik yaratish
 ProductSchema.pre('save', async function(next) {
   try {
-    // Agar artikul mavjud bo'lmasa yaratish
-    if (!this.artikul || this.artikul === 'undefined') {
-      
-      // Barcha mahsulotlarni artikul bo'yicha tartiblab, oxirgisini olish
+    if (!this.artikul) {
       const lastProduct = await mongoose.model('Product')
-        .findOne({ artikul: { $exists: true, $ne: null, $ne: 'undefined' } })
+        .findOne({ artikul: { $exists: true, $ne: null } })
         .sort({ artikul: -1 });
       
       let nextNumber = 1;
@@ -42,14 +39,12 @@ ProductSchema.pre('save', async function(next) {
         }
       }
       
-      // 3 xonali raqam formatida (001, 002, 003...)
       this.artikul = `ART-${String(nextNumber).padStart(3, '0')}`;
       console.log(`✅ Artikul yaratildi: ${this.artikul}`);
     }
     next();
   } catch (error) {
     console.error('Artikul yaratish xatosi:', error);
-    // Xatolik bo'lsa vaqt bo'yicha unique raqam
     const timestamp = Date.now().toString().slice(-6);
     this.artikul = `ART-${timestamp}`;
     next();
