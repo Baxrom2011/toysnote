@@ -284,10 +284,10 @@ function render() {
     return;
   }
   if (state.error) {
-    app.innerHTML = `<div style="padding:40px;text-align:center;color:var(--danger);">
+    app.innerHTML = `<div style="padding:40px;text-align:center;color:#ff4444;">
       <h3>Xatolik yuz berdi</h3>
       <p>${state.error}</p>
-      <button onclick="location.reload()" class="btn btn-primary" style="width:auto;margin-top:20px;">Qayta yuklash</button>
+      <button onclick="location.reload()" class="btn-neon" style="width:auto;margin-top:20px;">Qayta yuklash</button>
     </div>`;
     return;
   }
@@ -351,8 +351,7 @@ function attachLoginEvents() {
 // ============ LOGOUT CUBE ============
 function renderLogoutCube() {
   const userName = state.currentUser?.login || 'User';
-  const lang = currentLang;
-  const goodbye = LANGUAGES[lang].goodbye || 'Goodbye';
+  const goodbye = LANGUAGES[currentLang].goodbye || 'Goodbye';
   
   return `
   <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;">
@@ -384,23 +383,23 @@ function renderShell() {
     { id: 'mahsulot', label: t('products'), icon: '📦' },
     { id: 'sotuv', label: t('sales'), icon: '🛒' },
     { id: 'statistika', label: t('statistics'), icon: '📊' },
-    { id: 'tarix', label: t('history'), icon: '📜' },
+    { id: 'tarix', label: t('history'), icon: '📜' }
   ];
   
   if (isAdmin) {
     navItems.push({ id: 'sozlamalar', label: t('settings'), icon: '⚙️' });
   }
   
-  const navHtml = navItems.map(n => `
-    <div class="nav-item ${state.view === n.id ? 'active' : ''}" data-nav="${n.id}">
+  const navHtml = navItems.map(n => {
+    return `<div class="nav-item ${state.view === n.id ? 'active' : ''}" data-nav="${n.id}">
       <span>${n.icon}</span>
       <span>${n.label}</span>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   
-  const langOptions = ['uz', 'ru', 'en'].map(l => `
-    <option value="${l}" ${currentLang === l ? 'selected' : ''}>${l.toUpperCase()}</option>
-  `).join('');
+  const langOptions = ['uz', 'ru', 'en'].map(l => {
+    return `<option value="${l}" ${currentLang === l ? 'selected' : ''}>${l.toUpperCase()}</option>`;
+  }).join('');
   
   return `
   <div class="shell">
@@ -415,7 +414,7 @@ function renderShell() {
       
       ${navHtml}
       
-      <div class="spacer" style="flex:1;"></div>
+      <div style="flex:1;"></div>
       
       <div class="user-chip">
         <div class="user-avatar">
@@ -427,9 +426,7 @@ function renderShell() {
         </div>
       </div>
       
-      <button class="logout-btn" id="logoutBtn" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);padding:10px;border-radius:10px;cursor:pointer;width:100%;font-size:13px;">
-        ${t('logout')}
-      </button>
+      <button class="logout-btn" id="logoutBtn">${t('logout')}</button>
     </div>
     <div class="main">${renderView()}</div>
   </div>`;
@@ -449,31 +446,34 @@ function renderView() {
 
 function attachShellEvents() {
   document.querySelectorAll('[data-nav]').forEach(el => {
-    el.addEventListener('click', () => {
-      state.view = el.getAttribute('data-nav');
+    el.addEventListener('click', function() {
+      state.view = this.getAttribute('data-nav');
       saveStateToStorage();
       render();
     });
   });
   
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    state.showLogoutCube = true;
-    render();
-    setTimeout(() => {
-      state.currentUser = null;
-      token = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('app_state');
-      state.loaded = false;
-      state.showLogoutCube = false;
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async function() {
+      state.showLogoutCube = true;
       render();
-    }, 3000);
-  });
+      setTimeout(function() {
+        state.currentUser = null;
+        token = null;
+        localStorage.removeItem('token');
+        localStorage.removeItem('app_state');
+        state.loaded = false;
+        state.showLogoutCube = false;
+        render();
+      }, 3000);
+    });
+  }
   
   const langSelect = document.getElementById('langSelect');
   if (langSelect) {
-    langSelect.addEventListener('change', () => {
-      currentLang = langSelect.value;
+    langSelect.addEventListener('change', function() {
+      currentLang = this.value;
       localStorage.setItem('lang', currentLang);
       render();
     });
@@ -486,7 +486,7 @@ function attachShellEvents() {
 
 // ---- MIJOZLAR ----
 function viewMijozlar() {
-  const rows = state.customers.map(c => {
+  const rows = state.customers.map(function(c) {
     const debt = getCustomerDebtLocal(c._id);
     return `<tr>
       <td>${c.name}</td>
@@ -500,24 +500,35 @@ function viewMijozlar() {
   }).join('');
   
   return `
-  <div class="topbar"><div><h2>${t('customers')}</h2><p>Barcha mijozlar ro'yxati</p></div></div>
+  <div class="topbar">
+    <div>
+      <h2>${t('customers')}</h2>
+      <p>Barcha mijozlar ro'yxati</p>
+    </div>
+  </div>
   <div class="card">
     <h3>Yangi mijoz qo'shish</h3>
     <form id="customerForm" class="row-flex">
-      <div class="field"><label>Ism-familiya</label><input id="custName" required placeholder="Masalan: Aziz Karimov"></div>
-      <div class="field"><label>Telefon</label><input id="custPhone" type="tel" placeholder="+998 90 123 45 67"></div>
+      <div class="field">
+        <label>Ism-familiya</label>
+        <input id="custName" required placeholder="Masalan: Aziz Karimov">
+      </div>
+      <div class="field">
+        <label>Telefon</label>
+        <input id="custPhone" type="tel" placeholder="+998 90 123 45 67">
+      </div>
       <button class="btn-neon" type="submit">Qo'shish</button>
     </form>
   </div>
   <div class="card">
     <h3>Mijozlar ro'yxati (${state.customers.length})</h3>
-    ${state.customers.length ? `<table><thead><tr><th>Ism</th><th>Telefon</th><th>Holati</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">Hali mijoz qo'shilmagan.</div>`}
+    ${state.customers.length ? '<table><thead><tr><th>Ism</th><th>Telefon</th><th>Holati</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>' : '<div class="empty">Hali mijoz qo\'shilmagan.</div>'}
   </div>`;
 }
 
 // ---- PAY MODAL ----
 function renderPayModal() {
-  const c = state.customers.find(x => x._id === state.payModal.customerId);
+  const c = state.customers.find(function(x) { return x._id === state.payModal.customerId; });
   if (!c) return '';
   const debt = getCustomerDebtLocal(c._id);
   return `
@@ -526,10 +537,16 @@ function renderPayModal() {
       <h3>💰 Qarz to'lash — ${c.name}</h3>
       <p style="color:rgba(255,255,255,0.6);font-size:13.5px;margin-top:-8px;">Joriy qarz: <b style="color:var(--neon-orange)">${fmt(debt)} so'm</b></p>
       <form id="payForm">
-        <div class="field"><label>Sana</label><input type="date" id="paySana" value="${todayStr()}"></div>
-        <div class="field"><label>To'lov summasi (so'm)</label><input type="number" min="1" max="${debt}" id="payAmount" required placeholder="0"></div>
+        <div class="field">
+          <label>Sana</label>
+          <input type="date" id="paySana" value="${todayStr()}">
+        </div>
+        <div class="field">
+          <label>To'lov summasi (so'm)</label>
+          <input type="number" min="1" max="${debt}" id="payAmount" required placeholder="0">
+        </div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" id="payCancelBtn">Bekor qilish</button>
+          <button type="button" class="btn-secondary" id="payCancelBtn">Bekor qilish</button>
           <button type="submit" class="btn-neon">Saqlash</button>
         </div>
       </form>
@@ -538,28 +555,48 @@ function renderPayModal() {
 }
 
 function attachPayModalEvents() {
-  document.getElementById('payCancelBtn').addEventListener('click', () => { state.payModal = null; render(); });
-  document.getElementById('payOverlay').addEventListener('click', e => { if (e.target.id === 'payOverlay') { state.payModal = null; render(); } });
-  document.getElementById('payForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const sana = document.getElementById('paySana').value || todayStr();
-    const amount = Number(document.getElementById('payAmount').value);
-    if (!amount || amount <= 0) return;
-    try {
-      await addPayment(state.payModal.customerId, sana, amount);
+  const cancelBtn = document.getElementById('payCancelBtn');
+  const overlay = document.getElementById('payOverlay');
+  const payForm = document.getElementById('payForm');
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
       state.payModal = null;
-      await loadData();
       render();
-    } catch (error) {
-      alert(error.message);
-    }
-  });
+    });
+  }
+  
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target.id === 'payOverlay') {
+        state.payModal = null;
+        render();
+      }
+    });
+  }
+  
+  if (payForm) {
+    payForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const sana = document.getElementById('paySana').value || todayStr();
+      const amount = Number(document.getElementById('payAmount').value);
+      if (!amount || amount <= 0) return;
+      try {
+        await addPayment(state.payModal.customerId, sana, amount);
+        state.payModal = null;
+        await loadData();
+        render();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  }
 }
 
 // ---- MAHSULOT ----
 function viewMahsulot() {
-  const rows = state.products.map(p => {
-    const soldQty = state.sales.filter(s => s.productId === p._id).reduce((a, s) => a + s.soni, 0);
+  const rows = state.products.map(function(p) {
+    const soldQty = state.sales.filter(function(s) { return s.productId === p._id; }).reduce(function(a, s) { return a + s.soni; }, 0);
     return `<tr>
       <td><span class="artikul-badge">${p.artikul || 'ART-???'}</span></td>
       <td>${p.name}</td>
@@ -573,19 +610,30 @@ function viewMahsulot() {
   }).join('');
   
   return `
-  <div class="topbar"><div><h2>${t('products')}</h2><p>O'yinchoqlar va ularning narxlari</p></div></div>
+  <div class="topbar">
+    <div>
+      <h2>${t('products')}</h2>
+      <p>O'yinchoqlar va ularning narxlari</p>
+    </div>
+  </div>
   <div class="card">
     <h3>Yangi o'yinchoq qo'shish</h3>
     <form id="productForm" class="row-flex">
-      <div class="field"><label>Nomi</label><input id="prodName" required placeholder="Masalan: Ayiqcha"></div>
-      <div class="field"><label>Narxi (so'm)</label><input id="prodNarx" type="number" min="0" required placeholder="50000"></div>
+      <div class="field">
+        <label>Nomi</label>
+        <input id="prodName" required placeholder="Masalan: Ayiqcha">
+      </div>
+      <div class="field">
+        <label>Narxi (so'm)</label>
+        <input id="prodNarx" type="number" min="0" required placeholder="50000">
+      </div>
       <button class="btn-neon" type="submit">Qo'shish</button>
     </form>
     <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:10px;">⚠️ Artikul avtomatik yaratiladi: ART-001, ART-002 ...</p>
   </div>
   <div class="card">
     <h3>Mahsulotlar ro'yxati (${state.products.length})</h3>
-    ${state.products.length ? `<table><thead><tr><th>Artikul</th><th>Nomi</th><th>Narxi</th><th>Sotuvlar</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">Hali mahsulot qo'shilmagan.</div>`}
+    ${state.products.length ? '<table><thead><tr><th>Artikul</th><th>Nomi</th><th>Narxi</th><th>Sotuvlar</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>' : '<div class="empty">Hali mahsulot qo\'shilmagan.</div>'}
   </div>`;
 }
 
@@ -593,20 +641,22 @@ function viewMahsulot() {
 function viewSotuv() {
   const d = state.saleDraft;
   const f = computeSaleFigures(d);
-  const customerOptions = state.customers.map(c => `<option value="${c._id}" ${d.customerId === c._id ? 'selected' : ''}>${c.name}</option>`).join('');
+  const customerOptions = state.customers.map(function(c) {
+    return `<option value="${c._id}" ${d.customerId === c._id ? 'selected' : ''}>${c.name}</option>`;
+  }).join('');
   
   let searchResultsHtml = '';
   if (state.showSearchResults && state.searchResults.length > 0) {
-    searchResultsHtml = state.searchResults.map(p => `
-      <div class="search-result" data-product-id="${p._id}" data-product-name="${p.name}" data-product-narx="${p.narx}" data-product-artikul="${p.artikul || 'ART-???'}">
+    searchResultsHtml = state.searchResults.map(function(p) {
+      return `<div class="search-result" data-product-id="${p._id}" data-product-name="${p.name}" data-product-narx="${p.narx}" data-product-artikul="${p.artikul || 'ART-???'}">
         <span class="artikul">${p.artikul || 'ART-???'}</span> - ${p.name} <span style="color:rgba(255,255,255,0.4);">${fmt(p.narx)} so'm</span>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   let selectedProductHtml = '';
   if (d.productId) {
-    const p = state.products.find(x => x._id === d.productId);
+    const p = state.products.find(function(x) { return x._id === d.productId; });
     if (p) {
       selectedProductHtml = `<div style="margin-top:8px;padding:10px 14px;background:rgba(0,212,255,0.1);border-radius:10px;border:1px solid rgba(0,212,255,0.2);">
         <strong>Tanlangan:</strong> <span class="artikul-badge">${p.artikul || 'ART-???'}</span> ${p.name} — ${fmt(p.narx)} so'm
@@ -621,7 +671,7 @@ function viewSotuv() {
       <p>Yangi sotuvni ro'yxatga oling</p>
     </div>
   </div>
-  ${!state.products.length || !state.customers.length ? `<div class="msg msg-warn">Sotuv qilishdan oldin kamida bitta mahsulot va bitta mijoz qo'shing.</div>` : ''}
+  ${!state.products.length || !state.customers.length ? '<div class="msg msg-warn">Sotuv qilishdan oldin kamida bitta mahsulot va bitta mijoz qo\'shing.</div>' : ''}
   <div class="card">
     <form id="saleForm">
       <div class="grid-2">
@@ -660,7 +710,7 @@ function viewSotuv() {
         </div>
         <div>
           <div class="t-lbl">Bir dona narxi</div>
-          <div class="t-val" id="salePerUnitVal" style="font-size:18px">${f.product ? fmt(f.product.narx) : 0} so'm</div>
+          <div class="t-val" id="salePerUnitVal" style="font-size:18px;">${f.product ? fmt(f.product.narx) : 0} so'm</div>
         </div>
       </div>
       <div class="grid-2">
@@ -683,105 +733,194 @@ function viewSotuv() {
 
 // ---- STATISTIKA ----
 function viewStatistika() {
-  const totalSales = state.sales.reduce((a, s) => a + s.jami, 0);
-  const totalPaid = state.sales.reduce((a, s) => a + s.tolangan, 0);
+  const totalSales = state.sales.reduce(function(a, s) { return a + s.jami; }, 0);
+  const totalPaid = state.sales.reduce(function(a, s) { return a + s.tolangan; }, 0);
   let totalDebt = 0;
-  state.customers.forEach(c => {
+  state.customers.forEach(function(c) {
     totalDebt += getCustomerDebtLocal(c._id);
   });
   return `
-  <div class="topbar"><div><h2>${t('statistics')}</h2><p>Do'kon faoliyati bo'yicha umumiy ko'rsatkichlar</p></div></div>
-  <div class="grid-3" style="margin-bottom:20px">
+  <div class="topbar">
+    <div>
+      <h2>${t('statistics')}</h2>
+      <p>Do'kon faoliyati bo'yicha umumiy ko'rsatkichlar</p>
+    </div>
+  </div>
+  <div class="grid-3" style="margin-bottom:20px;">
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(0,212,255,0.1);color:var(--neon-blue)">💰</div>
+      <div class="icn" style="background:rgba(0,212,255,0.1);color:var(--neon-blue);">💰</div>
       <div class="lbl">Umumiy savdo</div>
       <div class="val">${fmt(totalSales)} so'm</div>
     </div>
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(0,255,136,0.1);color:var(--neon-green)">✅</div>
+      <div class="icn" style="background:rgba(0,255,136,0.1);color:var(--neon-green);">✅</div>
       <div class="lbl">Qabul qilingan pul</div>
       <div class="val">${fmt(totalPaid)} so'm</div>
     </div>
     <div class="stat-card glass">
-      <div class="icn" style="background:rgba(255,107,0,0.1);color:var(--neon-orange)">⚠️</div>
+      <div class="icn" style="background:rgba(255,107,0,0.1);color:var(--neon-orange);">⚠️</div>
       <div class="lbl">Umumiy qarz</div>
       <div class="val">${fmt(totalDebt)} so'm</div>
     </div>
   </div>
   <div class="grid-2">
-    <div class="card"><h3>Kunlar bo'yicha savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
-    <div class="card"><h3>Mahsulotlar bo'yicha sotuv</h3><div class="chart-box"><canvas id="chartProducts"></canvas></div></div>
+    <div class="card">
+      <h3>Kunlar bo'yicha savdo</h3>
+      <div class="chart-box"><canvas id="chartDaily"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Mahsulotlar bo'yicha sotuv</h3>
+      <div class="chart-box"><canvas id="chartProducts"></canvas></div>
+    </div>
   </div>
   <div class="grid-2">
-    <div class="card"><h3>Eng ko'p xarid qilgan mijozlar</h3><div class="chart-box"><canvas id="chartCustomers"></canvas></div></div>
-    <div class="card"><h3>Mijozlar bo'yicha qarzdorlik</h3><div class="chart-box"><canvas id="chartDebt"></canvas></div></div>
+    <div class="card">
+      <h3>Eng ko'p xarid qilgan mijozlar</h3>
+      <div class="chart-box"><canvas id="chartCustomers"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Mijozlar bo'yicha qarzdorlik</h3>
+      <div class="chart-box"><canvas id="chartDebt"></canvas></div>
+    </div>
   </div>`;
 }
 
+// ============ CHARTS ============
 let chartInstances = [];
-function destroyCharts() { chartInstances.forEach(c => { try { c.destroy(); } catch (e) {} }); chartInstances = []; }
+
+function destroyCharts() {
+  chartInstances.forEach(function(c) {
+    try { c.destroy(); } catch (e) {}
+  });
+  chartInstances = [];
+}
 
 function drawStatCharts() {
   if (state.view !== 'statistika' || typeof Chart === 'undefined') return;
   destroyCharts();
-  const palette = ['#00d4ff', '#ff00e6', '#9b00ff', '#00ff88', '#ff6b00', '#ffdd00'];
+  var palette = ['#00d4ff', '#ff00e6', '#9b00ff', '#00ff88', '#ff6b00', '#ffdd00'];
 
-  const byDay = {};
-  state.sales.forEach(s => { byDay[s.sana] = (byDay[s.sana] || 0) + s.jami; });
-  const days = Object.keys(byDay).sort();
-  const dailyCtx = document.getElementById('chartDaily');
+  // Daily
+  var byDay = {};
+  state.sales.forEach(function(s) {
+    byDay[s.sana] = (byDay[s.sana] || 0) + s.jami;
+  });
+  var days = Object.keys(byDay).sort();
+  var dailyCtx = document.getElementById('chartDaily');
   if (dailyCtx && days.length) {
     chartInstances.push(new Chart(dailyCtx, {
       type: 'line',
-      data: { labels: days, datasets: [{ label: "Savdo (so'm)", data: days.map(d => byDay[d]), borderColor: '#00d4ff', backgroundColor: 'rgba(0,212,255,0.1)', fill: true, tension: .3 }] },
-      options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+      data: {
+        labels: days,
+        datasets: [{
+          label: "Savdo (so'm)",
+          data: days.map(function(d) { return byDay[d]; }),
+          borderColor: '#00d4ff',
+          backgroundColor: 'rgba(0,212,255,0.1)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        responsive: true,
+        maintainAspectRatio: false
+      }
     }));
   } else if (dailyCtx) {
     dailyCtx.parentElement.innerHTML = '<div class="empty">Hali sotuvlar mavjud emas.</div>';
   }
 
-  const byProd = {};
-  state.sales.forEach(s => { const p = state.products.find(x => x._id === s.productId); const name = p ? p.name : '—'; byProd[name] = (byProd[name] || 0) + s.soni; });
-  const prodCtx = document.getElementById('chartProducts');
+  // Products
+  var byProd = {};
+  state.sales.forEach(function(s) {
+    var p = state.products.find(function(x) { return x._id === s.productId; });
+    var name = p ? p.name : '—';
+    byProd[name] = (byProd[name] || 0) + s.soni;
+  });
+  var prodCtx = document.getElementById('chartProducts');
   if (prodCtx) {
-    const labels = Object.keys(byProd);
-    if (labels.length) {
+    var prodLabels = Object.keys(byProd);
+    if (prodLabels.length) {
       chartInstances.push(new Chart(prodCtx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Dona', data: labels.map(l => byProd[l]), backgroundColor: labels.map((_, i) => palette[i % palette.length]) }] },
-        options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+        data: {
+          labels: prodLabels,
+          datasets: [{
+            label: 'Dona',
+            data: prodLabels.map(function(l) { return byProd[l]; }),
+            backgroundColor: prodLabels.map(function(_, i) { return palette[i % palette.length]; })
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          responsive: true,
+          maintainAspectRatio: false
+        }
       }));
     } else {
       prodCtx.parentElement.innerHTML = '<div class="empty">Hali sotuvlar mavjud emas.</div>';
     }
   }
 
-  const byCust = {};
-  state.sales.forEach(s => { const c = state.customers.find(x => x._id === s.customerId); const name = c ? c.name : '—'; byCust[name] = (byCust[name] || 0) + s.jami; });
-  const custCtx = document.getElementById('chartCustomers');
+  // Customers
+  var byCust = {};
+  state.sales.forEach(function(s) {
+    var c = state.customers.find(function(x) { return x._id === s.customerId; });
+    var name = c ? c.name : '—';
+    byCust[name] = (byCust[name] || 0) + s.jami;
+  });
+  var custCtx = document.getElementById('chartCustomers');
   if (custCtx) {
-    const labels = Object.keys(byCust).sort((a, b) => byCust[b] - byCust[a]).slice(0, 8);
-    if (labels.length) {
+    var custLabels = Object.keys(byCust).sort(function(a, b) {
+      return byCust[b] - byCust[a];
+    }).slice(0, 8);
+    if (custLabels.length) {
       chartInstances.push(new Chart(custCtx, {
         type: 'bar',
-        data: { labels, datasets: [{ label: "So'm", data: labels.map(l => byCust[l]), backgroundColor: '#00d4ff' }] },
-        options: { indexAxis: 'y', plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+        data: {
+          labels: custLabels,
+          datasets: [{
+            label: "So'm",
+            data: custLabels.map(function(l) { return byCust[l]; }),
+            backgroundColor: '#00d4ff'
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          responsive: true,
+          maintainAspectRatio: false
+        }
       }));
     } else {
       custCtx.parentElement.innerHTML = '<div class="empty">Hali sotuvlar mavjud emas.</div>';
     }
   }
 
-  const byDebt = {};
-  state.customers.forEach(c => { const d = getCustomerDebtLocal(c._id); if (d > 0) byDebt[c.name] = d; });
-  const debtCtx = document.getElementById('chartDebt');
+  // Debt
+  var byDebt = {};
+  state.customers.forEach(function(c) {
+    var d = getCustomerDebtLocal(c._id);
+    if (d > 0) byDebt[c.name] = d;
+  });
+  var debtCtx = document.getElementById('chartDebt');
   if (debtCtx) {
-    const labels = Object.keys(byDebt);
-    if (labels.length) {
+    var debtLabels = Object.keys(byDebt);
+    if (debtLabels.length) {
       chartInstances.push(new Chart(debtCtx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: labels.map(l => byDebt[l]), backgroundColor: labels.map((_, i) => palette[i % palette.length]) }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: {
+          labels: debtLabels,
+          datasets: [{
+            data: debtLabels.map(function(l) { return byDebt[l]; }),
+            backgroundColor: debtLabels.map(function(_, i) { return palette[i % palette.length]; })
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
       }));
     } else {
       debtCtx.parentElement.innerHTML = '<div class="empty">Qarzdorlik mavjud emas.</div>';
@@ -791,38 +930,48 @@ function drawStatCharts() {
 
 // ---- TARIX ----
 function viewTarix() {
-  const f = state.historyFilter;
-  const customerOptions = state.customers.map(c => `<option value="${c._id}" ${f.customerId === c._id ? 'selected' : ''}>${c.name}</option>`).join('');
-  let resultsHtml = '';
+  var f = state.historyFilter;
+  var customerOptions = state.customers.map(function(c) {
+    return `<option value="${c._id}" ${f.customerId === c._id ? 'selected' : ''}>${c.name}</option>`;
+  }).join('');
+  var resultsHtml = '';
   
   if (f.customerId) {
-    let filterSana = f.sana;
+    var filterSana = f.sana;
     if (filterSana) {
-      const parts = filterSana.split('.');
+      var parts = filterSana.split('.');
       if (parts.length === 3) {
-        filterSana = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        filterSana = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
       }
     }
     
-    let matches = state.sales.filter(s => s.customerId === f.customerId);
+    var matches = state.sales.filter(function(s) {
+      return s.customerId === f.customerId;
+    });
     if (filterSana) {
-      matches = matches.filter(s => s.sana === filterSana);
+      matches = matches.filter(function(s) {
+        return s.sana === filterSana;
+      });
     }
     
-    matches.sort((a, b) => b.createdAt - a.createdAt);
+    matches.sort(function(a, b) {
+      return b.createdAt - a.createdAt;
+    });
     
-    const totalJami = matches.reduce((a, s) => a + s.jami, 0);
-    const totalTolangan = matches.reduce((a, s) => a + s.tolangan, 0);
-    const totalQarz = matches.reduce((a, s) => a + s.qarz, 0);
+    var totalJami = matches.reduce(function(a, s) { return a + s.jami; }, 0);
+    var totalTolangan = matches.reduce(function(a, s) { return a + s.tolangan; }, 0);
+    var totalQarz = matches.reduce(function(a, s) { return a + s.qarz; }, 0);
     
-    const payments = state.payments.filter(p => p.customerId === f.customerId);
-    const totalPayments = payments.reduce((a, p) => a + p.amount, 0);
+    var payments = state.payments.filter(function(p) {
+      return p.customerId === f.customerId;
+    });
+    var totalPayments = payments.reduce(function(a, p) { return a + p.amount; }, 0);
     
     if (matches.length > 0 || payments.length > 0) {
-      let rows = matches.map(s => {
-        const p = state.products.find(x => x._id === s.productId);
-        const dateParts = s.sana.split('-');
-        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : s.sana;
+      var rows = matches.map(function(s) {
+        var p = state.products.find(function(x) { return x._id === s.productId; });
+        var dateParts = s.sana.split('-');
+        var formattedDate = dateParts.length === 3 ? dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0] : s.sana;
         
         return `<tr>
           <td>${formattedDate}</td>
@@ -830,13 +979,13 @@ function viewTarix() {
           <td>${s.soni} dona</td>
           <td>${fmt(s.jami)} so'm</td>
           <td>${fmt(s.tolangan)} so'm</td>
-          <td>${s.qarz > 0 ? `<span class="pill pill-debt">${fmt(s.qarz)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td>
+          <td>${s.qarz > 0 ? '<span class="pill pill-debt">' + fmt(s.qarz) + ' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
         </tr>`;
       }).join('');
       
-      let paymentRows = payments.map(p => {
-        const dateParts = p.sana.split('-');
-        const formattedDate = dateParts.length === 3 ? `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}` : p.sana;
+      var paymentRows = payments.map(function(p) {
+        var dateParts = p.sana.split('-');
+        var formattedDate = dateParts.length === 3 ? dateParts[2] + '.' + dateParts[1] + '.' + dateParts[0] : p.sana;
         return `<tr>
           <td>${formattedDate}</td>
           <td colspan="3">💳 Qarz to'lovi</td>
@@ -858,7 +1007,7 @@ function viewTarix() {
           </thead>
           <tbody>${rows}${paymentRows}</tbody>
         </table>
-        <div class="sale-total-box" style="margin-top:18px">
+        <div class="sale-total-box" style="margin-top:18px;">
           <div>
             <div class="t-lbl">Jami xarid</div>
             <div class="t-val">${fmt(totalJami)} so'm</div>
@@ -871,17 +1020,14 @@ function viewTarix() {
             <div class="t-lbl">Qarz</div>
             <div class="t-val">${fmt(totalQarz)} so'm</div>
           </div>
-          ${totalPayments > 0 ? `<div>
-            <div class="t-lbl">Qarz to'lovi</div>
-            <div class="t-val">${fmt(totalPayments)} so'm</div>
-          </div>` : ''}
+          ${totalPayments > 0 ? '<div><div class="t-lbl">Qarz to\'lovi</div><div class="t-val">' + fmt(totalPayments) + ' so\'m</div></div>' : ''}
         </div>
       `;
     } else {
-      resultsHtml = `<div class="empty">Bu mijoz bo'yicha hech qanday ma'lumot topilmadi.</div>`;
+      resultsHtml = '<div class="empty">Bu mijoz bo\'yicha hech qanday ma\'lumot topilmadi.</div>';
     }
   } else {
-    resultsHtml = `<div class="empty">Natijalarni ko'rish uchun mijozni tanlang.</div>`;
+    resultsHtml = '<div class="empty">Natijalarni ko\'rish uchun mijozni tanlang.</div>';
   }
   
   return `
@@ -905,7 +1051,7 @@ function viewTarix() {
         </select>
       </div>
       <button class="btn-neon" id="histShowBtn" style="width:auto;">Ko'rsatish</button>
-      <button class="btn btn-secondary" id="histClearBtn" style="width:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border-radius:12px;padding:12px 18px;cursor:pointer;">Tozalash</button>
+      <button class="btn-secondary" id="histClearBtn" style="width:auto;">Tozalash</button>
     </div>
   </div>
   <div class="card">
@@ -916,16 +1062,22 @@ function viewTarix() {
 
 // ---- SOZLAMALAR ----
 function viewSozlamalar() {
-  const isAdmin = state.currentUser?.role === 'admin';
+  var isAdmin = state.currentUser?.role === 'admin';
+  var userName = state.currentUser?.login || '';
   
   return `
-  <div class="topbar"><div><h2>⚙️ ${t('settings')}</h2><p>Shaxsiy sozlamalar va dizayn</p></div></div>
+  <div class="topbar">
+    <div>
+      <h2>⚙️ ${t('settings')}</h2>
+      <p>Shaxsiy sozlamalar va dizayn</p>
+    </div>
+  </div>
   
   <div class="card">
     <h3>👤 Profil rasmi</h3>
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       <div class="user-avatar" style="width:80px;height:80px;">
-        <img src="${state.settings.avatar || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2240%22 fill=%22%232F6FE4%22/%3E%3Ctext x=%2240%22 y=%2252%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2236%22 font-weight=%22bold%22%3E${state.currentUser?.login?.charAt(0).toUpperCase() || 'U'}%3C/text%3E%3C/svg%3E'}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        <img src="${state.settings.avatar || ''}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22 viewBox=%220 0 80 80%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2240%22 fill=%22%232F6FE4%22/%3E%3Ctext x=%2240%22 y=%2252%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2236%22 font-weight=%22bold%22%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E'">
       </div>
       <div>
         <form id="avatarForm" style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -943,11 +1095,15 @@ function viewSozlamalar() {
   <div class="card">
     <h3>🌐 Til</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      ${['uz', 'ru', 'en'].map(l => `
-        <button class="${currentLang === l ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('${l}')" style="padding:10px 20px;border-radius:10px;border:${currentLang === l ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === l ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
-          ${l.toUpperCase()} ${l === 'uz' ? '🇺🇿' : l === 'ru' ? '🇷🇺' : '🇬🇧'}
-        </button>
-      `).join('')}
+      <button class="${currentLang === 'uz' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('uz')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'uz' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'uz' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+        🇺🇿 O'zbek
+      </button>
+      <button class="${currentLang === 'ru' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('ru')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'ru' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'ru' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+        🇷🇺 Русский
+      </button>
+      <button class="${currentLang === 'en' ? 'btn-neon' : 'btn-secondary'}" onclick="changeLanguage('en')" style="padding:10px 20px;border-radius:10px;border:${currentLang === 'en' ? 'none' : '1px solid rgba(255,255,255,0.1)'};background:${currentLang === 'en' ? 'linear-gradient(135deg, var(--neon-blue), var(--neon-purple))' : 'rgba(255,255,255,0.05)'};color:#fff;cursor:pointer;">
+        🇬🇧 English
+      </button>
     </div>
   </div>
   
@@ -974,7 +1130,7 @@ function viewSozlamalar() {
       Mijozlar: ${state.customers.length} ta<br>
       Mahsulotlar: ${state.products.length} ta<br>
       Sotuvlar: ${state.sales.length} ta<br>
-      Jami savdo: ${fmt(state.sales.reduce((a, s) => a + s.jami, 0))} so'm
+      Jami savdo: ${fmt(state.sales.reduce(function(a, s) { return a + s.jami; }, 0))} so'm
     </p>
   </div>
   `;
@@ -983,12 +1139,12 @@ function viewSozlamalar() {
 // ============ VIEW EVENTS ============
 function attachViewEvents() {
   // Customers
-  const custForm = document.getElementById('customerForm');
+  var custForm = document.getElementById('customerForm');
   if (custForm) {
-    custForm.addEventListener('submit', async e => {
+    custForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
+      var name = document.getElementById('custName').value.trim();
+      var phone = document.getElementById('custPhone').value.trim();
       if (!name) return;
       try {
         await addCustomer(name, phone);
@@ -1000,9 +1156,9 @@ function attachViewEvents() {
     });
   }
 
-  document.querySelectorAll('[data-del-customer]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.getAttribute('data-del-customer');
+  document.querySelectorAll('[data-del-customer]').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var id = this.getAttribute('data-del-customer');
       if (!confirm("Bu mijozni o'chirishni tasdiqlaysizmi?")) return;
       try {
         await deleteCustomer(id);
@@ -1014,24 +1170,24 @@ function attachViewEvents() {
     });
   });
 
-  document.querySelectorAll('[data-pay-customer]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.payModal = { customerId: btn.getAttribute('data-pay-customer') };
+  document.querySelectorAll('[data-pay-customer]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      state.payModal = { customerId: this.getAttribute('data-pay-customer') };
       render();
     });
   });
 
   // Products
-  const prodForm = document.getElementById('productForm');
+  var prodForm = document.getElementById('productForm');
   if (prodForm) {
-    prodForm.addEventListener('submit', async e => {
+    prodForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const name = document.getElementById('prodName').value.trim();
-      const narx = Number(document.getElementById('prodNarx').value);
+      var name = document.getElementById('prodName').value.trim();
+      var narx = Number(document.getElementById('prodNarx').value);
       if (!name || !narx) return;
       try {
-        const result = await addProduct(name, narx);
-        alert(`✅ Mahsulot qo'shildi!\nArtikul: ${result.artikul}\nNomi: ${result.name}\nNarxi: ${fmt(result.narx)} so'm`);
+        var result = await addProduct(name, narx);
+        alert('✅ Mahsulot qo\'shildi!\nArtikul: ' + result.artikul + '\nNomi: ' + result.name + '\nNarxi: ' + fmt(result.narx) + ' so\'m');
         await loadData();
         render();
       } catch (error) {
@@ -1040,9 +1196,9 @@ function attachViewEvents() {
     });
   }
 
-  document.querySelectorAll('[data-del-product]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.getAttribute('data-del-product');
+  document.querySelectorAll('[data-del-product]').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      var id = this.getAttribute('data-del-product');
       if (!confirm("Bu mahsulotni o'chirishni tasdiqlaysizmi?")) return;
       try {
         await deleteProduct(id);
@@ -1055,58 +1211,58 @@ function attachViewEvents() {
   });
 
   // Oxirgi mahsulot
-  document.querySelectorAll('[data-last-product]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.getAttribute('data-last-product');
-      const product = state.products.find(p => p._id === id);
+  document.querySelectorAll('[data-last-product]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var id = this.getAttribute('data-last-product');
+      var product = state.products.find(function(p) { return p._id === id; });
       if (product) {
         state.lastProductSale = product;
-        // Sotuvga o'tish
         state.saleDraft.productId = product._id;
         state.view = 'sotuv';
-        state.searchQuery = `${product.artikul} - ${product.name}`;
+        state.searchQuery = product.artikul + ' - ' + product.name;
         render();
       }
     });
   });
 
   // Sales
-  const saleForm = document.getElementById('saleForm');
+  var saleForm = document.getElementById('saleForm');
   if (saleForm) {
-    const searchInput = document.getElementById('saleProductSearch');
-    const productHidden = document.getElementById('saleProduct');
-    const lastProductBtn = document.getElementById('lastProductBtn');
+    var searchInput = document.getElementById('saleProductSearch');
+    var productHidden = document.getElementById('saleProduct');
+    var lastProductBtn = document.getElementById('lastProductBtn');
 
     if (lastProductBtn) {
-      lastProductBtn.addEventListener('click', () => {
+      lastProductBtn.addEventListener('click', function() {
         if (state.products.length === 0) {
           alert('Hali mahsulot mavjud emas!');
           return;
         }
-        const lastProduct = state.products[state.products.length - 1];
+        var lastProduct = state.products[state.products.length - 1];
         state.lastProductSale = lastProduct;
         state.saleDraft.productId = lastProduct._id;
-        if (searchInput) searchInput.value = `${lastProduct.artikul} - ${lastProduct.name}`;
+        if (searchInput) searchInput.value = lastProduct.artikul + ' - ' + lastProduct.name;
         if (productHidden) productHidden.value = lastProduct._id;
         render();
-        setTimeout(() => {
-          const event = new Event('input');
-          document.getElementById('saleSoni')?.dispatchEvent(event);
+        setTimeout(function() {
+          var event = new Event('input');
+          var soniEl = document.getElementById('saleSoni');
+          if (soniEl) soniEl.dispatchEvent(event);
         }, 100);
       });
     }
 
     if (searchInput) {
-      let searchTimeout;
+      var searchTimeout;
       searchInput.addEventListener('input', async function() {
-        const query = this.value.trim();
+        var query = this.value.trim();
         state.searchQuery = query;
         
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(async () => {
+        searchTimeout = setTimeout(async function() {
           if (query.length > 0) {
             try {
-              const results = await searchProducts(query);
+              var results = await searchProducts(query);
               state.searchResults = results;
               state.showSearchResults = results.length > 0;
               render();
@@ -1122,15 +1278,14 @@ function attachViewEvents() {
       });
 
       document.addEventListener('click', function(e) {
-        const result = e.target.closest('.search-result');
+        var result = e.target.closest('.search-result');
         if (result) {
-          const productId = result.dataset.productId;
-          const productName = result.dataset.productName;
-          const productNarx = result.dataset.productNarx;
-          const productArtikul = result.dataset.productArtikul;
+          var productId = result.dataset.productId;
+          var productName = result.dataset.productName;
+          var productArtikul = result.dataset.productArtikul;
           
           if (productHidden) productHidden.value = productId;
-          searchInput.value = `${productArtikul || 'ART-???'} - ${productName}`;
+          searchInput.value = (productArtikul || 'ART-???') + ' - ' + productName;
           state.searchResults = [];
           state.showSearchResults = false;
           state.searchQuery = '';
@@ -1138,26 +1293,27 @@ function attachViewEvents() {
           
           render();
           
-          setTimeout(() => {
-            const event = new Event('input');
-            document.getElementById('saleSoni')?.dispatchEvent(event);
+          setTimeout(function() {
+            var event = new Event('input');
+            var soniEl = document.getElementById('saleSoni');
+            if (soniEl) soniEl.dispatchEvent(event);
           }, 100);
         }
       });
     }
 
-    const updateSaleComputed = () => {
+    var updateSaleComputed = function() {
       state.saleDraft = {
         sana: document.getElementById('saleSana').value,
         customerId: document.getElementById('saleCustomer').value,
         productId: document.getElementById('saleProduct').value,
         soni: document.getElementById('saleSoni').value,
-        tolangan: document.getElementById('saleTolangan').value,
+        tolangan: document.getElementById('saleTolangan').value
       };
-      const f = computeSaleFigures(state.saleDraft);
-      const jamiEl = document.getElementById('saleJamiVal');
-      const perUnitEl = document.getElementById('salePerUnitVal');
-      const qarzEl = document.getElementById('saleQarzVal');
+      var f = computeSaleFigures(state.saleDraft);
+      var jamiEl = document.getElementById('saleJamiVal');
+      var perUnitEl = document.getElementById('salePerUnitVal');
+      var qarzEl = document.getElementById('saleQarzVal');
       
       if (jamiEl) jamiEl.textContent = fmt(f.jami) + " so'm";
       if (perUnitEl) perUnitEl.textContent = (f.product ? fmt(f.product.narx) : 0) + " so'm";
@@ -1165,20 +1321,20 @@ function attachViewEvents() {
         qarzEl.value = fmt(f.qarz) + " so'm";
         qarzEl.style.background = f.qarz > 0 ? 'rgba(255,107,0,0.15)' : 'rgba(0,255,136,0.15)';
         qarzEl.style.color = f.qarz > 0 ? 'var(--neon-orange)' : 'var(--neon-green)';
-        qarzEl.style.border = `1px solid ${f.qarz > 0 ? 'rgba(255,107,0,0.3)' : 'rgba(0,255,136,0.3)'}`;
+        qarzEl.style.border = '1px solid ' + (f.qarz > 0 ? 'rgba(255,107,0,0.3)' : 'rgba(0,255,136,0.3)');
       }
     };
 
-    ['saleSana', 'saleCustomer', 'saleSoni', 'saleTolangan'].forEach(id => {
-      const el = document.getElementById(id);
+    ['saleSana', 'saleCustomer', 'saleSoni', 'saleTolangan'].forEach(function(id) {
+      var el = document.getElementById(id);
       if (!el) return;
-      const evt = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
+      var evt = (el.tagName === 'SELECT' || el.type === 'date') ? 'change' : 'input';
       el.addEventListener(evt, updateSaleComputed);
     });
 
-    saleForm.addEventListener('submit', async e => {
+    saleForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const d = state.saleDraft;
+      var d = state.saleDraft;
       
       if (!d.customerId || !d.productId || !d.soni || Number(d.soni) <= 0) {
         alert("Iltimos mijoz, mahsulot va sonini to'g'ri kiriting.");
@@ -1186,7 +1342,7 @@ function attachViewEvents() {
       }
       
       try {
-        const saleData = {
+        var saleData = {
           sana: d.sana || todayStr(),
           customerId: d.customerId,
           productId: d.productId,
@@ -1194,7 +1350,7 @@ function attachViewEvents() {
           tolangan: Number(d.tolangan || 0)
         };
         
-        const result = await addSale(saleData);
+        var result = await addSale(saleData);
         
         state.saleDraft = { sana: todayStr(), productId: '', customerId: '', soni: '', tolangan: '' };
         state.searchQuery = '';
@@ -1206,7 +1362,7 @@ function attachViewEvents() {
         await loadData();
         render();
         
-        alert(`✅ Sotuv muvaffaqiyatli saqlandi!\nJami: ${fmt(result.jami)} so'm\nQarz: ${fmt(result.qarz)} so'm`);
+        alert('✅ Sotuv muvaffaqiyatli saqlandi!\nJami: ' + fmt(result.jami) + ' so\'m\nQarz: ' + fmt(result.qarz) + ' so\'m');
         
       } catch (error) {
         console.error('❌ Sotuv xatosi:', error);
@@ -1216,23 +1372,23 @@ function attachViewEvents() {
   }
 
   // History
-  const histSana = document.getElementById('histSana');
-  const histCustomer = document.getElementById('histCustomer');
-  const histBtn = document.getElementById('histShowBtn');
-  const histClearBtn = document.getElementById('histClearBtn');
+  var histSana = document.getElementById('histSana');
+  var histCustomer = document.getElementById('histCustomer');
+  var histBtn = document.getElementById('histShowBtn');
+  var histClearBtn = document.getElementById('histClearBtn');
 
   if (histBtn) {
-    histBtn.addEventListener('click', () => {
-      state.historyFilter = { 
-        sana: histSana.value, 
-        customerId: histCustomer.value 
+    histBtn.addEventListener('click', function() {
+      state.historyFilter = {
+        sana: histSana ? histSana.value : '',
+        customerId: histCustomer ? histCustomer.value : ''
       };
       render();
     });
   }
 
   if (histClearBtn) {
-    histClearBtn.addEventListener('click', () => {
+    histClearBtn.addEventListener('click', function() {
       if (histSana) histSana.value = '';
       if (histCustomer) histCustomer.value = '';
       state.historyFilter = { sana: '', customerId: '' };
@@ -1241,11 +1397,11 @@ function attachViewEvents() {
   }
 
   // Settings - Avatar
-  const avatarForm = document.getElementById('avatarForm');
+  var avatarForm = document.getElementById('avatarForm');
   if (avatarForm) {
-    avatarForm.addEventListener('submit', async e => {
+    avatarForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      const url = document.getElementById('avatarUrl').value.trim();
+      var url = document.getElementById('avatarUrl').value.trim();
       if (url) {
         state.settings.avatar = url;
         localStorage.setItem('user_avatar', url);
@@ -1255,22 +1411,23 @@ function attachViewEvents() {
   }
 
   // Settings - Theme
-  const applyThemeBtn = document.getElementById('applyThemeBtn');
+  var applyThemeBtn = document.getElementById('applyThemeBtn');
   if (applyThemeBtn) {
-    applyThemeBtn.addEventListener('click', () => {
-      const neonColor = document.getElementById('neonColor').value;
-      const bgColor = document.getElementById('bgColor').value;
+    applyThemeBtn.addEventListener('click', function() {
+      var neonColor = document.getElementById('neonColor').value;
+      var bgColor = document.getElementById('bgColor').value;
       document.documentElement.style.setProperty('--neon-blue', neonColor);
       document.documentElement.style.setProperty('--dark-bg', bgColor);
-      document.querySelector('.neon-bg').style.background = bgColor;
+      var bg = document.querySelector('.neon-bg');
+      if (bg) bg.style.background = bgColor;
       localStorage.setItem('theme_neon', neonColor);
       localStorage.setItem('theme_bg', bgColor);
     });
   }
 
   // Load saved theme
-  const savedNeon = localStorage.getItem('theme_neon');
-  const savedBg = localStorage.getItem('theme_bg');
+  var savedNeon = localStorage.getItem('theme_neon');
+  var savedBg = localStorage.getItem('theme_bg');
   if (savedNeon) {
     document.documentElement.style.setProperty('--neon-blue', savedNeon);
   }
@@ -1291,16 +1448,16 @@ window.changeLanguage = changeLanguage;
 async function loadData() {
   try {
     state.loading = true;
-    const [customers, products, sales, users] = await Promise.all([
-      getCustomers().catch(() => []),
-      getProducts().catch(() => []),
-      getSales().catch(() => []),
-      getUsers().catch(() => [])
+    var results = await Promise.all([
+      getCustomers().catch(function() { return []; }),
+      getProducts().catch(function() { return []; }),
+      getSales().catch(function() { return []; }),
+      getUsers().catch(function() { return []; })
     ]);
-    state.customers = customers;
-    state.products = products;
-    state.sales = sales;
-    state.users = users;
+    state.customers = results[0];
+    state.products = results[1];
+    state.sales = results[2];
+    state.users = results[3];
     state.loaded = true;
     state.loading = false;
     state.error = null;
@@ -1314,11 +1471,10 @@ async function loadData() {
 // ============ INIT ============
 (async function init() {
   try {
-    const savedToken = localStorage.getItem('token');
+    var savedToken = localStorage.getItem('token');
     
-    // Load theme
-    const savedNeon = localStorage.getItem('theme_neon');
-    const savedBg = localStorage.getItem('theme_bg');
+    var savedNeon = localStorage.getItem('theme_neon');
+    var savedBg = localStorage.getItem('theme_bg');
     if (savedNeon) {
       document.documentElement.style.setProperty('--neon-blue', savedNeon);
     }
@@ -1329,7 +1485,7 @@ async function loadData() {
     if (savedToken) {
       token = savedToken;
       try {
-        const user = await getCurrentUser();
+        var user = await getCurrentUser();
         if (user) {
           state.currentUser = user;
           await loadData();
