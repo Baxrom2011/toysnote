@@ -33,6 +33,8 @@ label{display:block;color:rgba(255,255,255,0.4);font-size:12px;margin-bottom:4px
 .btn-pay:hover{background:rgba(108,99,255,0.2);}
 .btn-secondary{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.06);}
 .btn-secondary:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.btn-edit{background:rgba(255,179,71,0.1);color:#FFB347;}
+.btn-edit:hover{background:rgba(255,179,71,0.2);}
 table{width:100%;border-collapse:collapse;}
 th{text-align:left;color:rgba(255,255,255,0.3);font-weight:600;font-size:11px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);}
 td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.02);color:rgba(255,255,255,0.7);font-size:13px;}
@@ -92,9 +94,9 @@ let token = localStorage.getItem('token');
 
 // ============ TILLAR ============
 const LANG = {
-  uz: { hello: 'Salom', goodbye: 'Hayr', login: 'Kirish', logout: 'Chiqish', customers: 'Mijozlar', products: 'Mahsulotlar', sales: 'Sotuv', stats: 'Statistika', history: 'Tarix', settings: 'Sozlamalar', admin: 'Admin', user: 'Xodim', add: 'Qo\'shish', delete: 'O\'chirish', save: 'Saqlash', cancel: 'Bekor qilish', debt: 'Qarz', paid: 'To\'langan', total: 'Jami', last: 'Oxirgi mahsulot' },
-  ru: { hello: 'Привет', goodbye: 'До свидания', login: 'Войти', logout: 'Выйти', customers: 'Клиенты', products: 'Товары', sales: 'Продажи', stats: 'Статистика', history: 'История', settings: 'Настройки', admin: 'Админ', user: 'Сотрудник', add: 'Добавить', delete: 'Удалить', save: 'Сохранить', cancel: 'Отмена', debt: 'Долг', paid: 'Оплачено', total: 'Итого', last: 'Последний товар' },
-  en: { hello: 'Hello', goodbye: 'Goodbye', login: 'Login', logout: 'Logout', customers: 'Customers', products: 'Products', sales: 'Sales', stats: 'Statistics', history: 'History', settings: 'Settings', admin: 'Admin', user: 'Staff', add: 'Add', delete: 'Delete', save: 'Save', cancel: 'Cancel', debt: 'Debt', paid: 'Paid', total: 'Total', last: 'Last Product' }
+  uz: { hello: 'Salom', goodbye: 'Hayr', login: 'Kirish', logout: 'Chiqish', customers: 'Mijozlar', products: 'Mahsulotlar', sales: 'Sotuv', stats: 'Statistika', history: 'Tarix', settings: 'Sozlamalar', admin: 'Admin', user: 'Xodim', add: 'Qo\'shish', delete: 'O\'chirish', edit: 'Tahrirlash', save: 'Saqlash', cancel: 'Bekor qilish', debt: 'Qarz', paid: 'To\'langan', total: 'Jami', last: 'Oxirgi mahsulot' },
+  ru: { hello: 'Привет', goodbye: 'До свидания', login: 'Войти', logout: 'Выйти', customers: 'Клиенты', products: 'Товары', sales: 'Продажи', stats: 'Статистика', history: 'История', settings: 'Настройки', admin: 'Админ', user: 'Сотрудник', add: 'Добавить', delete: 'Удалить', edit: 'Редактировать', save: 'Сохранить', cancel: 'Отмена', debt: 'Долг', paid: 'Оплачено', total: 'Итого', last: 'Последний товар' },
+  en: { hello: 'Hello', goodbye: 'Goodbye', login: 'Login', logout: 'Logout', customers: 'Customers', products: 'Products', sales: 'Sales', stats: 'Statistics', history: 'History', settings: 'Settings', admin: 'Admin', user: 'Staff', add: 'Add', delete: 'Delete', edit: 'Edit', save: 'Save', cancel: 'Cancel', debt: 'Debt', paid: 'Paid', total: 'Total', last: 'Last Product' }
 };
 let lang = localStorage.getItem('lang') || 'uz';
 function t(k){ return LANG[lang][k] || k; }
@@ -125,13 +127,18 @@ async function loginUser(l,p){ const d=await apiRequest('/auth/login',{method:'P
 async function getCurrentUser(){ if(!token) return null; return apiRequest('/auth/me'); }
 async function getCustomers(){ return apiRequest('/customers'); }
 async function addCustomer(n,p){ return apiRequest('/customers',{method:'POST',body:JSON.stringify({name:n,phone:p})}); }
+async function updateCustomer(id,n,p){ return apiRequest('/customers/'+id,{method:'PUT',body:JSON.stringify({name:n,phone:p})}); }
 async function deleteCustomer(id){ return apiRequest('/customers/'+id,{method:'DELETE'}); }
 async function getProducts(){ return apiRequest('/products'); }
 async function searchProducts(q){ if(!q||q.length<1) return getProducts(); return apiRequest('/products/search/'+encodeURIComponent(q)); }
 async function addProduct(n,pr){ return apiRequest('/products',{method:'POST',body:JSON.stringify({name:n,narx:pr})}); }
+async function updateProduct(id,n,pr){ return apiRequest('/products/'+id,{method:'PUT',body:JSON.stringify({name:n,narx:pr})}); }
 async function deleteProduct(id){ return apiRequest('/products/'+id,{method:'DELETE'}); }
 async function getSales(){ return apiRequest('/sales'); }
 async function addSale(d){ return apiRequest('/sales',{method:'POST',body:JSON.stringify(d)}); }
+async function updateSale(id,d){ return apiRequest('/sales/'+id,{method:'PUT',body:JSON.stringify(d)}); }
+async function deleteSale(id){ return apiRequest('/sales/'+id,{method:'DELETE'}); }
+async function getPayments(){ return apiRequest('/payments'); }
 async function addPayment(cid,s,a){ return apiRequest('/payments',{method:'POST',body:JSON.stringify({customerId:cid,sana:s,amount:a})}); }
 async function getUsers(){ return apiRequest('/users'); }
 async function registerUser(l,p,r){ return apiRequest('/users/register',{method:'POST',body:JSON.stringify({login:l,password:p,role:r||'user'})}); }
@@ -140,7 +147,7 @@ async function deleteUser(l){ return apiRequest('/users/'+l,{method:'DELETE'}); 
 function fmt(n){ return Math.round(n||0).toLocaleString('ru-RU'); }
 function today(){ return new Date().toISOString().slice(0,10); }
 
-// ✅ QARZ HISOBLASH - TO'G'RI
+// ✅ QARZ HISOBLASH - TO'G'RI (payments ham yuklanadi)
 function getCustomerDebt(customerId) {
   if (!customerId) return 0;
   const sales = state.sales.filter(s => s.customerId === customerId);
@@ -150,7 +157,7 @@ function getCustomerDebt(customerId) {
   return Math.max(0, totalDebt - totalPaid);
 }
 
-// ✅ SOTUV HISOBLASH - TO'G'RI
+// ✅ SOTUV HISOBLASH
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
@@ -307,7 +314,7 @@ function attachShellEvents() {
 
 // ============ VIEWS ============
 
-// CUSTOMERS
+// ✅ CUSTOMERS - TUZATILGAN (o'chirish tugmasi ishlaydi)
 function viewCustomers() {
   const rows = state.customers.map(c => {
     const debt = getCustomerDebt(c._id);
@@ -316,8 +323,9 @@ function viewCustomers() {
       <td>${c.phone || '—'}</td>
       <td>${debt > 0 ? '<span class="pill pill-debt">'+fmt(debt)+' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
       <td class="actions">
+        <button class="btn btn-edit" data-edit-customer="${c._id}">✏️</button>
         ${debt > 0 ? '<button class="btn btn-pay" data-pay="'+c._id+'">💰</button>' : ''}
-        <button class="btn btn-danger" data-del-customer="'+c._id+'">🗑️</button>
+        <button class="btn btn-danger" data-del-customer="${c._id}">🗑️</button>
       </td>
     </tr>`;
   }).join('');
@@ -337,7 +345,7 @@ function viewCustomers() {
   </div>`;
 }
 
-// PRODUCTS
+// ✅ PRODUCTS - TUZATILGAN
 function viewProducts() {
   const rows = state.products.map(p => {
     const sold = state.sales.filter(s => s.productId === p._id).reduce((a,s) => a+s.soni, 0);
@@ -347,6 +355,7 @@ function viewProducts() {
       <td>${fmt(p.narx)} so'm</td>
       <td>${sold} dona</td>
       <td class="actions">
+        <button class="btn btn-edit" data-edit-product="${p._id}">✏️</button>
         <button class="btn btn-danger" data-del-product="${p._id}">🗑️</button>
         <button class="btn btn-pay" data-last="${p._id}">📦</button>
       </td>
@@ -369,7 +378,7 @@ function viewProducts() {
   </div>`;
 }
 
-// SALES
+// ✅ SALES - TUZATILGAN
 function viewSales() {
   const d = state.saleDraft;
   const f = computeSale(d);
@@ -434,7 +443,7 @@ function viewSales() {
   </div>`;
 }
 
-// STATS
+// ✅ STATS
 function viewStats() {
   const totalSales = state.sales.reduce((a,s) => a+s.jami, 0);
   const totalPaid = state.sales.reduce((a,s) => a+s.tolangan, 0);
@@ -453,7 +462,7 @@ function viewStats() {
   </div>`;
 }
 
-// HISTORY
+// ✅ HISTORY
 function viewHistory() {
   const f = state.historyFilter;
   const customerOptions = state.customers.map(c => 
@@ -488,12 +497,16 @@ function viewHistory() {
   </div>`;
 }
 
-// SETTINGS
+// ✅ SETTINGS
 function viewSettings() {
   const isAdmin = state.currentUser?.role === 'admin';
   const userName = state.currentUser?.login || '';
   const avatar = state.settings.avatar || '';
   const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%236C63FF"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="36" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
+  
+  const userRows = state.users.map(u => 
+    `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Admin' : 'Xodim'}</td><td>${u.login !== 'baxrom' ? '<button class="btn btn-danger" data-del-user="'+u.login+'">🗑️</button>' : '⭐'}</td></tr>`
+  ).join('');
   
   return `
   <div class="card">
@@ -518,6 +531,16 @@ function viewSettings() {
   
   ${isAdmin ? `
   <div class="card">
+    <h3>👥 Foydalanuvchilar</h3>
+    <form id="userForm" class="row" style="margin-bottom:12px;">
+      <div class="field"><label>Login</label><input id="newLogin" required placeholder="login"></div>
+      <div class="field"><label>Parol</label><input id="newParol" type="password" required placeholder="parol"></div>
+      <button class="btn btn-primary" type="submit" style="align-self:end;">➕ ${t('add')}</button>
+    </form>
+    ${state.users.length ? '<table><thead><tr><th>Login</th><th>Rol</th><th></th></tr></thead><tbody>'+userRows+'</tbody></table>' : '<div class="empty">Hali foydalanuvchi yo\'q</div>'}
+  </div>
+  
+  <div class="card">
     <h3>🎨 Dizayn</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <div><span style="color:rgba(255,255,255,0.3);font-size:12px;">Asosiy:</span> <input type="color" id="color1" value="#6C63FF" style="width:36px;height:36px;border:none;border-radius:6px;cursor:pointer;"></div>
@@ -534,6 +557,7 @@ function viewSettings() {
       Mijozlar: ${state.customers.length}<br>
       Mahsulotlar: ${state.products.length}<br>
       Sotuvlar: ${state.sales.length}<br>
+      To'lovlar: ${state.payments.length}<br>
       Jami: ${fmt(state.sales.reduce((a,s)=>a+s.jami,0))} so'm
     </div>
   </div>`;
@@ -579,7 +603,7 @@ function drawCharts() {
 
 // ============ EVENTS ============
 function attachViewEvents() {
-  // Customers
+  // ✅ Customers
   document.getElementById('customerForm')?.addEventListener('submit', async e => {
     e.preventDefault();
     const name = document.getElementById('custName').value.trim();
@@ -602,7 +626,7 @@ function attachViewEvents() {
     });
   });
   
-  // Products
+  // ✅ Products
   document.getElementById('productForm')?.addEventListener('submit', async e => {
     e.preventDefault();
     const name = document.getElementById('prodName').value.trim();
@@ -630,7 +654,7 @@ function attachViewEvents() {
     });
   });
   
-  // Sales
+  // ✅ Sales
   const saleForm = document.getElementById('saleForm');
   if (saleForm) {
     const searchInput = document.getElementById('saleSearch');
@@ -726,7 +750,7 @@ function attachViewEvents() {
     });
   }
   
-  // History
+  // ✅ History
   document.getElementById('histShow')?.addEventListener('click', function() {
     state.historyFilter = {
       sana: document.getElementById('histSana').value,
@@ -742,13 +766,34 @@ function attachViewEvents() {
     render();
   });
   
-  // Settings
+  // ✅ Settings - Avatar
   document.getElementById('avatarForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
     const url = document.getElementById('avatarUrl').value.trim();
     if (url) { state.settings.avatar = url; localStorage.setItem('user_avatar', url); render(); }
   });
   
+  // ✅ Settings - Users
+  document.getElementById('userForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const login = document.getElementById('newLogin').value.trim();
+    const password = document.getElementById('newParol').value;
+    if (!login || !password) return;
+    try {
+      await registerUser(login, password);
+      await loadData();
+      render();
+    } catch(err) { alert(err.message); }
+  });
+  
+  document.querySelectorAll('[data-del-user]').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      if (!confirm('O\'chirish?')) return;
+      try { await deleteUser(this.dataset.delUser); await loadData(); render(); } catch(err) { alert(err.message); }
+    });
+  });
+  
+  // ✅ Settings - Theme
   document.getElementById('applyTheme')?.addEventListener('click', function() {
     const c1 = document.getElementById('color1').value;
     const c2 = document.getElementById('color2').value;
@@ -827,15 +872,18 @@ window.changeLang = changeLang;
 async function loadData() {
   try {
     state.loading = true;
-    const [customers, products, sales, users] = await Promise.all([
+    // ✅ PAYMENTS HAM YUKLANADI!
+    const [customers, products, sales, payments, users] = await Promise.all([
       getCustomers().catch(()=>[]),
       getProducts().catch(()=>[]),
       getSales().catch(()=>[]),
+      getPayments().catch(()=>[]),
       getUsers().catch(()=>[])
     ]);
     state.customers = customers;
     state.products = products;
     state.sales = sales;
+    state.payments = payments;  // ✅ MUHIM!
     state.users = users;
     state.loaded = true;
     state.loading = false;
