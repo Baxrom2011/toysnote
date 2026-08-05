@@ -5,7 +5,6 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     unique: true,
     trim: true
-    // ⚠️ default O'CHIRILDI, faqat pre('save') ishlaydi
   },
   name: {
     type: String,
@@ -23,23 +22,24 @@ const ProductSchema = new mongoose.Schema({
   }
 });
 
-// ✅ Artikul ketma-ket raqamlash (ART-000001, ART-000002...)
+// ✅ ART-001 dan boshlab ketma-ket
 ProductSchema.pre('save', async function(next) {
   try {
     if (!this.artikul) {
+      // Oxirgi mahsulotni topish
       const last = await mongoose.model('Product')
         .findOne({ artikul: { $exists: true, $ne: null } })
         .sort({ artikul: -1 });
       
       let nextNumber = 1;
       if (last && last.artikul) {
-        const match = last.artikul.match(/ART-?(\d+)/);
+        const match = last.artikul.match(/ART-(\d+)/);
         if (match) {
           nextNumber = parseInt(match[1]) + 1;
         }
       }
-      // 6 xonali raqam: 000001, 000002...
-      this.artikul = 'ART-' + String(nextNumber).padStart(6, '0');
+      // ART-001, ART-002, ART-003...
+      this.artikul = 'ART-' + String(nextNumber).padStart(3, '0');
       console.log('✅ Artikul yaratildi:', this.artikul);
     }
     next();
