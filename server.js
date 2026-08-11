@@ -47,15 +47,22 @@ mongoose.connect(MONGODB_URI)
     console.log('✅ MongoDB ga ulanish muvaffaqiyatli');
     
     const User = require('./models/User');
-    const admin = await User.findOne({ login: 'baxrom' });
-    if (!admin) {
-      const newAdmin = new User({
-        login: 'baxrom',
-        password: '14042011',
-        role: 'admin'
-      });
-      await newAdmin.save();
-      console.log('✅ Admin yaratildi: baxrom / 14042011');
+    const adminLogin = process.env.ADMIN_LOGIN;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (adminLogin && adminPassword) {
+      const admin = await User.findOne({ login: adminLogin });
+      if (!admin) {
+        const newAdmin = new User({
+          login: adminLogin,
+          password: adminPassword,
+          role: 'admin'
+        });
+        await newAdmin.save();
+        console.log(`✅ Admin yaratildi: ${adminLogin}`);
+      }
+    } else {
+      console.warn('⚠️ ADMIN_LOGIN va ADMIN_PASSWORD .env faylida berilmagan. Avtomatik admin yaratilmaydi.');
     }
   })
   .catch(err => {
