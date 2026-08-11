@@ -1060,17 +1060,29 @@ function attachViewEvents() {
   
   // History - Edit & Delete
   document.querySelectorAll('[data-edit-sale]').forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', async function() {
       const id = this.dataset.editSale;
       const sale = state.sales.find(s => s._id === id);
       if (sale) {
         const newTolangan = prompt('To\'langan summani o\'zgartiring (so\'m):', sale.tolangan);
         if (newTolangan !== null) {
           const newVal = Number(newTolangan);
-          if (newVal >= 0 && newVal <= sale.jami) {
-            updateSale(id, { ...sale, tolangan: newVal, qarz: sale.jami - newVal });
+          if (Number.isFinite(newVal) && newVal >= 0) {
+            try {
+              await updateSale(id, {
+                sana: sale.sana,
+                customerId: sale.customerId,
+                productId: sale.productId,
+                soni: sale.soni,
+                tolangan: newVal
+              });
+              await loadData();
+              render();
+            } catch (err) {
+              alert('Xatolik: ' + err.message);
+            }
           } else {
-            alert('To\'langan summa jami summadan katta bo\'lishi mumkin emas!');
+            alert('To\'langan summa 0 yoki undan katta bo\'lishi kerak!');
           }
         }
       }
