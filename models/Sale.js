@@ -34,7 +34,14 @@ const SaleSchema = new mongoose.Schema({
   },
   qarz: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0
+  },
+  // Sotuvdan ortiqcha to'langan pul bilan bog'liq payment
+  saleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Sale',
+    default: null
   },
   createdAt: {
     type: Date,
