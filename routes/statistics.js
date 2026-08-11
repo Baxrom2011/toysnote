@@ -1,35 +1,31 @@
 const express = require('express');
 const Sale = require('../models/Sale');
-const Payment = require('../models/Payment');
 const { auth } = require('../middleware/auth');
 const router = express.Router();
 
 router.get('/', auth, async (req, res) => {
   try {
     const sales = await Sale.find();
-    const payments = await Payment.find();
 
-    const totalSales = sales.reduce((sum, s) => sum + s.jami, 0);
-    const totalPaid = sales.reduce((sum, s) => sum + s.tolangan, 0);
-    const totalDebtRaw = sales.reduce((sum, s) => sum + s.qarz, 0);
-    const totalPaidBack = payments.reduce((sum, p) => sum + p.amount, 0);
-    const totalDebt = Math.max(0, totalDebtRaw - totalPaidBack);
+    const totalSales = sales.reduce((sum, s) => sum + Number(s.jami || 0), 0);
+    const totalPaid = sales.reduce((sum, s) => sum + Number(s.tolangan || 0), 0);
+    const totalDebt = sales.reduce((sum, s) => sum + Math.max(0, Number(s.qarz || 0)), 0);
 
     const dailySales = {};
     sales.forEach(s => {
-      dailySales[s.sana] = (dailySales[s.sana] || 0) + s.jami;
+      dailySales[s.sana] = (dailySales[s.sana] || 0) + Number(s.jami || 0);
     });
 
     const productSales = {};
     sales.forEach(s => {
       const key = s.productId.toString();
-      productSales[key] = (productSales[key] || 0) + s.soni;
+      productSales[key] = (productSales[key] || 0) + Number(s.soni || 0);
     });
 
     const customerSales = {};
     sales.forEach(s => {
       const key = s.customerId.toString();
-      customerSales[key] = (customerSales[key] || 0) + s.jami;
+      customerSales[key] = (customerSales[key] || 0) + Number(s.jami || 0);
     });
 
     res.json({
