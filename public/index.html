@@ -230,6 +230,240 @@ tr:hover td{background:rgba(255,255,255,0.01);}
 .icon-options button{padding:8px 14px;border:2px solid var(--border);border-radius:10px;background:transparent;cursor:pointer;font-size:22px;transition:all 0.3s;}
 .icon-options button:hover{border-color:#4A90D9;transform:scale(1.05);}
 .icon-options button.active{border-color:#4A90D9;background:rgba(74,144,217,0.08);}
+
+/* ============ PROFESSIONAL ADMIN UI ============ */
+:root{
+  --primary:#2563eb;
+  --primary-light:#3b82f6;
+  --primary-dark:#1d4ed8;
+  --secondary:#16a34a;
+  --accent:#64748b;
+  --danger:#dc2626;
+  --bg-start:#0f172a;
+  --bg-end:#111827;
+  --card-bg:#172033;
+  --border:#293548;
+  --text:#f8fafc;
+  --text-secondary:#aeb9ca;
+  --text-muted:#718096;
+  --radius:8px;
+  --shadow:0 4px 18px rgba(0,0,0,.18);
+  --glass:#172033;
+  --glow:transparent;
+}
+*{box-sizing:border-box}
+body{
+  font-family:'Inter',Arial,sans-serif;
+  background:#0b1220;
+  color:var(--text);
+  letter-spacing:0;
+}
+.glass,.card{
+  background:#141d2d;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  border:1px solid #273246;
+  box-shadow:0 3px 14px rgba(0,0,0,.16);
+  border-radius:8px;
+  transition:none;
+}
+.glass:hover{
+  border-color:#344157;
+  box-shadow:0 3px 14px rgba(0,0,0,.16);
+}
+.header{
+  background:#111a2a !important;
+  border-bottom:1px solid #273246 !important;
+  backdrop-filter:none !important;
+}
+.nav button{
+  border-radius:6px !important;
+  transition:none !important;
+}
+.nav button.active{
+  background:#1e3a66 !important;
+  color:#fff !important;
+}
+.btn{
+  border-radius:6px !important;
+  box-shadow:none !important;
+  transition:background .15s ease,border-color .15s ease !important;
+}
+.btn-primary{
+  background:#2563eb !important;
+  border:1px solid #2563eb !important;
+}
+.btn-primary:hover{background:#1d4ed8 !important}
+.btn-secondary{
+  background:#1b2638 !important;
+  border:1px solid #334155 !important;
+}
+input,select,textarea{
+  border-radius:6px !important;
+  background:#0f172a !important;
+  border:1px solid #334155 !important;
+  color:#f8fafc !important;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#3b82f6 !important;
+  box-shadow:0 0 0 2px rgba(59,130,246,.12) !important;
+}
+table{
+  border-collapse:collapse;
+}
+th{
+  background:#101827 !important;
+  color:#94a3b8 !important;
+  font-size:11px !important;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-weight:600 !important;
+}
+td{
+  border-bottom:1px solid #273246 !important;
+}
+tr:hover td{
+  background:#182235 !important;
+}
+.pill{
+  border-radius:5px !important;
+  padding:4px 8px !important;
+  font-size:11px !important;
+}
+.pill-ok{
+  background:rgba(22,163,74,.12) !important;
+  color:#4ade80 !important;
+}
+.pill-debt{
+  background:rgba(220,38,38,.12) !important;
+  color:#f87171 !important;
+}
+.badge{
+  border-radius:4px !important;
+  background:#1e293b !important;
+  border:1px solid #334155;
+}
+.history-toolbar{
+  padding:16px !important;
+}
+.history-date-row{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.history-date-row .field{
+  min-width:210px;
+}
+.history-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:14px;
+}
+.history-header h3{
+  margin:0 !important;
+}
+.history-subtitle{
+  color:#7f8da3;
+  font-size:12px;
+  margin-top:4px;
+}
+.history-summary{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid #273246;
+  background:#101827;
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  gap:28px;
+  flex-wrap:wrap;
+}
+.summary-item{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:150px;
+}
+.summary-item span{
+  color:#7f8da3;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.summary-item strong{
+  color:#f8fafc;
+  font-size:16px;
+}
+.summary-item.paid strong{color:#4ade80}
+.summary-item.debt strong{color:#f87171}
+.cash-button{
+  border:1px solid #2563eb;
+  background:#2563eb;
+  color:#fff;
+  border-radius:6px;
+  padding:10px 16px;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+}
+.cash-button:hover{background:#1d4ed8}
+.cash-modal{
+  width:min(430px,calc(100vw - 32px)) !important;
+}
+.cash-modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:18px;
+}
+.cash-kicker{
+  color:#60a5fa;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.12em;
+  margin-bottom:4px;
+}
+.cash-modal h3{margin:0}
+.modal-close{
+  width:30px;
+  height:30px;
+  border:1px solid #334155;
+  background:#111827;
+  color:#94a3b8;
+  border-radius:6px;
+  font-size:20px;
+  cursor:pointer;
+}
+.cash-debt-box{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  background:#101827;
+  border:1px solid #273246;
+  border-radius:7px;
+  margin-bottom:16px;
+}
+.cash-debt-box span{
+  color:#94a3b8;
+  font-size:12px;
+}
+.cash-debt-box strong{
+  color:#f87171;
+  font-size:16px;
+}
+.table-wrap{overflow-x:auto}
+@media(max-width:700px){
+  .history-summary{gap:14px}
+  .summary-item{min-width:130px}
+  .history-date-row .field{min-width:100%;width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -266,7 +500,7 @@ let state = {
   users: [], customers: [], products: [], sales: [], payments: [],
   currentUser: null, view: 'mijozlar', loginErr: '', error: null, payModal: null,
   saleDraft: { sana: '', productId: '', customerId: '', soni: '', tolangan: '' },
-  historyFilter: { sana: '', customerId: '' },
+  historyFilter: { sana: '' },
   searchResults: [], showSearch: false, searchQuery: '',
   settings: { avatar: localStorage.getItem('user_avatar') || '' },
   showWelcome: false,
@@ -311,19 +545,12 @@ function today(){ return new Date().toISOString().slice(0,10); }
 
 function getCustomerDebt(customerId) {
   if (!customerId) return 0;
-
-  const sales = state.sales.filter(
-    s => s.customerId === customerId
-  );
-
-  return sales.reduce(
-    (total, sale) => {
-      const debt = Number(sale.qarz || 0);
-
-      return total + Math.max(0, debt);
-    },
-    0
-  );
+  const sales = state.sales.filter(s => s.customerId === customerId);
+  return sales.reduce((sum, s) => {
+    const jami = Number(s.jami || 0);
+    const tolangan = Math.min(Number(s.tolangan || 0), jami);
+    return sum + Math.max(0, jami - tolangan);
+  }, 0);
 }
 
 function getDebtByDate(customerId, sana) {
@@ -576,7 +803,7 @@ function viewProducts() {
       <td class="actions">
         <button class="btn btn-edit" data-edit-product="${p._id}">✏️</button>
         <button class="btn btn-danger" data-del-product="${p._id}">🗑️</button>
-        <button class="btn btn-pay" data-last="${p._id}">📦</button>
+        
       </td>
     </tr>`;
   }).join('');
@@ -656,7 +883,6 @@ function viewSales() {
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
         <button class="btn btn-primary" type="submit">💾 ${t('save')}</button>
-        <button type="button" class="btn btn-primary" id="lastBtn" style="background:linear-gradient(135deg,#2ECC71,#4A90D9);">📦 ${t('last')}</button>
       </div>
     </form>
   </div>`;
@@ -665,7 +891,11 @@ function viewSales() {
 // ============ STATISTIKA ============
 function viewStats() {
   const totalSales = state.sales.reduce((a,s) => a+s.jami, 0);
-  const totalPaid = state.sales.reduce((a,s) => a+s.tolangan, 0);
+  const totalPaid = state.sales.reduce((sum, s) => {
+    const jami = Number(s.jami || 0);
+    const paid = Math.min(Number(s.tolangan || 0), jami);
+    return sum + paid;
+  }, 0);
   let totalDebt = 0;
   state.customers.forEach(c => totalDebt += getCustomerDebt(c._id));
   
@@ -673,10 +903,11 @@ function viewStats() {
   let dateDebt = 0, dateSales = [];
   if (filterSana) {
     dateSales = state.sales.filter(s => s.sana === filterSana);
-    dateDebt = dateSales.reduce((a,s) => a + s.qarz, 0);
-    const datePayments = state.payments.filter(p => p.sana === filterSana);
-    const datePaid = datePayments.reduce((a,p) => a + p.amount, 0);
-    dateDebt = Math.max(0, dateDebt - datePaid);
+    dateDebt = dateSales.reduce((sum, s) => {
+      const jami = Number(s.jami || 0);
+      const paid = Math.min(Number(s.tolangan || 0), jami);
+      return sum + Math.max(0, jami - paid);
+    }, 0);
   }
   
   return `
@@ -726,60 +957,114 @@ function viewStats() {
 // ============ HISTORY ============
 function viewHistory() {
   const f = state.historyFilter;
-  const customerOptions = state.customers.map(c => 
-    `<option value="${c._id}" ${f.customerId===c._id?'selected':''}>${c.name}</option>`
-  ).join('');
-  
-  let rows = '', totalJ=0, totalP=0, totalQ=0;
-  if (f.customerId) {
-    let matches = state.sales.filter(s => s.customerId === f.customerId);
-    if (f.sana) matches = matches.filter(s => s.sana === f.sana);
-    
-    // ✅ TO'G'RI HISOBLASH
-    totalJ = matches.reduce((a,s) => a + s.jami, 0);
-    totalP = matches.reduce((a,s) => a + s.tolangan, 0);
-    totalQ = matches.reduce((a,s) => a + s.qarz, 0);
-    
-    rows = matches.map(s => {
-      const p = state.products.find(x => x._id === s.productId);
-      return `<tr>
-        <td>${s.sana}</td>
-        <td>${p ? p.name : '—'}</td>
-        <td>${s.soni} dona</td>
-        <td>${fmt(s.jami)} so'm</td>
-        <td>${fmt(s.tolangan)} so'm</td>
-        <td>${s.qarz > 0 ? '<span class="pill pill-debt">'+fmt(s.qarz)+' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
-        <td class="actions">
-          <button class="btn btn-edit" data-edit-sale="${s._id}">✏️</button>
-          <button class="btn btn-danger" data-del-sale="${s._id}">🗑️</button>
-        </td>
-      </tr>`;
-    }).join('');
-  }
-  
+  const selectedDate = f.sana || '';
+
+  let matches = selectedDate
+    ? state.sales.filter(s => s.sana === selectedDate)
+    : [];
+
+  let totalJ = 0;
+  let totalP = 0;
+  let totalQ = 0;
+
+  matches.forEach(s => {
+    const jami = Number(s.jami || 0);
+    const paid = Math.min(Number(s.tolangan || 0), jami);
+    const debt = Math.max(0, jami - paid);
+    totalJ += jami;
+    totalP += paid;
+    totalQ += debt;
+  });
+
+  const rows = matches.map(s => {
+    const p = state.products.find(x => x._id === s.productId);
+    const c = state.customers.find(x => x._id === s.customerId);
+    const jami = Number(s.jami || 0);
+    const paid = Math.min(Number(s.tolangan || 0), jami);
+    const debt = Math.max(0, jami - paid);
+
+    return `<tr>
+      <td>${s.sana || '—'}</td>
+      <td>${c ? c.name : '—'}</td>
+      <td>${p ? p.name : '—'}</td>
+      <td>${s.soni || 0} dona</td>
+      <td>${fmt(jami)} so'm</td>
+      <td>${fmt(paid)} so'm</td>
+      <td>
+        ${debt > 0
+          ? `<span class="pill pill-debt">${fmt(debt)} so'm</span>`
+          : `<span class="pill pill-ok">To'liq</span>`}
+      </td>
+      <td class="actions">
+        <button class="btn btn-edit" data-edit-sale="${s._id}">✏️</button>
+        <button class="btn btn-danger" data-del-sale="${s._id}">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+
   return `
-  <div class="card glass">
-    <div class="row">
-      <div class="field"><label>Sana</label><input type="date" id="histSana" value="${f.sana||''}"></div>
-      <div class="field"><label>Mijoz</label><select id="histCustomer"><option value="">— tanlang —</option>${customerOptions}</select></div>
+  <div class="card glass history-toolbar">
+    <div class="history-date-row">
+      <div class="field">
+        <label>Sana</label>
+        <input type="date" id="histSana" value="${selectedDate}">
+      </div>
       <button class="btn btn-primary" id="histShow">Ko'rsatish</button>
       <button class="btn btn-secondary" id="histClear">Tozalash</button>
     </div>
   </div>
+
   <div class="card glass">
-    <h3>📜 ${t('history')}</h3>
-    ${f.customerId ? (rows ? 
-      `<table>
-        <thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th><th></th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div style="margin-top:10px;padding:10px 14px;background:rgba(74,144,217,0.03);border-radius:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;">
-        <div>📊 Jami: <strong>${fmt(totalJ)} so'm</strong></div>
-        <div>✅ To'langan: <strong style="color:#2ECC71;">${fmt(totalP)} so'm</strong></div>
-        <div>⚠️ Qarz: <strong style="color:${totalQ > 0 ? '#E74C3C' : '#2ECC71'};">${fmt(totalQ)} so'm</strong></div>
-      </div>` 
-      : '<div class="empty">Ma\'lumot topilmadi</div>') 
-    : '<div class="empty">Mijoz tanlang</div>'}
+    <div class="history-header">
+      <div>
+        <h3>📋 Sotuvlar tarixi</h3>
+        ${selectedDate
+          ? `<div class="history-subtitle">${selectedDate} sanasidagi sotuvlar</div>`
+          : `<div class="history-subtitle">Sotuvlarni ko'rish uchun sana tanlang</div>`}
+      </div>
+    </div>
+
+    ${selectedDate
+      ? (rows
+        ? `<div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sana</th>
+                  <th>Mijoz</th>
+                  <th>Mahsulot</th>
+                  <th>Soni</th>
+                  <th>Jami</th>
+                  <th>To'langan</th>
+                  <th>Qarz</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+
+          <div class="history-summary">
+            <div class="summary-item">
+              <span>Jami</span>
+              <strong>${fmt(totalJ)} so'm</strong>
+            </div>
+            <div class="summary-item paid">
+              <span>To'langan</span>
+              <strong>${fmt(totalP)} so'm</strong>
+            </div>
+            <div class="summary-item ${totalQ > 0 ? 'debt' : 'paid'}">
+              <span>Qarz</span>
+              <strong>${fmt(totalQ)} so'm</strong>
+            </div>
+            ${totalQ > 0
+              ? `<button class="cash-button" id="dateCashBtn">
+                   <span>▣</span> Kassa
+                 </button>`
+              : ''}
+          </div>`
+        : `<div class="empty">Bu sanada sotuv mavjud emas</div>`)
+      : `<div class="empty">Yuqoridan sana tanlang.</div>`}
   </div>`;
 }
 
@@ -945,34 +1230,11 @@ function attachViewEvents() {
       try { await deleteProduct(this.dataset.delProduct); await loadData(); render(); } catch(err) { alert(err.message); }
     });
   });
-  
-  document.querySelectorAll('[data-last]').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const id = this.dataset.last;
-      const p = state.products.find(x => x._id === id);
-      if (p) { state.saleDraft.productId = p._id; state.view = 'sotuv'; state.searchQuery = p.artikul + ' - ' + p.name; render(); }
-    });
-  });
-  
   // Sales
   const saleForm = document.getElementById('saleForm');
   if (saleForm) {
     const searchInput = document.getElementById('saleSearch');
     const productHidden = document.getElementById('saleProduct');
-    
-    document.getElementById('lastBtn')?.addEventListener('click', function() {
-      if (state.products.length === 0) { alert('Mahsulot yo\'q!'); return; }
-      const last = state.products[state.products.length - 1];
-      state.saleDraft.productId = last._id;
-      if (searchInput) searchInput.value = last.artikul + ' - ' + last.name;
-      if (productHidden) productHidden.value = last._id;
-      render();
-      setTimeout(() => {
-        const ev = new Event('input');
-        document.getElementById('saleSoni')?.dispatchEvent(ev);
-      }, 100);
-    });
-    
     if (searchInput) {
       let timeout;
       searchInput.addEventListener('input', async function() {
@@ -1053,44 +1315,38 @@ function attachViewEvents() {
   // History
   document.getElementById('histShow')?.addEventListener('click', function() {
     state.historyFilter = {
-      sana: document.getElementById('histSana').value,
-      customerId: document.getElementById('histCustomer').value
+      sana: document.getElementById('histSana').value
     };
     render();
   });
-  
+
   document.getElementById('histClear')?.addEventListener('click', function() {
-    document.getElementById('histSana').value = '';
-    document.getElementById('histCustomer').value = '';
-    state.historyFilter = { sana: '', customerId: '' };
+    state.historyFilter = { sana: '' };
+    render();
+  });
+
+  document.getElementById('dateCashBtn')?.addEventListener('click', function() {
+    openDateCashModal(state.historyFilter.sana);
+  });
+
+  // History - Edit & Delete
+d: '' };
     render();
   });
   
   // History - Edit & Delete
   document.querySelectorAll('[data-edit-sale]').forEach(btn => {
-    btn.addEventListener('click', async function() {
+    btn.addEventListener('click', function() {
       const id = this.dataset.editSale;
       const sale = state.sales.find(s => s._id === id);
       if (sale) {
         const newTolangan = prompt('To\'langan summani o\'zgartiring (so\'m):', sale.tolangan);
         if (newTolangan !== null) {
           const newVal = Number(newTolangan);
-          if (Number.isFinite(newVal) && newVal >= 0) {
-            try {
-              await updateSale(id, {
-                sana: sale.sana,
-                customerId: sale.customerId,
-                productId: sale.productId,
-                soni: sale.soni,
-                tolangan: newVal
-              });
-              await loadData();
-              render();
-            } catch (err) {
-              alert('Xatolik: ' + err.message);
-            }
+          if (newVal >= 0 && newVal <= sale.jami) {
+            updateSale(id, { ...sale, tolangan: newVal, qarz: sale.jami - newVal });
           } else {
-            alert('To\'langan summa 0 yoki undan katta bo\'lishi kerak!');
+            alert('To\'langan summa jami summadan katta bo\'lishi mumkin emas!');
           }
         }
       }
@@ -1167,6 +1423,163 @@ function attachViewEvents() {
       applyIcon(currentIcon);
       render();
     });
+  });
+}
+
+
+// ============ DATE CASH MODAL ============
+function openDateCashModal(sana) {
+  if (!sana) return;
+
+  const sales = state.sales
+    .filter(s => s.sana === sana)
+    .map(s => ({
+      ...s,
+      jami: Number(s.jami || 0),
+      tolangan: Number(s.tolangan || 0)
+    }))
+    .filter(s => Math.max(0, s.jami - Math.min(s.tolangan, s.jami)) > 0);
+
+  const debt = sales.reduce((sum, s) => {
+    const paid = Math.min(s.tolangan, s.jami);
+    return sum + Math.max(0, s.jami - paid);
+  }, 0);
+
+  if (debt <= 0) {
+    alert('Bu sanada qarz mavjud emas.');
+    return;
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'dateCashOverlay';
+
+  overlay.innerHTML = `
+    <div class="modal-card glass cash-modal">
+      <div class="cash-modal-head">
+        <div>
+          <div class="cash-kicker">KASSA</div>
+          <h3>${sana} — qarz to'lovi</h3>
+        </div>
+        <button type="button" class="modal-close" id="dateCashCancel">×</button>
+      </div>
+
+      <div class="cash-debt-box">
+        <span>Shu sanadagi jami qarz</span>
+        <strong>${fmt(debt)} so'm</strong>
+      </div>
+
+      <form id="dateCashForm">
+        <div class="field">
+          <label>To'lov summasi</label>
+          <input
+            type="number"
+            id="dateCashAmount"
+            min="1"
+            max="${debt}"
+            step="1"
+            required
+            placeholder="0"
+            autofocus
+          >
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="dateCashCancel2">Bekor qilish</button>
+          <button type="submit" class="cash-button">Kassaga kiritish</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    document.getElementById('dateCashOverlay')?.remove();
+  };
+
+  document.getElementById('dateCashCancel')?.addEventListener('click', close);
+  document.getElementById('dateCashCancel2')?.addEventListener('click', close);
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) close();
+  });
+
+  document.getElementById('dateCashForm')?.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const amount = Number(document.getElementById('dateCashAmount').value);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert("To'lov summasini kiriting.");
+      return;
+    }
+
+    if (amount > debt) {
+      alert(
+        "To'lov qarzdan katta bo'lishi mumkin emas.\n" +
+        "Qarz: " + fmt(debt) + " so'm"
+      );
+      return;
+    }
+
+    const orderedSales = [...sales].sort((a, b) => {
+      const ca = String(a.createdAt || '');
+      const cb = String(b.createdAt || '');
+      return ca.localeCompare(cb);
+    });
+
+    let remaining = amount;
+
+    try {
+      for (const sale of orderedSales) {
+        if (remaining <= 0) break;
+
+        const paid = Math.min(
+          Number(sale.tolangan || 0),
+          Number(sale.jami || 0)
+        );
+
+        const saleDebt = Math.max(
+          0,
+          Number(sale.jami || 0) - paid
+        );
+
+        if (saleDebt <= 0) continue;
+
+        const payHere = Math.min(
+          remaining,
+          saleDebt
+        );
+
+        const newPaid = paid + payHere;
+        const newDebt = Math.max(
+          0,
+          Number(sale.jami || 0) - newPaid
+        );
+
+        await updateSale(sale._id, {
+          ...sale,
+          tolangan: newPaid,
+          qarz: newDebt
+        });
+
+        remaining -= payHere;
+      }
+
+      close();
+      await loadData();
+      render();
+
+      alert(
+        "To'lov saqlandi.\n" +
+        "Sana: " + sana + "\n" +
+        "Summa: " + fmt(amount) + " so'm"
+      );
+
+    } catch (err) {
+      alert("To'lovni saqlashda xato: " + err.message);
+    }
   });
 }
 
