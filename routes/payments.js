@@ -5,7 +5,7 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Barcha to'lovlar
+// Barcha kassa to'lovlari
 router.get('/', auth, async (req, res) => {
   try {
     const payments = await Payment.find().sort({ createdAt: -1 });
@@ -16,158 +16,99 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-
-// ======================================================
-// QARZ TO'LASH
-// To'lovni mijozning eski qarzlaridan boshlab sotuvlarga
-// ketma-ket taqsimlaydi.
-// ======================================================
+// Kassa: tanlangan sanadagi (va ixtiyoriy mijozning) qarzini kamaytiradi.
 router.post('/', auth, async (req, res) => {
   try {
-    const { customerId, sana } = req.body;
+    const sana = String(req.body.sana || '').trim();
+    const customerId = req.body.customerId || null;
     const amount = Number(req.body.amount);
 
-    if (!customerId) {
-      return res.status(400).json({
-        error: 'Mijoz kerak'
-      });
-    }
-
     if (!sana) {
-      return res.status(400).json({
-        error: 'Sana kerak'
-      });
+      return res.status(400).json({ error: 'Sana kerak' });
     }
 
     if (!Number.isFinite(amount) || amount <= 0) {
-      return res.status(400).json({
-        error: 'To\'lov summasi 0 dan katta bo\'lishi kerak'
-      });
+      return res.status(400).json({ error: 'Musbat summa kiriting' });
     }
 
-    // Mijozning sotuvlarini eski tartibda olamiz
-    const sales = await Sale.find({
-      customerId
-    }).sort({
-      sana: 1,
-      createdAt: 1
-    });
+    const filter = { sana };
+    if (customerId) filter.customerId = customerId;
 
-    // Hozirgi jami qarz
-    const totalDebt = sales.reduce((sum, sale) => {
-      return sum + Math.max(0, Number(sale.qarz || 0));
-    }, 0);
+    const sales = await Sale.find(filter).sort({ createdAt: 1, _id: 1 });
 
-    if (totalDebt <= 0) {
-      return res.status(400).json({
-        error: 'Bu mijozda qarz mavjud emas'
-      });
+    const currentDebt = sales.reduce(
+      (sum, sale) => sum + Math.max(0, Number(sale.qarz || 0)),
+      0
+    );
+
+    if (currentDebt <= 0) {
+      return res.status(400).json({ error: 'Bu sanada qarz mavjud emas' });
     }
 
-    if (amount > totalDebt) {
+    if (amount > currentDebt) {
       return res.status(400).json({
-        error:
-          'To\'lov qarzdan katta bo\'lishi mumkin emas. ' +
-          'Joriy qarz: ' +
-          totalDebt.toLocaleString('ru-RU') +
-          ' so\'m'
+        error: `Kiritilgan summa qarzdan katta. Qarz: ${currentDebt.toLocaleString('ru-RU')} so'm`
       });
     }
 
     let remaining = amount;
-    const updatedSales = [];
+    const allocated = [];
 
-    // Eski qarzlardan boshlab yopamiz
+    // To'lovni shu sanadagi qarzlarga ketma-ket taqsimlaymiz.
     for (const sale of sales) {
       if (remaining <= 0) break;
 
-      const currentDebt = Math.max(
+      const debt = Math.max(0, Number(sale.qarz || 0));
+      if (debt <= 0) continue;
+
+      const paid = Math.min(remaining, debt);
+      sale.tolangan = Math.min(
+        Number(sale.jami || 0),
+        Number(sale.tolangan || 0) + paid
+      );
+      sale.qarz = Math.max(
         0,
-        Number(sale.qarz || 0)
+        Number(sale.jami || 0) - sale.tolangan
       );
-
-      if (currentDebt <= 0) continue;
-
-      const payForThisSale = Math.min(
-        remaining,
-        currentDebt
-      );
-
-      sale.tolangan =
-        Number(sale.tolangan || 0) +
-        payForThisSale;
-
-      sale.qarz =
-        Math.max(
-          0,
-          Number(sale.jami || 0) -
-          sale.tolangan
-        );
 
       await sale.save();
 
-      updatedSales.push({
-        saleId: sale._id,
-        paid: payForThisSale,
-        remainingDebt: sale.qarz
-      });
-
-      remaining -= payForThisSale;
+      allocated.push({ saleId: sale._id, paid });
+      remaining -= paid;
     }
 
-    // Payment alohida tarix sifatida saqlanadi.
-    // MUHIM: bu payment sotuvning to'langan summasiga
-    // yana qayta qo'shilmaydi.
+    // Kassa operatsiyasi tarixi.
+    // Bir nechta mijoz bo'lsa customerId null bo'ladi.
     const payment = await Payment.create({
       customerId,
       sana,
       amount
     });
 
-    const newSales = await Sale.find({ customerId });
-
-    const newDebt = newSales.reduce((sum, sale) => {
-      return sum + Math.max(0, Number(sale.qarz || 0));
-    }, 0);
+    const newDebt = Math.max(0, currentDebt - amount);
 
     res.status(201).json({
       payment,
-      allocated: updatedSales,
-      remainingDebt: newDebt
+      allocated,
+      oldDebt: currentDebt,
+      amount,
+      newDebt
     });
-
   } catch (error) {
     console.error('POST /payments error:', error);
-
-    res.status(500).json({
-      error: 'Server xatosi'
-    });
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
 
-
-// Mijozning to'lovlari
 router.get('/customer/:customerId', auth, async (req, res) => {
   try {
-    const payments = await Payment.find({
-      customerId: req.params.customerId
-    }).sort({
-      createdAt: -1
-    });
-
+    const payments = await Payment.find({ customerId: req.params.customerId })
+      .sort({ createdAt: -1 });
     res.json(payments);
-
   } catch (error) {
-    console.error(
-      'GET /payments/customer/:id error:',
-      error
-    );
-
-    res.status(500).json({
-      error: 'Server xatosi'
-    });
+    console.error('GET /payments/customer/:id error:', error);
+    res.status(500).json({ error: 'Server xatosi' });
   }
 });
-
 
 module.exports = router;
