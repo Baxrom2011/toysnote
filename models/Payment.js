@@ -9,7 +9,8 @@ const PaymentSchema = new mongoose.Schema({
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer',
-    required: true
+    required: false,
+    default: null
   },
   sana: {
     type: String,
