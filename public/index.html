@@ -359,24 +359,11 @@ function getCustomerDebt(customerId) {
   }, 0);
 }
 
-function getCustomerDebt(customerId) {
-  if (!customerId) return 0;
-
-  return state.sales
-    .filter(s => s.customerId === customerId)
-    .reduce((total, s) => {
-      const jami = Number(s.jami || 0);
-      const tolangan = Math.min(
-        Number(s.tolangan || 0),
-        jami
-      );
-
-      return total + Math.max(
-        0,
-        jami - tolangan
-      );
-    }, 0);
+function getDebtByDate(customerId, sana) {
+  // Kassa sanasi — pul olingan sana. Qarz esa mijozning barcha eski sotuvlaridan hisoblanadi.
+  return getCustomerDebt(customerId);
 }
+
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
@@ -787,30 +774,49 @@ function viewStats() {
 
 // ============ HISTORY ============
 function viewHistory() {
-  const f = state.historyFilter || { sana:'', customerId:'' };
+  const f = state.historyFilter || { sana: '', customerId: '' };
   const selectedDate = f.sana || '';
   const selectedCustomer = f.customerId || '';
   const customers = state.customers || [];
 
-  let matches = state.sales.filter(s =>
+  const matches = state.sales.filter(s =>
     (!selectedDate || s.sana === selectedDate) &&
     (!selectedCustomer || s.customerId === selectedCustomer)
   );
 
-  const totalJ = matches.reduce((a,s)=>a+Number(s.jami||0),0);
-  const totalP = matches.reduce((a,s)=>a+Math.min(Number(s.tolangan||0),Number(s.jami||0)),0);
-  const totalQ = matches.reduce((a,s)=>a+Math.max(0,Number(s.jami||0)-Math.min(Number(s.tolangan||0),Number(s.jami||0))),0);
+  const totalJ = matches.reduce((sum, s) => sum + Number(s.jami || 0), 0);
+  const totalP = matches.reduce((sum, s) => {
+    const jami = Number(s.jami || 0);
+    return sum + Math.min(Number(s.tolangan || 0), jami);
+  }, 0);
+  const totalQ = matches.reduce((sum, s) => {
+    const jami = Number(s.jami || 0);
+    const paid = Math.min(Number(s.tolangan || 0), jami);
+    return sum + Math.max(0, jami - paid);
+  }, 0);
+
+  // Kassa uchun qarz — tanlangan mijozning barcha eski sotuvlaridagi umumiy qarz.
+  // Sana faqat pul olingan sana sifatida ishlatiladi.
+  const customerDebt = selectedCustomer ? getCustomerDebt(selectedCustomer) : 0;
+  const selectedCustomerName = selectedCustomer
+    ? (customers.find(c => c._id === selectedCustomer)?.name || 'Mijoz')
+    : '';
 
   const rows = matches.map(s => {
-    const p = state.products.find(x=>x._id===s.productId);
-    const c = customers.find(x=>x._id===s.customerId);
-    const jami = Number(s.jami||0);
-    const paid = Math.min(Number(s.tolangan||0),jami);
-    const debt = Math.max(0,jami-paid);
+    const p = state.products.find(x => x._id === s.productId);
+    const c = customers.find(x => x._id === s.customerId);
+    const jami = Number(s.jami || 0);
+    const paid = Math.min(Number(s.tolangan || 0), jami);
+    const debt = Math.max(0, jami - paid);
+
     return `<tr>
-      <td>${s.sana||'—'}</td><td>${c?c.name:'—'}</td><td>${p?p.name:'—'}</td>
-      <td>${s.soni||0} dona</td><td>${fmt(jami)} so'm</td><td>${fmt(paid)} so'm</td>
-      <td>${debt>0?`<span class="pill pill-debt">${fmt(debt)} so'm</span>`:`<span class="pill pill-ok">To'liq</span>`}</td>
+      <td>${s.sana || '—'}</td>
+      <td>${c ? c.name : '—'}</td>
+      <td>${p ? p.name : '—'}</td>
+      <td>${s.soni || 0} dona</td>
+      <td>${fmt(jami)} so'm</td>
+      <td>${fmt(paid)} so'm</td>
+      <td>${debt > 0 ? `<span class="pill pill-debt">${fmt(debt)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td>
       <td class="actions">
         <button class="icon-btn" data-edit-sale="${s._id}" title="Tahrirlash">${svgIcon('settings',15)}</button>
         <button class="icon-btn" data-del-sale="${s._id}" title="O'chirish">${svgIcon('logout',15)}</button>
@@ -818,14 +824,27 @@ function viewHistory() {
     </tr>`;
   }).join('');
 
-  const customerOptions = customers.map(c=>`<option value="${c._id}" ${selectedCustomer===c._id?'selected':''}>${c.name}${c.phone?' — '+c.phone:''}</option>`).join('');
+  const customerOptions = customers.map(c =>
+    `<option value="${c._id}" ${selectedCustomer === c._id ? 'selected' : ''}>${c.name}${c.phone ? ' — ' + c.phone : ''}</option>`
+  ).join('');
+
   const hasFilter = !!(selectedDate || selectedCustomer);
+  const canCash = !!selectedCustomer && customerDebt > 0;
 
   return `
   <div class="card glass history-toolbar">
     <div class="history-filter">
-      <div class="field"><label>Sana</label><input type="date" id="histSana" value="${selectedDate}"></div>
-      <div class="field"><label>Mijoz</label><select id="histCustomer"><option value="">Barcha mijozlar</option>${customerOptions}</select></div>
+      <div class="field">
+        <label>Sana</label>
+        <input type="date" id="histSana" value="${selectedDate}">
+      </div>
+      <div class="field">
+        <label>Mijoz</label>
+        <select id="histCustomer">
+          <option value="">Mijozni tanlang</option>
+          ${customerOptions}
+        </select>
+      </div>
       <button class="btn btn-primary" id="histShow">${svgIcon('history',15)} Ko'rsatish</button>
       <button class="btn btn-secondary" id="histClear">Tozalash</button>
     </div>
@@ -833,15 +852,38 @@ function viewHistory() {
 
   <div class="card glass">
     <div class="history-header">
-      <div><h3>Sotuvlar tarixi</h3><div class="history-subtitle">${selectedDate?selectedDate+' sanasidagi':''}${selectedCustomer?' '+(customers.find(c=>c._id===selectedCustomer)?.name||''):' barcha mijozlar'} sotuvlari</div></div>
+      <div>
+        <h3>Sotuvlar tarixi</h3>
+        <div class="history-subtitle">
+          ${selectedDate ? selectedDate + ' sanasi' : 'Sana tanlanmagan'}
+          ${selectedCustomer ? ' — ' + selectedCustomerName : ''}
+        </div>
+      </div>
+      ${canCash ? `<button class="cash-button" id="dateCashBtn">${svgIcon('wallet',16)} Kassa</button>` : ''}
     </div>
-    ${hasFilter ? (rows ? `<div class="table-wrap"><table><thead><tr><th>Sana</th><th>Mijoz</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+
+    ${canCash ? `<div class="cash-info-strip"><span>${selectedCustomerName} umumiy qarzi</span><strong>${fmt(customerDebt)} so'm</strong></div>` : ''}
+
+    ${!hasFilter ? `
+      <div class="empty">Sana va mijozni tanlang.</div>
+    ` : rows ? `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sana</th><th>Mijoz</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
       <div class="history-summary">
         <div class="summary-item"><span>Jami</span><strong>${fmt(totalJ)} so'm</strong></div>
         <div class="summary-item paid"><span>To'langan</span><strong>${fmt(totalP)} so'm</strong></div>
-        <div class="summary-item ${totalQ>0?'debt':'paid'}"><span>Qarz</span><strong>${fmt(totalQ)} so'm</strong></div>
-        ${totalQ>0 && selectedDate ? `<button class="cash-button" id="dateCashBtn">${svgIcon('wallet',16)} Kassa</button>`:''}
-      </div>` : `<div class="empty">Tanlangan shart bo'yicha sotuv topilmadi.</div>`) : `<div class="empty">Sana yoki mijoz tanlang.</div>`}
+        <div class="summary-item ${totalQ > 0 ? 'debt' : 'paid'}"><span>Qarz</span><strong>${fmt(totalQ)} so'm</strong></div>
+      </div>
+    ` : `
+      <div class="empty">
+        Bu sanada tanlangan mijozning sotuvlari yo'q.
+        ${canCash ? `<br><small style="color:var(--text-muted);">Mijozda oldingi sotuvlardan qarz mavjud. Kassa orqali to'lovni qabul qilishingiz mumkin.</small>` : ''}
+      </div>
+    `}
   </div>`;
 }
 
@@ -1104,7 +1146,19 @@ function attachViewEvents() {
   });
 
   document.getElementById('dateCashBtn')?.addEventListener('click', function() {
-    openDateCashModal(state.historyFilter.sana, state.historyFilter.customerId);
+    const sana = document.getElementById('histSana')?.value || '';
+    const customerId = document.getElementById('histCustomer')?.value || '';
+
+    if (!sana) {
+      alert('Avval pul olingan sanani tanlang.');
+      return;
+    }
+    if (!customerId) {
+      alert('Avval mijozni tanlang.');
+      return;
+    }
+
+    openDateCashModal(sana, customerId);
   });
 
   // History - Edit & Delete
@@ -1202,24 +1256,21 @@ function attachViewEvents() {
 
 // ============ DATE CASH MODAL ============
 function openDateCashModal(sana, customerId) {
-  if (!sana) return;
+  if (!sana || !customerId) {
+    alert('Sana va mijozni tanlang.');
+    return;
+  }
 
-  const sales = state.sales
-    .filter(s => s.sana === sana && (!customerId || s.customerId === customerId))
-    .map(s => ({
-      ...s,
-      jami: Number(s.jami || 0),
-      tolangan: Number(s.tolangan || 0)
-    }))
-    .filter(s => Math.max(0, s.jami - Math.min(s.tolangan, s.jami)) > 0);
+  const customer = state.customers.find(c => c._id === customerId);
+  if (!customer) {
+    alert('Mijoz topilmadi.');
+    return;
+  }
 
-  const debt = sales.reduce((sum, s) => {
-    const paid = Math.min(s.tolangan, s.jami);
-    return sum + Math.max(0, s.jami - paid);
-  }, 0);
-
+  // Sana — pul olingan sana. Qarz esa mijozning barcha eski sotuvlaridagi umumiy qarz.
+  const debt = getCustomerDebt(customerId);
   if (debt <= 0) {
-    alert('Bu sanada qarz mavjud emas.');
+    alert('Bu mijozda qarz mavjud emas.');
     return;
   }
 
@@ -1231,32 +1282,25 @@ function openDateCashModal(sana, customerId) {
     <div class="modal-card glass cash-modal">
       <div class="cash-modal-head">
         <div>
-          <div class="cash-kicker">Kassa</div>
-          <h3>${sana} — qarz to'lovi</h3>
+          <div class="cash-kicker">KASSA</div>
+          <h3>${customer.name}</h3>
+          <div style="color:var(--text-secondary);font-size:13px;margin-top:4px;">
+            Pul olingan sana: <strong>${sana}</strong>
+          </div>
         </div>
         <button type="button" class="modal-close" id="dateCashCancel">×</button>
       </div>
 
       <div class="cash-debt-box">
-        <span>Shu sanadagi jami qarz</span>
+        <span>Mijozning umumiy qarzi</span>
         <strong>${fmt(debt)} so'm</strong>
       </div>
 
       <form id="dateCashForm">
         <div class="field">
-          <label>To'lov summasi</label>
-          <input
-            type="number"
-            id="dateCashAmount"
-            min="1"
-            max="${debt}"
-            step="1"
-            required
-            placeholder="0"
-            autofocus
-          >
+          <label>Olingan summa (so'm)</label>
+          <input type="number" id="dateCashAmount" min="1" max="${debt}" step="1" required placeholder="0" autofocus>
         </div>
-
         <div class="modal-actions">
           <button type="button" class="btn btn-secondary" id="dateCashCancel2">Bekor qilish</button>
           <button type="submit" class="cash-button">Kassaga kiritish</button>
@@ -1267,91 +1311,40 @@ function openDateCashModal(sana, customerId) {
 
   document.body.appendChild(overlay);
 
-  const close = () => {
-    document.getElementById('dateCashOverlay')?.remove();
-  };
-
+  const close = () => document.getElementById('dateCashOverlay')?.remove();
   document.getElementById('dateCashCancel')?.addEventListener('click', close);
   document.getElementById('dateCashCancel2')?.addEventListener('click', close);
-
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) close();
-  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
   document.getElementById('dateCashForm')?.addEventListener('submit', async e => {
     e.preventDefault();
-
     const amount = Number(document.getElementById('dateCashAmount').value);
 
     if (!Number.isFinite(amount) || amount <= 0) {
-      alert("To'lov summasini kiriting.");
+      alert("To'g'ri musbat summa kiriting.");
       return;
     }
-
     if (amount > debt) {
-      alert(
-        "To'lov qarzdan katta bo'lishi mumkin emas.\n" +
-        "Qarz: " + fmt(debt) + " so'm"
-      );
+      alert("Kiritilgan summa mijozning umumiy qarzidan katta.\nQarz: " + fmt(debt) + " so'm");
       return;
     }
-
-    const orderedSales = [...sales].sort((a, b) => {
-      const ca = String(a.createdAt || '');
-      const cb = String(b.createdAt || '');
-      return ca.localeCompare(cb);
-    });
-
-    let remaining = amount;
 
     try {
-      for (const sale of orderedSales) {
-        if (remaining <= 0) break;
-
-        const paid = Math.min(
-          Number(sale.tolangan || 0),
-          Number(sale.jami || 0)
-        );
-
-        const saleDebt = Math.max(
-          0,
-          Number(sale.jami || 0) - paid
-        );
-
-        if (saleDebt <= 0) continue;
-
-        const payHere = Math.min(
-          remaining,
-          saleDebt
-        );
-
-        const newPaid = paid + payHere;
-        const newDebt = Math.max(
-          0,
-          Number(sale.jami || 0) - newPaid
-        );
-
-        await updateSale(sale._id, {
-          ...sale,
-          tolangan: newPaid,
-          qarz: newDebt
-        });
-
-        remaining -= payHere;
-      }
-
+      // Backend pulni mijozning eng eski qarzlaridan boshlab taqsimlaydi.
+      await addPayment(customerId, sana, amount);
       close();
       await loadData();
+      state.historyFilter = { sana, customerId };
       render();
 
+      const newDebt = getCustomerDebt(customerId);
       alert(
-        "To'lov saqlandi.\n" +
-        "Sana: " + sana + "\n" +
-        "Summa: " + fmt(amount) + " so'm"
+        "To'lov saqlandi.\n\n" +
+        "Olingan summa: " + fmt(amount) + " so'm\n" +
+        "Qolgan qarz: " + fmt(newDebt) + " so'm"
       );
-
     } catch (err) {
-      alert("To'lovni saqlashda xato: " + err.message);
+      alert('To'lovni saqlashda xato: ' + err.message);
     }
   });
 }
