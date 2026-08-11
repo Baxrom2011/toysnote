@@ -361,13 +361,12 @@ function getCustomerDebt(customerId) {
 
 function getDebtByDate(customerId, sana) {
   if (!customerId || !sana) return 0;
-  return state.sales.filter(s => s.customerId === customerId && s.sana === sana).reduce((sum,s) => {
-    const jami = Number(s.jami||0);
-    const paid = Math.min(Number(s.tolangan||0), jami);
-    return sum + Math.max(0, jami-paid);
-  },0);
+  const sales = state.sales.filter(s => s.customerId === customerId && s.sana === sana);
+  const totalDebt = sales.reduce((a,s) => a + (s.qarz||0), 0);
+  const payments = state.payments.filter(p => p.customerId === customerId && p.sana === sana);
+  const totalPaid = payments.reduce((a,p) => a + p.amount, 0);
+  return Math.max(0, totalDebt - totalPaid);
 }
-
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
   const jami = product && d.soni ? product.narx * Number(d.soni) : 0;
