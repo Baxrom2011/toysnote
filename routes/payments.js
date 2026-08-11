@@ -16,11 +16,12 @@ router.get('/', auth, async (req, res) => {
 
 router.post('/', auth, async (req, res) => {
   try {
-    const { customerId, sana, amount } = req.body;
-    if (!customerId || !sana || !amount) {
-      return res.status(400).json({ error: 'Barcha maydonlar kerak' });
+    const { customerId, sana } = req.body;
+    const amount = Number(req.body.amount);
+    if (!customerId || !sana || !Number.isFinite(amount) || amount <= 0) {
+      return res.status(400).json({ error: 'Mijoz, sana va musbat summa kerak' });
     }
-    const payment = new Payment({ customerId, sana, amount: Number(amount) });
+    const payment = new Payment({ customerId, sana, amount });
     await payment.save();
     res.status(201).json(payment);
   } catch (error) {
