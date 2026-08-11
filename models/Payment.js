@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const PaymentSchema = new mongoose.Schema({
+  saleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Sale',
+    default: null
+  },
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Customer',
