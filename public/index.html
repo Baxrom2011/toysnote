@@ -359,13 +359,23 @@ function getCustomerDebt(customerId) {
   }, 0);
 }
 
-function getDebtByDate(customerId, sana) {
-  if (!customerId || !sana) return 0;
-  const sales = state.sales.filter(s => s.customerId === customerId && s.sana === sana);
-  const totalDebt = sales.reduce((a,s) => a + (s.qarz||0), 0);
-  const payments = state.payments.filter(p => p.customerId === customerId && p.sana === sana);
-  const totalPaid = payments.reduce((a,p) => a + p.amount, 0);
-  return Math.max(0, totalDebt - totalPaid);
+function getCustomerDebt(customerId) {
+  if (!customerId) return 0;
+
+  return state.sales
+    .filter(s => s.customerId === customerId)
+    .reduce((total, s) => {
+      const jami = Number(s.jami || 0);
+      const tolangan = Math.min(
+        Number(s.tolangan || 0),
+        jami
+      );
+
+      return total + Math.max(
+        0,
+        jami - tolangan
+      );
+    }, 0);
 }
 function computeSale(d) {
   const product = state.products.find(p => p._id === d.productId);
