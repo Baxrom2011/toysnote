@@ -384,7 +384,7 @@ let state = {
   settings: { avatar: localStorage.getItem('user_avatar') || '' },
   showWelcome: false,
   isLoggingOut: false,
-  statsFilter: { customerId: '' }
+  statsFilter: { customerId: '', type: 'sotuvlar' }
 };
 
 // ============ API ============
@@ -818,36 +818,173 @@ function viewSales() {
 // ============ STATISTIKA ============
 function viewStats() {
   const selectedCustomer = state.statsFilter.customerId || '';
+  const statsType = state.statsFilter.type || 'sotuvlar';
+
   const filteredSales = selectedCustomer
     ? state.sales.filter(s => s.customerId === selectedCustomer)
     : state.sales;
 
+  const filteredPayments = selectedCustomer
+    ? state.payments.filter(p => p.customerId === selectedCustomer)
+    : state.payments;
+
   const totalSales = filteredSales.reduce((sum,s) => sum + Number(s.jami || 0), 0);
-  const totalPaid = filteredSales.reduce((sum,s) => {
+  const totalPaidFromSales = filteredSales.reduce((sum,s) => {
     const jami = Number(s.jami || 0);
     return sum + Math.min(Number(s.tolangan || 0), jami);
   }, 0);
-  const totalDebt = Math.max(0, totalSales - totalPaid);
+  const totalDebt = Math.max(0, totalSales - totalPaidFromSales);
+
+  const totalKassa = filteredPayments.reduce((sum,p) => sum + Number(p.amount || 0), 0);
+
   const customer = state.customers.find(c => c._id === selectedCustomer);
 
   const customerOptions = state.customers.map(c => `
     <option value="${c._id}" ${selectedCustomer===c._id?'selected':''}>${c.name}</option>
   `).join('');
 
-  const rows = filteredSales.map(s => {
-    const p = state.products.find(x => x._id === s.productId);
-    const jami = Number(s.jami || 0);
-    const paid = Math.min(Number(s.tolangan || 0), jami);
-    const debt = Math.max(0, jami - paid);
-    return `<tr>
-      <td>${s.sana || '—'}</td>
-      <td>${p ? p.name : '—'}</td>
-      <td>${s.soni || 0} dona</td>
-      <td>${fmt(jami)} so'm</td>
-      <td>${fmt(paid)} so'm</td>
-      <td>${debt > 0 ? `<span class="pill pill-debt">${fmt(debt)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td>
-    </tr>`;
-  }).join('');
+  let content = '';
+
+  if (statsType === 'sotuvlar') {
+    const rows = filteredSales.map(s => {
+      const p = state.products.find(x => x._id === s.productId);
+      const jami = Number(s.jami || 0);
+      const paid = Math.min(Number(s.tolangan || 0), jami);
+      const debt = Math.max(0, jami - paid);
+      const c = state.customers.find(x => x._id === s.customerId);
+
+      return `<tr>
+        <td>${s.sana || '—'}</td>
+        <td>${c ? c.name : '—'}</td>
+        <td>${p ? p.name : '—'}</td>
+        <td>${s.soni || 0} dona</td>
+        <td>${fmt(jami)} so'm</td>
+        <td>${fmt(paid)} so'm</td>
+        <td>${debt > 0 ? `<span class="pill pill-debt">${fmt(debt)} so'm</span>` : `<span class="pill pill-ok">To'liq</span>`}</td>
+      </tr>`;
+    }).join('');
+
+    content = `
+      <div class="grid" style="margin-bottom:14px;">
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon">${iconSvg('sales')}</div>
+          <div class="stat-label">Jami sotuv</div>
+          <div class="stat-value">${fmt(totalSales)} so'm</div>
+        </div>
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon" style="background:rgba(95,189,131,.12);color:#78c996;">${iconSvg('history')}</div>
+          <div class="stat-label">To'langan</div>
+          <div class="stat-value" style="color:#6fc48c;">${fmt(totalPaidFromSales)} so'm</div>
+        </div>
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon" style="background:rgba(181,69,58,.12);color:#df8277;">${iconSvg('stats')}</div>
+          <div class="stat-label">Qarz</div>
+          <div class="stat-value" style="color:#d9786e;">${fmt(totalDebt)} so'm</div>
+        </div>
+      </div>
+
+      <div class="card glass table-card">
+        <div class="table-head">
+          <h3 style="margin:0;">${customer ? customer.name + ' — sotuvlar' : 'Barcha sotuvlar'}</h3>
+          <div class="history-subtitle">${filteredSales.length} ta sotuv</div>
+        </div>
+        ${filteredSales.length
+          ? `<div class="table-wrap"><table><thead><tr>
+              <th>Sana</th><th>Mijoz</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th>
+            </tr></thead><tbody>${rows}</tbody></table></div>`
+          : `<div class="empty">Sotuvlar mavjud emas</div>`}
+      </div>
+
+      <div class="grid">
+        <div class="card glass"><h3>Kunlik savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
+        <div class="card glass"><h3>Mahsulot sotuvi</h3><div class="chart-box"><canvas id="chartProducts"></canvas></div></div>
+      </div>`;
+  }
+
+  if (statsType === 'tolovlar') {
+    const paymentSales = filteredSales.filter(s => Number(s.tolangan || 0) > 0);
+    const totalSalePayments = paymentSales.reduce((sum,s) => {
+      return sum + Math.min(Number(s.tolangan || 0), Number(s.jami || 0));
+    }, 0);
+
+    const rows = paymentSales.map(s => {
+      const p = state.products.find(x => x._id === s.productId);
+      const c = state.customers.find(x => x._id === s.customerId);
+      const amount = Math.min(Number(s.tolangan || 0), Number(s.jami || 0));
+
+      return `<tr>
+        <td>${s.sana || '—'}</td>
+        <td>${c ? c.name : '—'}</td>
+        <td>${p ? p.name : '—'}</td>
+        <td>${fmt(amount)} so'm</td>
+        <td>${fmt(Number(s.jami || 0))} so'm</td>
+      </tr>`;
+    }).join('');
+
+    content = `
+      <div class="grid" style="margin-bottom:14px;">
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon">${iconSvg('history')}</div>
+          <div class="stat-label">To'lovlar</div>
+          <div class="stat-value">${paymentSales.length} ta</div>
+        </div>
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon" style="background:rgba(95,189,131,.12);color:#78c996;">${iconSvg('sales')}</div>
+          <div class="stat-label">Jami to'lov</div>
+          <div class="stat-value" style="color:#6fc48c;">${fmt(totalSalePayments)} so'm</div>
+        </div>
+      </div>
+
+      <div class="card glass table-card">
+        <div class="table-head">
+          <h3 style="margin:0;">${customer ? customer.name + ' — to\'lovlar' : 'Barcha to\'lovlar'}</h3>
+          <div class="history-subtitle">${paymentSales.length} ta to'lov</div>
+        </div>
+        ${paymentSales.length
+          ? `<div class="table-wrap"><table><thead><tr>
+              <th>Sana</th><th>Mijoz</th><th>Mahsulot</th><th>To'lov</th><th>Sotuv jami</th>
+            </tr></thead><tbody>${rows}</tbody></table></div>`
+          : `<div class="empty">To'lovlar mavjud emas</div>`}
+      </div>`;
+  }
+
+  if (statsType === 'kassa') {
+    const rows = filteredPayments.map(p => {
+      const c = state.customers.find(x => x._id === p.customerId);
+
+      return `<tr>
+        <td>${p.sana || '—'}</td>
+        <td>${c ? c.name : '—'}</td>
+        <td>${fmt(Number(p.amount || 0))} so'm</td>
+      </tr>`;
+    }).join('');
+
+    content = `
+      <div class="grid" style="margin-bottom:14px;">
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon">${iconSvg('history')}</div>
+          <div class="stat-label">Kassa operatsiyalari</div>
+          <div class="stat-value">${filteredPayments.length} ta</div>
+        </div>
+        <div class="card glass stat-card" style="margin:0;">
+          <div class="stat-icon" style="background:rgba(95,189,131,.12);color:#78c996;">${iconSvg('sales')}</div>
+          <div class="stat-label">Kassaga tushgan</div>
+          <div class="stat-value" style="color:#6fc48c;">${fmt(totalKassa)} so'm</div>
+        </div>
+      </div>
+
+      <div class="card glass table-card">
+        <div class="table-head">
+          <h3 style="margin:0;">${customer ? customer.name + ' — kassa' : 'Barcha kassa tushumlari'}</h3>
+          <div class="history-subtitle">${filteredPayments.length} ta kassa yozuvi</div>
+        </div>
+        ${filteredPayments.length
+          ? `<div class="table-wrap"><table><thead><tr>
+              <th>Sana</th><th>Mijoz</th><th>Kassaga tushgan</th>
+            </tr></thead><tbody>${rows}</tbody></table></div>`
+          : `<div class="empty">Kassa yozuvlari mavjud emas</div>`}
+      </div>`;
+  }
 
   return `
     <div class="card glass stats-filter">
@@ -858,39 +995,23 @@ function viewStats() {
           ${customerOptions}
         </select>
       </div>
-      ${customer ? `<div style="padding:10px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text-secondary);font-size:12px;">Tanlangan: <strong style="color:var(--text);">${customer.name}</strong></div>` : ''}
-    </div>
 
-    <div class="grid" style="margin-bottom:14px;">
-      <div class="card glass stat-card" style="margin:0;">
-        <div class="stat-icon">${iconSvg('sales')}</div>
-        <div class="stat-label">Jami</div>
-        <div class="stat-value">${fmt(totalSales)} so'm</div>
+      <div class="field">
+        <label>Ko'rinish</label>
+        <select id="statsType">
+          <option value="sotuvlar" ${statsType==='sotuvlar'?'selected':''}>🛍 Sotuvlar</option>
+          <option value="tolovlar" ${statsType==='tolovlar'?'selected':''}>💳 To'lovlar</option>
+          <option value="kassa" ${statsType==='kassa'?'selected':''}>💰 Kassa</option>
+        </select>
       </div>
-      <div class="card glass stat-card" style="margin:0;">
-        <div class="stat-icon" style="background:rgba(95,189,131,.12);color:#78c996;">${iconSvg('history')}</div>
-        <div class="stat-label">To'langan</div>
-        <div class="stat-value" style="color:#6fc48c;">${fmt(totalPaid)} so'm</div>
-      </div>
-      <div class="card glass stat-card" style="margin:0;">
-        <div class="stat-icon" style="background:rgba(181,69,58,.12);color:#df8277;">${iconSvg('stats')}</div>
-        <div class="stat-label">Qarz</div>
-        <div class="stat-value" style="color:#d9786e;">${fmt(totalDebt)} so'm</div>
+
+      <div style="padding:10px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text-secondary);font-size:12px;align-self:end;">
+        Tanlangan:
+        <strong style="color:var(--text);">${customer ? customer.name : 'Barcha mijozlar'}</strong>
       </div>
     </div>
 
-    <div class="card glass table-card">
-      <div class="table-head">
-        <h3 style="margin:0;">${customer ? customer.name + ' — sotuvlar' : 'Barcha sotuvlar'}</h3>
-        <div class="history-subtitle">${filteredSales.length} ta sotuv</div>
-      </div>
-      ${filteredSales.length ? `<div class="table-wrap"><table><thead><tr><th>Sana</th><th>Mahsulot</th><th>Soni</th><th>Jami</th><th>To'langan</th><th>Qarz</th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty">Sotuvlar mavjud emas</div>`}
-    </div>
-
-    <div class="grid">
-      <div class="card glass"><h3>Kunlik savdo</h3><div class="chart-box"><canvas id="chartDaily"></canvas></div></div>
-      <div class="card glass"><h3>Mahsulot sotuvi</h3><div class="chart-box"><canvas id="chartProducts"></canvas></div></div>
-    </div>`;
+    ${content}`;
 }
 
 // ============ HISTORY ============
@@ -1095,7 +1216,7 @@ function viewSettings() {
 // ============ CHARTS ============
 let charts = [];
 function drawCharts() {
-  if (state.view !== 'statistika') return;
+  if (state.view !== 'statistika' || (state.statsFilter.type || 'sotuvlar') !== 'sotuvlar') return;
   charts.forEach(c => { try { c.destroy(); } catch(e) {} });
   charts = [];
   
@@ -1335,6 +1456,11 @@ function attachViewEvents() {
   // Stats
   document.getElementById('statsCustomer')?.addEventListener('change', function() {
     state.statsFilter.customerId = this.value;
+    render();
+  });
+
+  document.getElementById('statsType')?.addEventListener('change', function() {
+    state.statsFilter.type = this.value;
     render();
   });
   
