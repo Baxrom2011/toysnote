@@ -457,7 +457,7 @@ function render() {
   if (state.loading) { app.innerHTML = '<div class="loading">Yuklanmoqda...</div>'; return; }
   if (!state.loaded) { app.innerHTML = '<div class="loading">Ma\'lumotlar yuklanmoqda...</div>'; return; }
   if (!state.currentUser) { app.innerHTML = renderLogin(); attachLoginEvents(); return; }
-  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#D07268;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()">Qayta yuklash</button></div>'; return; }
+  if (state.error) { app.innerHTML = '<div style="padding:40px;text-align:center;color:#D07268;"><h3>Xatolik</h3><p>'+state.error+'</p><button class="btn btn-primary" onclick="location.reload()" type="button">Qayta yuklash</button></div>'; return; }
   
   if (state.isLoggingOut) {
     app.innerHTML = renderLogoutAnimation();
@@ -512,7 +512,7 @@ function renderLogin() {
       <p class="subtitle">Do'kon boshqaruvi uchun xavfsiz boshqaruv paneli</p>
       ${state.loginErr ? `<div class="login-error">${state.loginErr}</div>` : ''}
       <div class="flag-select" style="justify-content:center;margin-bottom:18px;">
-        ${['uz','ru','en'].map(l => `<button class="${lang===l?'active':''}" onclick="document.getElementById('loginLang').value='${l}';this.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));this.classList.add('active');">${flags[l]}</button>`).join('')}
+        ${['uz','ru','en'].map(l => `<button class="${lang===l?'active':''}" onclick="document.getElementById('loginLang').value='${l}';this.parentElement.querySelectorAll('button').forEach(b= type="button">b.classList.remove('active'));this.classList.add('active');">${flags[l]}</button>`).join('')}
       </div>
       <input type="hidden" id="loginLang" value="${lang}">
       <form id="loginForm">
@@ -587,7 +587,7 @@ function renderShell() {
   if (isAdmin) navs.push({ id:'sozlamalar', label:t('settings'), icon:'settings' });
 
   const navHtml = navs.map(n => `
-    <button class="sidebar-link ${state.view===n.id?'active':''}" data-nav="${n.id}">
+    <button class="sidebar-link ${state.view===n.id?'active':''}" data-nav="${n.id}" type="button">
       ${iconSvg(n.icon)}<span>${n.label}</span>
     </button>
   `).join('');
@@ -611,8 +611,8 @@ function renderShell() {
           <div><div class="user-name">${userName}</div><div class="user-role">${isAdmin?t('admin'):t('user')}</div></div>
         </div>
         <div class="sidebar-actions">
-          <button id="sidebarLogout">${iconSvg('logout')} Chiqish</button>
-          <button onclick="changeLang('${lang==='uz'?'ru':'uz'}')">${iconSvg('globe')} ${lang.toUpperCase()}</button>
+          <button id="logoutBtn" type="button">${iconSvg('logout')} Chiqish</button>
+          <button onclick="changeLang('${lang==='uz'?'ru':'uz'}')" type="button">${iconSvg('globe')} ${lang.toUpperCase()}</button>
         </div>
       </div>
     </aside>
@@ -625,7 +625,7 @@ function renderShell() {
         </div>
         <div class="topbar-right">
           <div class="flag-select">
-            ${['uz','ru','en'].map(l => `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="font-size:10px;padding:4px 7px;">${flags[l]}</button>`).join('')}
+            ${['uz','ru','en'].map(l => `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="font-size:10px;padding:4px 7px;" type="button">${flags[l]}</button>`).join('')}
           </div>
           <div class="user-chip">
             <div class="user-avatar"><img src="${avatar || defaultAvatar}" alt="Avatar"></div>
@@ -658,20 +658,30 @@ function attachShellEvents() {
     });
   });
   
-  document.getElementById('logoutBtn').addEventListener('click', function() {
-    if (confirm(t('goodbye') + ', ' + state.currentUser?.login + '.')) {
-      state.isLoggingOut = true;
-      render();
-      setTimeout(() => {
-        state.currentUser = null;
-        token = null;
-        localStorage.removeItem('token');
-        state.loaded = false;
-        state.isLoggingOut = false;
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!state.currentUser || state.isLoggingOut) return;
+
+      if (confirm(t('goodbye') + ', ' + state.currentUser.login + '.')) {
+        state.isLoggingOut = true;
         render();
-      }, 900);
-    }
-  });
+
+        setTimeout(() => {
+          state.currentUser = null;
+          token = null;
+          localStorage.removeItem('token');
+          state.loaded = true;
+          state.isLoggingOut = false;
+          state.error = null;
+          render();
+        }, 900);
+      }
+    });
+  }
   
   attachViewEvents();
 }
@@ -687,9 +697,9 @@ function viewCustomers() {
       <td>${c.phone || '—'}</td>
       <td>${debt > 0 ? '<span class="pill pill-debt">'+fmt(debt)+' so\'m</span>' : '<span class="pill pill-ok">To\'liq</span>'}</td>
       <td class="actions">
-        <button class="btn btn-edit" data-edit-customer="${c._id}">Tahrirlash</button>
-        ${debt > 0 ? '<button class="btn btn-pay" data-pay="'+c._id+'">To\'lov</button>' : ''}
-        <button class="btn btn-danger" data-del-customer="${c._id}">O'chirish</button>
+        <button class="btn btn-edit" data-edit-customer="${c._id}" type="button">Tahrirlash</button>
+        ${debt > 0 ? '<button class="btn btn-pay" data-pay="'+c._id+'" type="button">To\'lov</button>' : ''}
+        <button class="btn btn-danger" data-del-customer="${c._id}" type="button">O'chirish</button>
       </td>
     </tr>`;
   }).join('');
@@ -719,8 +729,8 @@ function viewProducts() {
       <td>${fmt(p.narx)} so'm</td>
       <td>${sold} dona</td>
       <td class="actions">
-        <button class="btn btn-edit" data-edit-product="${p._id}">Tahrirlash</button>
-        <button class="btn btn-danger" data-del-product="${p._id}">O'chirish</button>
+        <button class="btn btn-edit" data-edit-product="${p._id}" type="button">Tahrirlash</button>
+        <button class="btn btn-danger" data-del-product="${p._id}" type="button">O'chirish</button>
       </td>
     </tr>`;
   }).join('');
@@ -925,8 +935,8 @@ function viewHistory() {
           : `<span class="pill pill-ok">To'liq</span>`}
       </td>
       <td class="actions">
-        <button class="btn btn-edit" data-edit-sale="${s._id}">Tahrirlash</button>
-        <button class="btn btn-danger" data-del-sale="${s._id}">O'chirish</button>
+        <button class="btn btn-edit" data-edit-sale="${s._id}" type="button">Tahrirlash</button>
+        <button class="btn btn-danger" data-del-sale="${s._id}" type="button">O'chirish</button>
       </td>
     </tr>`;
   }).join('');
@@ -945,8 +955,8 @@ function viewHistory() {
           ${state.customers.map(c => `<option value="${c._id}" ${f.customerId===c._id?'selected':''}>${c.name}</option>`).join('')}
         </select>
       </div>
-      <button class="btn btn-primary" id="histShow">Ko'rsatish</button>
-      <button class="btn btn-secondary" id="histClear">Tozalash</button>
+      <button class="btn btn-primary" id="histShow" type="button">Ko'rsatish</button>
+      <button class="btn btn-secondary" id="histClear" type="button">Tozalash</button>
     </div>
   </div>
 
@@ -994,7 +1004,7 @@ function viewHistory() {
               <strong>${fmt(totalQ)} so'm</strong>
             </div>
             ${totalQ > 0 && f.customerId
-              ? `<button class="cash-button" id="dateCashBtn">Kassa</button>`
+              ? `<button class="cash-button" id="dateCashBtn" type="button">Kassa</button>`
               : ''}
           </div>`
         : `<div class="empty">Bu sanada sotuv mavjud emas</div>`)
@@ -1010,7 +1020,7 @@ function viewSettings() {
   const defaultAvatar = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"%3E%3Ccircle cx="40" cy="40" r="40" fill="%233B6EA8"/%3E%3Ctext x="40" y="52" text-anchor="middle" fill="white" font-size="34" font-weight="bold"%3E${userName.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
   
   const userRows = state.users.map(u => 
-    `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Admin' : 'Xodim'}</td><td>${u.login !== 'baxrom' ? '<button class="btn btn-danger" data-del-user="'+u.login+'">O\'chirish</button>' : '—'}</td></tr>`
+    `<tr><td>${u.login}</td><td>${u.role === 'admin' ? 'Admin' : 'Xodim'}</td><td>${u.login !== 'baxrom' ? '<button class="btn btn-danger" data-del-user="'+u.login+'" type="button">O\'chirish</button>' : '—'}</td></tr>`
   ).join('');
   
   const flags = { uz: 'UZ', ru: 'RU', en: 'EN' };
@@ -1031,7 +1041,7 @@ function viewSettings() {
     <h3>Til</h3>
     <div class="flag-select" style="gap:8px;">
       ${['uz','ru','en'].map(l => 
-        `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="padding:6px 14px;font-size:13px;">${flags[l]}</button>`
+        `<button class="${lang===l?'active':''}" onclick="changeLang('${l}')" style="padding:6px 14px;font-size:13px;" type="button">${flags[l]}</button>`
       ).join('')}
     </div>
   </div>
@@ -1053,16 +1063,16 @@ function viewSettings() {
       <div>
         <div style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;">${t('theme')}</div>
         <div class="theme-options">
-          <button class="${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark">${t('dark')}</button>
-          <button class="${currentTheme === 'light' ? 'active' : ''}" data-theme="light">${t('light')}</button>
-          <button class="${currentTheme === 'classic' ? 'active' : ''}" data-theme="classic">${t('classic')}</button>
+          <button class="${currentTheme === 'dark' ? 'active' : ''}" data-theme="dark" type="button">${t('dark')}</button>
+          <button class="${currentTheme === 'light' ? 'active' : ''}" data-theme="light" type="button">${t('light')}</button>
+          <button class="${currentTheme === 'classic' ? 'active' : ''}" data-theme="classic" type="button">${t('classic')}</button>
         </div>
       </div>
       <div>
         <div style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:6px;">${t('icon')}</div>
         <div class="icon-options">
           ${['TN','A','S','P','D','R'].map(i => 
-            `<button class="${currentIcon === i ? 'active' : ''}" data-icon="${i}">${i}</button>`
+            `<button class="${currentIcon === i ? 'active' : ''}" data-icon="${i}" type="button">${i}</button>`
           ).join('')}
         </div>
       </div>
